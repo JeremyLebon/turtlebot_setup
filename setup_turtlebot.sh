@@ -35,10 +35,10 @@ else
 fi
 
 #Stel ROS_DOMAIN_ID in
-echo "export ROS_DOMAIN_ID=$ROS_DOMAIN_ID" #> /etc/profile.d/ros_domain.sh
+echo "export ROS_DOMAIN_ID=$ROS_DOMAIN_ID" > /etc/profile.d/ros_domain.sh
 
 #Stel LIDAR model in
-echo "export LDS_MODEL=$LIDAR" 
+echo "export LDS_MODEL=$LIDAR" > /etc/profile.d/lidar_model.sh
 echo "✅ Instellingen LIDAR_TYPE: $LIDAR)"
 
 
