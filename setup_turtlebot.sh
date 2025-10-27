@@ -24,6 +24,16 @@ echo "✅ Instellingen gevonden voor $HOSTNAME (ROS_DOMAIN_ID=$ROS_DOMAIN_ID)"
 # Stel hostname in
 hostnamectl set-hostname "$HOSTNAME"
 
+# ✅ Avahi herstarten zodat nieuwe hostname meteen zichtbaar is via .local
+if systemctl list-unit-files | grep -q avahi-daemon.service; then
+  echo "🔄 Herstart Avahi-daemon..."
+  systemctl restart avahi-daemon
+  sleep 2
+  echo "✅ Avahi-daemon opnieuw opgestart"
+else
+  echo "⚠️ Avahi-daemon niet gevonden — controleer of Avahi is geïnstalleerd."
+fi
+
 # Stel ROS_DOMAIN_ID in
 # echo "export ROS_DOMAIN_ID=$ROS_DOMAIN_ID" > /etc/profile.d/ros_domain.sh
 
