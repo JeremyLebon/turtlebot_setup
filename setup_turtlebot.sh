@@ -41,7 +41,8 @@ echo "export ROS_DOMAIN_ID=$ROS_DOMAIN_ID" > /etc/profile.d/ros_domain.sh
 echo "export LDS_MODEL=$LIDAR" > /etc/profile.d/lidar_model.sh
 echo "✅ Instellingen LIDAR_TYPE: $LIDAR)"
 
-
+source /etc/profile.d/ros_domain.sh
+source /etc/profile.d/lidar_model.sh
 
 # # Pas Docker .env aan (indien aanwezig)
 # if [ -f /home/ubuntu/docker/.env ]; then
