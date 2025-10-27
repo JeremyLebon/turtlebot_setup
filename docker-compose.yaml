@@ -12,10 +12,10 @@ services:
       - CYCLONEDDS_URI=file:///root/turtlebot3_ws/cylconedds_config.xml
       - LDS_MODEL=${LDS_MODEL}
       - TURTLEBOT3_MODEL=burger
-      - TURTLEBOT3_NAME=TB3_1
+      - TURTLEBOT3_NAME=TB3_${TURTLEBOT_NR}
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
 
-    container_name: turtlebot_
+    container_name: turtlebot_${TURTLEBOT_NR}
     privileged: true
     cap_add:
       - NET_ADMIN
