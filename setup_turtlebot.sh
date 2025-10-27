@@ -17,7 +17,7 @@ if [ -z "$LINE" ]; then
 fi
 
 # Parse CSV (mac,hostname,ros_domain_id)
-IFS=',' read -r CSV_MAC HOSTNAME ROS_DOMAIN_ID <<< "$LINE"
+IFS=',' read -r CSV_MAC HOSTNAME ROS_DOMAIN_ID LIDAR <<< "$LINE"
 
 echo "✅ Instellingen gevonden voor $HOSTNAME (ROS_DOMAIN_ID=$ROS_DOMAIN_ID)"
 
@@ -34,8 +34,14 @@ else
   echo "⚠️ Avahi-daemon niet gevonden — controleer of Avahi is geïnstalleerd."
 fi
 
-# Stel ROS_DOMAIN_ID in
-# echo "export ROS_DOMAIN_ID=$ROS_DOMAIN_ID" > /etc/profile.d/ros_domain.sh
+#Stel ROS_DOMAIN_ID in
+echo "export ROS_DOMAIN_ID=$ROS_DOMAIN_ID" #> /etc/profile.d/ros_domain.sh
+
+#Stel LIDAR model in
+echo "export LDS_MODEL=$LIDAR" 
+echo "✅ Instellingen LIDAR_TYPE: $LIDAR)"
+
+
 
 # # Pas Docker .env aan (indien aanwezig)
 # if [ -f /home/ubuntu/docker/.env ]; then
