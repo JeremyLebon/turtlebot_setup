@@ -17,7 +17,7 @@ if [ -z "$LINE" ]; then
 fi
 
 # Parse CSV (mac,hostname,ros_domain_id)
-IFS=',' read -r CSV_MAC HOSTNAME ROS_DOMAIN_ID LIDAR <<< "$LINE"
+IFS=',' read -r NR CSV_MAC HOSTNAME ROS_DOMAIN_ID LIDAR <<< "$LINE"
 
 echo "✅ Instellingen gevonden voor $HOSTNAME (ROS_DOMAIN_ID=$ROS_DOMAIN_ID)"
 
@@ -35,14 +35,17 @@ else
 fi
 
 #Stel ROS_DOMAIN_ID in
-echo "export ROS_DOMAIN_ID=$ROS_DOMAIN_ID" > /etc/profile.d/ros_domain.sh
+echo "export ROS_DOMAIN_ID=$ROS_DOMAIN_ID" >> /etc/profile.d/turtlebot_config.sh
 
 #Stel LIDAR model in
-echo "export LDS_MODEL=$LIDAR" > /etc/profile.d/lidar_model.sh
+echo "export LDS_MODEL=$LIDAR" >> /etc/profile.d/turtlebot_config.sh
 echo "✅ Instellingen LIDAR_TYPE: $LIDAR)"
 
-source /etc/profile.d/ros_domain.sh
-source /etc/profile.d/lidar_model.sh
+#Instellen TurtleBot3 nummer
+echo "export TURTLEBOT_NR=$NR" >> /etc/profile.d/turtlebot_config.sh
+echo "✅ Instellingen turtlebot nr: $NR)"
+
+source /etc/profile.d/turtlebot_config.sh
 
 # # Pas Docker .env aan (indien aanwezig)
 # if [ -f /home/ubuntu/docker/.env ]; then

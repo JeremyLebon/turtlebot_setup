@@ -1,4 +1,10 @@
-mac,hostname,ros_domain_id,lidar
-AA:BB:CC:11:22:33,turtlebot01,10,LDS-01
-88:A2:9E:2C:D5:70,turtlebot02,11,LDS-01
-AA:BB:CC:11:22:55,turtlebot03,12,LDS-01
+nr,mac,hostname,ros_domain_id,lidar
+1,AA:BB:CC:11:22:33,turtlebot01,1,LDS-01
+2,88:A2:9E:2C:D5:70,turtlebot02,2,LDS-01
+3,AA:BB:CC:11:22:55,turtlebot03,3,LDS-01
+4,AA:BB:CC:11:22:33,turtlebot04,4,LDS-02
+5,AA:A2:9E:2C:D5:70,turtlebot05,5,LDS-02
+6,AA:BB:CC:11:22:55,turtlebot06,6,LDS-02
+7,AA:BB:CC:11:22:33,turtlebot07,7,LDS-02
+8,AA:A2:9E:2C:D5:70,turtlebot08,8,LDS-02
+9,AA:BB:CC:11:22:55,turtlebot09,9,LDS-02

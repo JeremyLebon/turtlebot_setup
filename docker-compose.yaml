@@ -15,7 +15,7 @@ services:
       - TURTLEBOT3_NAME=TB3_1
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
 
-    container_name: turtlebot
+    container_name: turtlebot_
     privileged: true
     cap_add:
       - NET_ADMIN
