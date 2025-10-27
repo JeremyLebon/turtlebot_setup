@@ -2,7 +2,8 @@
 # /usr/local/bin/setup_turtlebot.sh
 
 CONFIG_FILE="turtlebot_config.csv"
-NET_IFACE="wlan0"  # pas aan naar wlan0 als je wifi gebruikt
+NET_IFACE="wlan0"  
+
 
 # Lees MAC-adres
 MAC=$(cat /sys/class/net/$NET_IFACE/address | tr '[:lower:]' '[:upper:]')
