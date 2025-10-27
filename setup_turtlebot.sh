@@ -1,7 +1,7 @@
 #!/bin/bash
 # /usr/local/bin/setup_turtlebot.sh
 
-CONFIG_FILE="turtlebot_config.csv"
+CONFIG_FILE="/home/turtlebot-rpi5/turtlebot_setup/turtlebot_config.csv"
 NET_IFACE="wlan0"  
 
 
