@@ -10,7 +10,7 @@ services:
       - XAUTHORITY=${XAUTH}
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
       - CYCLONEDDS_URI=file:///root/turtlebot3_ws/cylconedds_config.xml
-      - LDS_MODEL=${LIDAR}
+      - LDS_MODEL=${LDS_MODEL}
       - TURTLEBOT3_MODEL=burger
       - TURTLEBOT3_NAME=TB3_1
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
