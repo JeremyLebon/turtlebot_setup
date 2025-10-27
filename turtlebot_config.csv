@@ -1,0 +1,4 @@
+mac,hostname,ros_domain_id
+AA:BB:CC:11:22:33,turtlebot01,10
+88:A2:9E:2C:D5:70,turtlebot02,11
+AA:BB:CC:11:22:55,turtlebot03,12
