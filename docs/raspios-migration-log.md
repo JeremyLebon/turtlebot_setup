@@ -562,3 +562,26 @@ van de originele imx708-module: `rpicam-hello --list-cameras` toonde
 meteen weer normale (niet-sentinel) crop-waarden, en `camera_node` startte
 zonder problemen - geen reboot nodig deze keer (in tegenstelling tot de
 eerdere board-vervangingssessie).
+
+## Camera optioneel gemaakt + turtlebot09 MAC bijgewerkt (2026-09-21)
+
+- Nieuw: `ENABLE_CAMERA`-omgevingsvariabele + `turtlebot_docker/docker/
+  camera_start.sh` (zelfde patroon als `zenoh_start_router.sh`) - start
+  `camera_node` automatisch bij shell-start, enkel als `ENABLE_CAMERA=true`.
+  Nieuwe `camera`-kolom in `turtlebot_config.csv` (overal `false` - per
+  robot aan te passen). Live getest in de container (`docker cp`, niet
+  herbouwd/gepusht naar Docker Hub): beide standen werken correct, incl.
+  idempotent gedrag bij een tweede aanroep.
+- **Kanttekening tijdens het testen**: `pgrep -f camera_node` bleek
+  zichzelf te matchen wanneer ik het los testte via
+  `bash -c "pgrep -fa camera_node"` (de wrapper-string zelf bevat de
+  zoekterm). Dit is geen bug in het eigenlijke script (dat wordt als
+  bestand aangeroepen, niet als inline-string, dus geen zelf-match daar),
+  maar de `[c]amera_node`-bracket-trick is defensief toegevoegd in
+  `camera_start.sh` voor de zekerheid.
+- **turtlebot09 MAC-adres bijgewerkt**: het board dat eerder sneuvelde
+  (rode LED, vermoede kortsluiting) is vervangen; nieuw board MAC
+  `88:A2:9E:2C:EA:4D`. Bijgewerkt in `turtlebot_config.csv` en effectief
+  getest via `setup_turtlebot.sh` op het board zelf: correct herkend als
+  turtlebot09 (ROS_DOMAIN_ID=9, LDS-02, hostname + Avahi correct
+  bijgewerkt).
