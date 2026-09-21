@@ -368,3 +368,44 @@ manueel per unit verdeeld worden (geen auto-coördinatie tussen units).
 
 **Status**: testrobot is nu afgesloten (pauze). Volgende sessie: verder
 testen zodra de access points beschikbaar zijn.
+
+## Board vervangen + CSI-camera werkend (2026-09-21)
+
+Bij het heropstarten bleef de RPi5-LED enkel rood (geen groen/boot-
+activiteit) - vermoeden van kortsluiting via de camera-aansluiting (zie
+troubleshooting-advies eerder in deze sessie: stroom eraf, camera
+loskoppelen, kabeltype/oriëntatie/vergrendeling controleren). Jeremy heeft
+het board vervangen door een nieuwe RPi5, met dezelfde SD-kaart.
+
+- Nieuw IP: **192.168.60.249** (was 192.168.60.69 - ander board = ander
+  MAC-adres = nieuwe DHCP-lease op het gedeelde netwerk). Gevonden via
+  `nmap -sn 192.168.60.0/24`.
+- SD-kaart-inhoud volledig intact: Docker, de `turtlebot_99`-container
+  (gestopt maar aanwezig), de buildx-builder-container - niets verloren.
+- Camera aanvankelijk nog niet gedetecteerd (verwacht - firmware-niveau
+  detectie bij boot, en fysieke aansluiting moest opnieuw/gecontroleerd
+  worden op het nieuwe board). Na meerdere reboots + het fysiek
+  controleren van de CSI-kabel (RPi5 heeft een ander/kleiner
+  connectortype dan oudere Pi's - "Standard-Mini" kabel nodig, oriëntatie
+  metalen contacten weg van het klepje, klepje volledig dichtklikken):
+  **camera werkt.**
+
+```
+rpicam-hello --list-cameras
+0 : imx708_wide [4608x2592 10-bit RGGB] (Camera Module 3 Wide, 12MP)
+
+rpicam-still -o /tmp/test.jpg -t 2000 --width 640 --height 480
+-> gelukt, /tmp/test.jpg (37KB)
+```
+
+Kleine onschuldige waarschuwing in de libcamera-log ("No static
+properties available for 'imx708_wide'") - blokkeert de werking niet,
+enkel dat sommige auto-tuning-parameters op defaults draaien i.p.v.
+sensor-specifieke kalibratie.
+
+I2C-shield/Grove Base Hat: nog **niet** opnieuw aangesloten/gedetecteerd
+op dit nieuwe board (`i2cdetect -y -a 1` blijft leeg) - dit is een aparte,
+nog openstaande fysieke aansluiting t.o.v. de camera.
+
+Nog te doen: `camera_ros` effectief testen in de `raspios-zenoh`-container
+nu de camera bevestigd werkt op host-niveau, I2C-shield heraansluiten.
