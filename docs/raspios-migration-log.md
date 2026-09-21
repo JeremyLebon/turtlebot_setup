@@ -333,3 +333,38 @@ robot-software zelf.
 `ZENOH_CONFIG_OVERRIDE` client-config, zie `zenoh-migration.md`) en
 specifiek het WSL2-scenario - dat blijft de belangrijkste openstaande
 verificatie.
+
+## WSL-test + netwerkdiagnose (2026-09-21)
+
+Jeremy heeft `turtlebot_vis` (branch `zenoh`) getest op WSL en kreeg
+verbinding (`ros2 topic list` werkte, `rviz2` toonde data), maar meldde
+merkbare vertraging. Diagnose op de robot:
+
+- CPU/geheugen: geen probleem (load ~0.4 op 4 cores, nav2+slam_toolbox
+  samen ~30% CPU, 1.1GB/8GB geheugen gebruikt).
+- Wifi-signaal van de robot zelf: uitstekend (93/100, 270 Mbit/s, kanaal 36).
+- Ping-jitter naar de robot: **4ms tot 226ms**, mdev 55ms - abnormaal hoog
+  voor een sterk signaal.
+- `iftop`-meting (10s): robot -> WSL-laptop (`192.168.60.245`) ~400-440
+  Kbps, laptop -> robot ~20-27 Kbps - ver onder de link-capaciteit.
+
+Conclusie: geen bandbreedteprobleem, geen CPU/geheugenprobleem op de
+robot. De jitter wijst op **contentie op het gedeelde `Wifi_turtlebots`-
+netwerk** (bevestigt het reeds gedocumenteerde pijnpunt van vorig jaar),
+niet op iets in de Zenoh/ROS2-stack zelf. `iftop`/`nethogs` geinstalleerd
+op de testrobot voor eventueel verder gebruik (let op: `/usr/sbin` zit
+niet in het standaard SSH-`$PATH`, gebruik `sudo iftop ...` of het
+volledige pad).
+
+**Access points voor per-robot isolatie**: Jeremy heeft morgen 9x
+TP-Link TL-WR902AC beschikbaar (consumenten-travel-router, geen VLAN-
+ondersteuning, geen centraal beheer/controller-ecosysteem). Aanbevolen
+config: elke unit in **Router-modus** (niet AP-modus) - ethernetpoort als
+WAN-uplink naar de gedeelde switch, wifi-radio geeft een eigen NAT'te,
+geisoleerde subnet per robot. Robot verbindt dan als gewone wifi-client
+(geen RPi5-hotspot meer nodig). AP-modus zou i.p.v. isolatie gewoon één
+plat netwerk geven, want dit toestel kent geen VLAN's. Kanalen moeten
+manueel per unit verdeeld worden (geen auto-coördinatie tussen units).
+
+**Status**: testrobot is nu afgesloten (pauze). Volgende sessie: verder
+testen zodra de access points beschikbaar zijn.
