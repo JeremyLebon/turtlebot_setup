@@ -501,3 +501,29 @@ Volledige stack herstart en getest zichtbaar in WSL:
   puur bekijken van de camera-feed is dit een prima werkende oplossing;
   het rviz2-dropdown-issue is nog niet verder uitgezocht (lage
   prioriteit, rqt_image_view volstaat).
+
+**Opgelost - root cause was tóch een ontbrekend package**:
+`osrf/ros:humble-desktop-full` (de basis-image van `turtlebot_vis`) bevat,
+in tegenstelling tot de aanname eerder in dit logboek, **geen**
+`compressed_image_transport` standaard. Manueel geinstalleerd in de
+container:
+
+```bash
+sudo apt install ros-$ROS_DISTRO-compressed-image-transport
+```
+
+Na deze installatie werkte het topic manueel intypen in rviz2's
+Image-display Topic-veld (de dropdown zelf blijft de optie niet
+automatisch tonen - dat blijft een apart, lager-prioriteit UI-issue).
+
+**Permanente fix**: `ros-humble-compressed-image-transport` toegevoegd
+aan `turtlebot_vis/docker/Dockerfile` (branch `zenoh`), zodat dit niet
+telkens manueel herhaald moet worden bij een nieuwe/verse container of
+door andere studenten. **Camera-feed werkt nu volledig in rviz2 vanuit
+WSL, via compressed transport.**
+
+(Nvm eerdere aanname in dit logboek dat `rqt_image_view` bewees dat het
+package al aanwezig was - dat blijkt achteraf niet correct; mogelijk
+gebruikt rqt_image_view een ander decodeerpad voor CompressedImage dan
+rviz2's Image-display, wat verklaart waarom het daar wel werkte zonder
+het package.)
