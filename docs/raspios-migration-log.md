@@ -476,3 +476,28 @@ Enige restwaarschuwing (cosmetisch, geen blocker): ontbrekend
 camera-kalibratiebestand (`.yaml`) - gebruikt gewoon defaults, kan later
 aangemaakt worden via een standaard ROS2-camera-kalibratieprocedure indien
 gewenst.
+
+## WSL: camera-feed bekijken + latency bevestigd opgelost via compressed transport (2026-09-21)
+
+Board vervangen -> nieuw IP **192.168.60.249** (was .69) - `turtlebot_vis`
+`.env` (`ROBOT_ZENOH_IP`) moet hierop aangepast worden bij elke test na
+een board/IP-wissel.
+
+Volledige stack herstart en getest zichtbaar in WSL:
+- `/camera/image_raw` gebruiken in rviz2 gaf weinig te zien: normaal, want
+  `/camera/image_raw/compressed` (CompressedImage) rechtstreeks als
+  Image-display-topic selecteren werkt niet (verkeerd berichttype) - je
+  moet het basistopic `/camera/image_raw` kiezen en de transport-hint op
+  `compressed` zetten.
+- rviz2 toonde `compressed` niet als optie in de transport-dropdown, ook
+  al bevestigde de gebruiker dat `compressed_image_transport` wel
+  degelijk geinstalleerd is en het topic met data zichtbaar is via CLI
+  (`ros2 topic list`/`echo`) - dus een rviz2-specifiek
+  plugin-discovery-probleem (pluginlib), geen ROS-graph/Zenoh-probleem.
+- **Workaround/alternatief dat wel meteen werkte**: `ros2 run
+  rqt_image_view rqt_image_view`, compressed topic gekozen -> "heel
+  responsief". Bevestigt de latency-diagnose: raw (800x600 XRGB8888,
+  ~58MB/s bij 30fps) was de bottleneck, niet Zenoh/wifi zelf. Voor het
+  puur bekijken van de camera-feed is dit een prima werkende oplossing;
+  het rviz2-dropdown-issue is nog niet verder uitgezocht (lage
+  prioriteit, rqt_image_view volstaat).
