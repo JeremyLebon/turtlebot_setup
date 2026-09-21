@@ -527,3 +527,38 @@ package al aanwezig was - dat blijkt achteraf niet correct; mogelijk
 gebruikt rqt_image_view een ander decodeerpad voor CompressedImage dan
 rviz2's Image-display, wat verklaart waarom het daar wel werkte zonder
 het package.)
+
+## Camera-bandbreedte getuned + permanent gemaakt (2026-09-21)
+
+Gemeten bandbreedte (via `iftop` op de robot, robot -> WSL-laptop) bij
+standaardinstellingen van `camera_ros` (800x600 auto, `jpeg_quality=95`,
+30fps): **~23-26 Mbit/s**. Stapsgewijs getuned en telkens gemeten:
+
+| Stap | Instelling | Bandbreedte |
+|---|---|---|
+| 0 (start) | 800x600, kwaliteit 95, 30fps | ~23-26 Mbit/s |
+| 1 | + kwaliteit 60 | ~4,6-5,3 Mbit/s |
+| 2 | + 640x480, 15fps | **~1,3-1,5 Mbit/s** |
+
+Totale reductie: ~17-20x. `width`/`height` zijn **read-only** tijdens het
+draaien van de node (`ros2 param set` faalt daarop) - vereist een
+herstart van `camera_node` met de nieuwe waarden. `jpeg_quality` en
+`FrameDurationLimits` (framerate, in microseconden - 66667us = 15fps) zijn
+wel live aanpasbaar.
+
+**Permanent gemaakt**: nieuw bestand `turtlebot_docker/camera_params.yaml`
+(zelfde patroon als `cyclonedds_config.xml`), gekopieerd in de image via
+de Dockerfile naar `/root/turtlebot3_ws/camera_params.yaml`. Starten met:
+```bash
+ros2 run camera_ros camera_node --ros-args --params-file /root/turtlebot3_ws/camera_params.yaml
+```
+Getest en bevestigd: 640x480, 15fps (exact), geen fouten.
+
+**Zijnoot - camera fysiek gewisseld tijdens het testen**: gebruiker
+wisselde kort naar een ander/goedkoper cameramodule-type, wat een
+"Failed to start streaming: Input/output error" gaf bij het starten van
+`camera_node` (logisch, andere/niet-ondersteunde sensor). Na terugplaatsen
+van de originele imx708-module: `rpicam-hello --list-cameras` toonde
+meteen weer normale (niet-sentinel) crop-waarden, en `camera_node` startte
+zonder problemen - geen reboot nodig deze keer (in tegenstelling tot de
+eerdere board-vervangingssessie).

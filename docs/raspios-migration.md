@@ -143,9 +143,18 @@ ros2 launch turtlebot3_bringup robot.launch.py
 
 Camera:
 ```bash
-ros2 run camera_ros camera_node --ros-args -p camera:=0
+ros2 run camera_ros camera_node --ros-args --params-file /root/turtlebot3_ws/camera_params.yaml
 ros2 topic echo /camera/image_raw --no-arr   # of rqt_image_view vanaf een laptop
 ```
+
+`camera_params.yaml` (staat al in de image, zie `turtlebot_docker/camera_params.yaml`)
+zet resolutie/framerate/JPEG-kwaliteit bewust laag (640x480, 15fps,
+kwaliteit 60) om de bandbreedte van de gecomprimeerde stream binnen de
+wifi-budget te houden - standaardinstellingen (800x600 auto, kwaliteit
+95, 30fps) mat ~23-26 Mbit/s op echte hardware, deze instellingen ~1,3-1,5
+Mbit/s (~17-20x minder). Belangrijk: `width`/`height` zijn read-only
+tijdens het draaien - wijzigingen daarvan vereisen een herstart van
+`camera_node` (niet enkel `ros2 param set`).
 
 I2C (vanuit de container, als er I2C-peripherals aangesloten zijn):
 ```bash
