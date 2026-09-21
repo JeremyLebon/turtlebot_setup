@@ -626,3 +626,25 @@ effectieve data ontvangen via rosbridge - `/battery_state` (12.08V,
 87.8%) en `/scan` (226 ranges). Gecommit + gepusht naar
 `raspios-migration`, **nog niet herbouwd/gepusht naar Docker Hub** - een
 volgende volledige rebuild neemt dit mee.
+
+## Teleop + systeeminfo toegevoegd aan de statuspagina (2026-09-21)
+
+Op vraag: teleop-bediening (D-pad + snelheidsslider + pijltjestoetsen,
+publiceert op `/cmd_vel`) en een systeeminfo-paneel (IP, MAC, CPU-load,
+geheugen, uptime) toegevoegd aan de statuspagina.
+
+Systeeminfo (IP/MAC/CPU/geheugen) is geen standaard ROS-topic, dus nieuw
+klein stdlib-only nodetje `system_info_node.py` toegevoegd (geen psutil
+nodig - `os.getloadavg()`, `/proc/meminfo`, `/proc/uptime`, SIOCGIFADDR-
+ioctl voor het IP). Publiceert JSON op `/system_info` (std_msgs/String),
+elke 2s.
+
+Live getest via rosbridge (zelfde protocol als de webpagina gebruikt):
+- `/system_info`: correcte data ontvangen (`hostname: turtlebot09,
+  ip: 192.168.60.249, mac: 88:A2:9E:2C:EA:4D, cpu_load_1min: 0.55,
+  mem_percent: 10.6, uptime_seconds: 2517`).
+- `/cmd_vel`: twist-reeks verstuurd via rosbridge-publish (dezelfde
+  publicatiemethode als de teleop-knoppen), gevolgd door expliciete stop.
+
+Gecommit + gepusht, nog niet herbouwd naar Docker Hub (idem als de
+statuspagina zelf).
