@@ -648,3 +648,29 @@ Live getest via rosbridge (zelfde protocol als de webpagina gebruikt):
 
 Gecommit + gepusht, nog niet herbouwd naar Docker Hub (idem als de
 statuspagina zelf).
+
+## Teleop reageerde niet: fysieke oorzaak gevonden en opgelost (2026-09-21)
+
+Gebruiker meldde dat teleop (zowel via de webpagina als rechtstreeks via
+`ros2 topic pub`) niet werkte na de turtlebot09-board-vervanging.
+Systematisch uitgesloten:
+- `/cmd_vel` heeft correct 1 subscriber (`turtlebot3_node`).
+- `/sensor_state` toonde `torque: true` (en bleef dat ook na een expliciete
+  `/motor_power`-service-call en na een reboot).
+- Toch: odometrie bleef exact `x: 0.0` (met een verdachte
+  bijna-nul-garbagewaarde voor `y`, bv. `4.63e-310` - typisch voor
+  ongeinitialiseerd geheugen) voor en na elk stuurcommando.
+
+**Root cause**: het OpenCR-bord stond fysiek spanningsloos (een aparte
+motor-aan/uit-schakelaar stond uit) - de RPi5 kon nog wel via USB/serieel
+met OpenCR communiceren (vandaar `torque: true` als software-rapportage),
+maar de motoren zelf hadden geen kracht. Gebruiker heeft de schakelaar
+omgezet; na reboot stonden de wielen merkbaar geblokkeerd bij opstart
+(teken van echte motorvoeding/torque). Test bevestigde beweging:
+odometrie ging van `x: 0.085, y: 0.0095` naar `x: 0.326, y: 0.065` na een
+stuurcommando - probleem opgelost.
+
+**Les voor de fleet**: bij "torque: true maar geen beweging" na hardware-
+ingrepen (board-vervanging, transport, ...) eerst de fysieke
+motor-voedingsschakelaar op het OpenCR-bord controleren, niet enkel de
+software-status vertrouwen.
