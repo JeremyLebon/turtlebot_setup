@@ -604,3 +604,25 @@ automatisch op** (geen `docker exec`/manuele tussenkomst meer nodig),
 `/camera/image_raw/compressed` publiceert stabiel op 15fps - exact de
 getunede instellingen. Dit bevestigt de volledige `ENABLE_CAMERA`-feature
 werkt end-to-end vanuit de gebakken image.
+
+## Per-robot statuspagina toegevoegd (2026-09-21)
+
+`turtlebot_monitor` (apart repo) bekeken op vraag - bleek nooit volledig
+afgewerkt (placeholder launch-commando in `docker-compose.yaml`), had een
+verouderd MAC-adres voor turtlebot09, en is architecturaal onverenigbaar
+met de geplande per-robot access points (nmap-scan van één gedeeld
+subnet). README toegevoegd aan dat repo met deze bevindingen.
+
+I.p.v. daaraan verder te bouwen: nieuwe, eenvoudigere aanpak in
+`turtlebot_docker` - geïnspireerd op `JeremyLebon/robot`'s
+`components/robot_web` en iRobot Create3's ingebouwde statuspagina.
+`rosbridge_server` (websocket, poort 9090) + een statische HTML/roslibjs-
+pagina (poort 8080), rechtstreeks per robot, geen domain_bridge/nmap
+nodig - dus geen last van de AP-isolatie.
+
+Live getest in de container (apt install + docker cp, nog niet in de
+gepushte image): echte WebSocket-handshake bevestigd (HTTP 101), en
+effectieve data ontvangen via rosbridge - `/battery_state` (12.08V,
+87.8%) en `/scan` (226 ranges). Gecommit + gepusht naar
+`raspios-migration`, **nog niet herbouwd/gepusht naar Docker Hub** - een
+volgende volledige rebuild neemt dit mee.

@@ -177,6 +177,11 @@ tijdens het draaien - wijzigingen daarvan vereisen een herstart van
 `camera_node` (niet enkel `ros2 param set`). Niet elke robot heeft een
 camera - `ENABLE_CAMERA` staat per robot in `turtlebot_config.csv`.
 
+Statuspagina (draait automatisch, geen commando nodig): open
+`http://<robot-ip>:8080` in een browser voor een live overzicht
+(batterij, lidar, IMU, odometrie, camera) - werkt volledig offline, geen
+internet nodig. Zie `turtlebot_docker/status_page/`.
+
 I2C (vanuit de container, als er I2C-peripherals aangesloten zijn):
 ```bash
 i2cdetect -y 1
