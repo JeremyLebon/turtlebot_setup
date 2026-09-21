@@ -26,7 +26,14 @@ services:
       - NET_ADMIN
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
-    command: bash 
+      # Required for libcamera/camera_ros: libcamera enumerates cameras via
+      # libudev, reading the host's udev database (/run/udev/data/*), not
+      # just the raw /dev nodes. Without this mount, camera_ros fails with
+      # "Unable to acquire a CFE instance" / "no cameras available" even
+      # though /dev/media*, /dev/video* are otherwise accessible (privileged
+      # mode does not bind-mount /run/udev automatically).
+      - /run/udev:/run/udev:ro
+    command: bash
     devices:
       - /dev/ttyACM0:/dev/ttyACM0  # OpenCR
       - /dev/ttyUSB0:/dev/ttyUSB0  # LDS 01 - laser lidar

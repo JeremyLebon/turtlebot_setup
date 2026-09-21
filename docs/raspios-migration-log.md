@@ -409,3 +409,70 @@ nog openstaande fysieke aansluiting t.o.v. de camera.
 
 Nog te doen: `camera_ros` effectief testen in de `raspios-zenoh`-container
 nu de camera bevestigd werkt op host-niveau, I2C-shield heraansluiten.
+
+## camera_ros in container: libpisp-versiemismatch gevonden en gefixt (2026-09-21)
+
+`ros2 run camera_ros camera_node` faalde in de container met
+`terminate ... what(): no cameras available`, ook al werkte de camera
+prima op host-niveau (`rpicam-hello`/`rpicam-still`).
+
+Troubleshooting-traject:
+1. `pipewire`/`wireplumber` (host-desktop-mediasessie) hield
+   `/dev/media0`/`/dev/media2` vast (`fuser` toonde dit) -> gestopt,
+   uitgeschakeld en gemaskeerd via `systemctl --user mask` (headless
+   robot heeft geen audio/camera-sessiebeheer nodig). Loste het probleem
+   niet volledig op, maar is sowieso een terechte opkuis.
+2. Container volledig herschapen (`docker compose down/up`) i.p.v. enkel
+   herstart, voor het geval `/dev` een oude snapshot was - geen verschil.
+3. Basistoegang getest (`os.open()` in python op `/dev/media0` binnen de
+   container): lukt probleemloos - dus geen permissie/capability-issue.
+4. Verbose libcamera-log (`LIBCAMERA_LOG_LEVELS=*:0`) toonde:
+   `RPI pisp.cpp:896 Unable to acquire a CFE instance` - specifiek in de
+   `rpi/pisp`-pipeline handler (de `rpi/vc4`/Unicam-fout ernaast is
+   irrelevant/verwacht, RPi5 heeft geen Unicam-hardware).
+5. **Root cause gevonden**: `libpisp`-versiemismatch. Host (apt-package
+   `libpisp1`): **v1.7.0**. Container (automatisch opgehaalde
+   meson-wrap-dependency tijdens de libcamera-build): **v1.5.0** - te oud
+   voor deze (nieuwere) PiSP-hardwarerevisie.
+
+Fix in `turtlebot_docker/docker/Dockerfile`: `libpisp` expliciet vanaf
+broncode bouwen op tag `v1.7.0` (matcht host-versie), vóór de
+libcamera-build, plus `--wrap-mode=nofallback` op de libcamera
+meson-setup zodat een mismatch voortaan hard faalt i.p.v. stil een oude
+versie te bundelen. Nieuwe build gestart via de remote buildx-builder.
+
+**Zijnota - buildx-builder-endpoint**: na de board-vervanging (nieuw IP
+192.168.60.249) moest de buildx-builder `rpi5` opnieuw aangemaakt worden
+(`docker buildx create --name rpi5 ... "ssh://turtlebot@192.168.60.249"`)
+- hergebruikte gelukkig dezelfde onderliggende buildkit-container.
+
+Na de libpisp-fix (build + push, ~576s) opnieuw getest: **exact dezelfde
+fout** ("Unable to acquire a CFE instance"), ook al was libpisp nu wel
+degelijk 1.7.0 in de container (bevestigd via `find`). libpisp-versie was
+dus niet de (volledige) oorzaak.
+
+Verder uitgesloten via gerichte tests:
+- Geen enkel proces houdt de devices vast op het moment van de poging
+  (grondige `/proc/*/fd`-scan over alle processen, niet enkel `fuser`).
+- `--pid=host` toegevoegd aan een losse `docker run`-test: geen verschil
+  (dus geen PID-namespace-probleem).
+
+**Root cause gevonden via web-onderzoek** (forumthread "Running rpicam
+inside Docker on Raspberry Pi"): libcamera enumereert camera's via
+**libudev**, en leest daarvoor de udev-database op de host
+(`/run/udev/data/*`) - niet enkel de ruwe `/dev`-nodes. `privileged: true`
+mount dit **niet** automatisch mee. Bevestigd: container had helemaal
+geen `/run/udev` (bestond niet), terwijl de host daar exact de juiste
+entries had staan (`c510:0-3` voor de media-devices).
+
+**Fix**: `/run/udev:/run/udev:ro` toegevoegd aan `volumes:` in
+`docker-compose.yaml` (beide repo's). Getest met een losse `docker run`
+(werkte meteen: camera geregistreerd, stream geconfigureerd) én via de
+echte compose-container. **Volledig bevestigd**: `camera_ros` start
+zonder fouten, `/camera/image_raw` (+ `/camera/camera_info`,
+`/camera/image_raw/compressed`) publiceren stabiel op **30fps**.
+
+Enige restwaarschuwing (cosmetisch, geen blocker): ontbrekend
+camera-kalibratiebestand (`.yaml`) - gebruikt gewoon defaults, kan later
+aangemaakt worden via een standaard ROS2-camera-kalibratieprocedure indien
+gewenst.
