@@ -82,9 +82,10 @@ gebruiken voor de eerste test.)
 
 ## 6. Image bouwen onder een nieuwe tag
 
-Belangrijk: gebruik de tag `:raspios`, **niet** `:latest`, zodat de bestaande
-Ubuntu-fleet (die `:latest` pullt) niet per ongeluk een niet-geteste image
-binnenkrijgt.
+Belangrijk: gebruik de tag `:raspios-zenoh` (deze branch bevat ondertussen
+zowel de RPi OS- als de Zenoh-migratie, samengevoegd), **niet** `:latest`,
+zodat de bestaande Ubuntu-fleet (die `:latest` pullt) niet per ongeluk een
+niet-geteste image binnenkrijgt.
 
 Bouw dit **niet** rechtstreeks op de RPi5 (te traag) en ook niet via de
 gewone x86-buildx uit de hoofd-README (QEMU-emulatie is traag voor de
@@ -133,17 +134,36 @@ output, en test dan pas met een reboot of de service automatisch aanslaat.
 ```bash
 cd turtlebot_setup
 docker compose pull
-docker compose up
+docker compose up -d
 ```
+
+**`up -d` (achtergrond) vs. `up` (voorgrond) - belangrijk voor studenten:**
+met `docker compose up` zonder `-d` hangt de container vast aan je
+SSH-sessie/terminal. Valt je wifi/SSH-verbinding weg, krijgt dat
+voorgrond-proces een signaal en sluit `docker compose` de containers
+**netjes af** - niet enkel je zicht erop verdwijnt, de hele stack
+(bringup, Zenoh, camera) stopt dan mee. Met `-d` staat de container los
+van je SSH-sessie en overleeft een wegvallende verbinding probleemloos.
+Om toch live logs te zien: `docker compose logs -f` (kan gewoon gestopt
+worden met Ctrl+C zonder de container te raken), of draai `docker compose
+up` (voorgrond) binnenin een `tmux`/`screen`-sessie op de robot als je
+echt de voorgrond-ervaring wil met behoud van robuustheid tegen
+verbindingsonderbrekingen.
+
+**Let op na een reboot/stroomonderbreking**: de container heeft
+momenteel geen restart-policy (bewuste keuze - studenten leren zo zelf
+Docker (her)starten). Na een reboot moet dus manueel opnieuw
+`docker compose up -d` gedraaid worden.
 
 In de container:
 ```bash
 ros2 launch turtlebot3_bringup robot.launch.py
 ```
 
-Camera:
+Camera: automatisch via `ENABLE_CAMERA=true` in `.env`/`turtlebot_config.csv`
+(zie `camera_start.sh` in `turtlebot_docker`) - geen manueel commando meer
+nodig. Om zelf te testen:
 ```bash
-ros2 run camera_ros camera_node --ros-args --params-file /root/turtlebot3_ws/camera_params.yaml
 ros2 topic echo /camera/image_raw --no-arr   # of rqt_image_view vanaf een laptop
 ```
 
@@ -154,7 +174,8 @@ wifi-budget te houden - standaardinstellingen (800x600 auto, kwaliteit
 95, 30fps) mat ~23-26 Mbit/s op echte hardware, deze instellingen ~1,3-1,5
 Mbit/s (~17-20x minder). Belangrijk: `width`/`height` zijn read-only
 tijdens het draaien - wijzigingen daarvan vereisen een herstart van
-`camera_node` (niet enkel `ros2 param set`).
+`camera_node` (niet enkel `ros2 param set`). Niet elke robot heeft een
+camera - `ENABLE_CAMERA` staat per robot in `turtlebot_config.csv`.
 
 I2C (vanuit de container, als er I2C-peripherals aangesloten zijn):
 ```bash
