@@ -66,6 +66,11 @@ IPv4-only. Vandaar de expliciete `ZENOH_CONFIG_OVERRIDE` met
 
 ## Aan de studentenkant (laptop / WSL)
 
+Kant-en-klaar: `JeremyLebon/turtlebot_vis` (branch `zenoh`) implementeert
+precies dit, incl. rviz2/rqt en WSLg-ondersteuning - zie dat repo's
+README voor setup-instructies. Onderstaande is enkel de kerngedachte
+erachter, voor wie het handmatig/anders wil opzetten.
+
 Op de laptop die met de wifi/AP van een specifieke turtlebot verbindt
 (robot-IP = de gateway van die AP, bv. `10.42.0.1`):
 
