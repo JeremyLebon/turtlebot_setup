@@ -16,8 +16,8 @@ if [ -z "$LINE" ]; then
   exit 1
 fi
 
-# Parse CSV (mac,hostname,ros_domain_id)
-IFS=',' read -r NR CSV_MAC HOSTNAME ROS_DOMAIN_ID LIDAR <<< "$LINE"
+# Parse CSV (nr,mac,hostname,ros_domain_id,lidar,camera)
+IFS=',' read -r NR CSV_MAC HOSTNAME ROS_DOMAIN_ID LIDAR CAMERA <<< "$LINE"
 
 echo "✅ Instellingen gevonden voor $HOSTNAME (ROS_DOMAIN_ID=$ROS_DOMAIN_ID)"
 
@@ -44,6 +44,11 @@ echo "✅ Instellingen LIDAR_TYPE: $LIDAR)"
 #Instellen TurtleBot3 nummer
 echo "export TURTLEBOT_NR=$NR" >> /etc/profile.d/turtlebot_config.sh
 echo "✅ Instellingen turtlebot nr: $NR)"
+
+#Stel in of de CSI-camera aanwezig is (niet elke robot heeft er een)
+ENABLE_CAMERA="${CAMERA:-false}"
+echo "export ENABLE_CAMERA=$ENABLE_CAMERA" >> /etc/profile.d/turtlebot_config.sh
+echo "✅ Instellingen camera: $ENABLE_CAMERA)"
 
 source /etc/profile.d/turtlebot_config.sh
 

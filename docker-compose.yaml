@@ -19,6 +19,12 @@ services:
       - TURTLEBOT3_MODEL=burger
       - TURTLEBOT3_NAME=TB3_${TURTLEBOT_NR}
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+      # Not every turtlebot has a CSI camera attached at all times - set to
+      # "true" only on robots with a camera physically connected (see
+      # camera_start.sh). Attempting to start camera_node without a camera
+      # just crashes with "no cameras available". Set per-robot via .env or
+      # turtlebot_config.csv (see setup_turtlebot.sh).
+      - ENABLE_CAMERA=${ENABLE_CAMERA:-false}
 
     container_name: turtlebot_${TURTLEBOT_NR}
     privileged: true
