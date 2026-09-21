@@ -585,3 +585,22 @@ eerdere board-vervangingssessie).
   getest via `setup_turtlebot.sh` op het board zelf: correct herkend als
   turtlebot09 (ROS_DOMAIN_ID=9, LDS-02, hostname + Avahi correct
   bijgewerkt).
+
+## Volledige image herbouwd + end-to-end automatische camera-start bevestigd (2026-09-21)
+
+`turtlebot_config.csv`: `camera=true` gezet voor turtlebot09 (bevestigd
+camera fysiek aanwezig). Volledige image herbouwd/gepusht via de remote
+buildx-builder (build-cache bleek niet hergebruikt - volledige ~10 min
+build + ~10 min push, geen snelle incrementele build zoals gehoopt).
+
+Bij het testen op de robot bleek de lokale test-`docker-compose.yaml` op
+`~/turtlebot_setup_test/` verouderd (miste de `ENABLE_CAMERA`-regel - die
+was lokaal wel toegevoegd/gepusht naar git, maar nooit naar de robot's
+testmap gekopieerd). Rechtgezet door het bestand opnieuw te scp'en.
+
+Na `docker compose down/up` met de nieuwe image + correcte compose +
+`.env` (`ENABLE_CAMERA=true`): **`camera_node` startte volledig
+automatisch op** (geen `docker exec`/manuele tussenkomst meer nodig),
+`/camera/image_raw/compressed` publiceert stabiel op 15fps - exact de
+getunede instellingen. Dit bevestigt de volledige `ENABLE_CAMERA`-feature
+werkt end-to-end vanuit de gebakken image.
