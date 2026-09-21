@@ -1,9 +1,14 @@
 # Migratie: CycloneDDS -> Zenoh (rmw_zenoh_cpp)
 
 Doel: `RMW_IMPLEMENTATION` omschakelen van `rmw_cyclonedds_cpp` naar
-`rmw_zenoh_cpp`, specifiek om het gedocumenteerde WSL2-probleem op te lossen
-("DDS werkt niet via WSL2, want enkel virtuele netwerken beschikbaar" -
-zie `turtlebot_docker/README.md`). Deze migratie staat los van de
+`rmw_zenoh_cpp`. DDS werkt op zich ook via WSL2 (zie
+`turtlebot_docker/README.md` voor de context), maar de
+multicast-discovery-mechanica van DDS brengt merkbaar veel
+netwerk-overhead met zich mee - zeker relevant op een gedeelde/beperkte
+wifi-verbinding met meerdere robots/studenten tegelijk (zie ook het
+wifi-congestieprobleem van vorig jaar). Zenoh in client-modus (unicast TCP
+naar een vaste router-endpoint, geen multicast-scouting nodig) is hier
+lichter. Deze migratie staat los van de
 Raspberry Pi OS-migratie (`raspios-migration`-branch) - werkt op de huidige
 Ubuntu-fleet, geen RPi5-hardwarewijzigingen nodig.
 
@@ -73,8 +78,8 @@ ros2 topic list   # zou nu de topics van die robot moeten tonen
 
 Dit forceert de zenoh-sessie in "client"-modus die rechtstreeks (unicast
 TCP) naar de robot's router verbindt, i.p.v. te vertrouwen op
-multicast-scouting - exact het mechanisme dat wél door WSL2's virtuele
-netwerk heen werkt, in tegenstelling tot DDS-multicast-discovery.
+multicast-scouting - werkt door WSL2's virtuele netwerk heen met veel
+minder overhead dan DDS-multicast-discovery.
 
 ## Testen
 
@@ -90,14 +95,19 @@ netwerk heen werkt, in tegenstelling tot DDS-multicast-discovery.
    router gestart is: `cat /tmp/rmw_zenohd.log`, `pgrep -fa rmw_zenohd`.
 3. Vanaf een laptop verbonden met die robot's wifi: bovenstaande
    client-config zetten, `ros2 topic list` / `ros2 topic echo` testen.
-4. Specifiek de WSL2-situatie testen (dit is de eigenlijke reden voor deze
-   migratie) - dat kon ik hier niet zelf testen, geen WSL/Windows-client
+4. Specifiek het WSL2-scenario testen, met `turtlebot_vis` (branch
+   `zenoh`) - dat kon ik hier niet zelf testen, geen WSL/Windows-client
    beschikbaar. Dit is de belangrijkste nog openstaande verificatie.
 
 ## Status
 
-Nog niet getest op echte hardware - enkel code/config klaar op de
-`zenoh`-branch (lokaal, niet gepusht, niet gecommit). Aanbevolen
-testvolgorde: eerst robot <-> robot-AP-laptop (stap 2-3), dan pas de
-WSL2-scenario (stap 4), want dat laatste is waar dit probleem specifiek
-voor bedoeld is.
+- `zenoh`-branch samengevoegd in `raspios-migration` (beide repo's,
+  gecommit + gepusht naar GitHub).
+- Gecombineerde image `nobel86/turtlebot-rpi5:raspios-zenoh` gebouwd en
+  getest op de testrobot: router start automatisch, luistert correct op
+  `tcp/0.0.0.0:7447`, `/imu` (20Hz) en `/scan` (~10Hz) bevestigd werkend
+  via Zenoh (zie `raspios-migration-log.md`).
+- `turtlebot_vis` (branch `zenoh`) aangepast met de bijhorende
+  client-config, klaar om te testen.
+- Nog open: stap 4 hierboven (het effectieve WSL2-scenario, door Jeremy
+  zelf uit te voeren).

@@ -281,3 +281,55 @@ essentieel, de bovenstaande resultaten bevestigen SLAM werkt end-to-end.
 
 Nog te doen: camera zodra aangesloten. SLAM-proces staat nog actief op de
 testrobot.
+
+## Zenoh-branch samengevoegd + gecombineerde image getest (2026-09-21)
+
+Op vraag: `zenoh`-branch gemerged in `raspios-migration` (beide repo's).
+Conflicten:
+- `turtlebot_docker/docker/Dockerfile`: package-lijst gecombineerd
+  (`ros-humble-rmw-zenoh-cpp` toegevoegd naast bestaande packages),
+  `zenoh_start_router.sh` COPY + `.bashrc`-hook behouden, camera_ros/
+  libcamera-blok behouden, `ROS_DOMAIN_ID`/`LDS_MODEL` blijven
+  uitgecommentarieerd (env-var uit compose i.p.v. hardcoded in image).
+- `docker-compose.yaml` (beide repo's): enkel de image-tag botste
+  (`:raspios` vs `:zenoh`) -> nieuwe gecombineerde tag `:raspios-zenoh`
+  gebruikt, rest (RMW_IMPLEMENTATION, i2c-device, comments) was al correct
+  auto-merged.
+
+Gecombineerde image gebouwd + gepusht via de remote buildx-builder:
+
+```bash
+docker buildx build --builder rpi5 --platform linux/arm64 \
+  -f docker/Dockerfile -t nobel86/turtlebot-rpi5:raspios-zenoh --push .
+```
+
+Digest: `sha256:773859d5e146624c3acd743b2cbaeeeca7bf78b2b5e48ae8ddec54ac880cc0d7`.
+Build ~125s, push ~438s (grotere image door camera_ros+libcamera+zenoh
+samen).
+
+Getest op de testrobot (container `turtlebot_99` herstart met de nieuwe
+image, `~/turtlebot_setup_test/docker-compose.yaml` bijgewerkt naar
+`:raspios-zenoh` + `RMW_IMPLEMENTATION=rmw_zenoh_cpp`):
+
+- **Zenoh-router**: start automatisch bij container-start (via
+  `.bashrc`-hook), log toont `Started Zenoh router with id ...`, luistert
+  bevestigd op `tcp/0.0.0.0:7447` (`ss -tlnp`) - de IPv4-fix uit
+  `zenoh_start_router.sh` werkt zoals bedoeld.
+- **Bringup**: geslaagd met `LDS_MODEL=LDS-02`, alle nodes/servers actief,
+  geen fouten.
+- **`/imu`**: publiceert op 20Hz via Zenoh (`ros2 topic hz`).
+- **`/scan`**: publiceert op ~10.1Hz via Zenoh (vergelijkbaar met de
+  ~9.8Hz eerder gemeten over CycloneDDS).
+- **`ros2 topic list`**: toont alle verwachte topics.
+
+Kanttekening (tooling, geen functioneel probleem): `timeout N ros2 topic
+hz ...` over SSH/docker exec bleek niet altijd netjes af te sluiten na N
+seconden onder Zenoh (SIGTERM lijkt niet altijd door te dringen tot het
+onderliggende rclpy-proces) - manueel `kill -9` nodig in 2 test-runs. Iets
+om rekening mee te houden bij verder scripten van tests, geen bug in de
+robot-software zelf.
+
+**Nog niet getest**: verbinding vanaf een externe laptop/student (via
+`ZENOH_CONFIG_OVERRIDE` client-config, zie `zenoh-migration.md`) en
+specifiek het WSL2-scenario - dat blijft de belangrijkste openstaande
+verificatie.
