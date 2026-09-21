@@ -674,3 +674,46 @@ stuurcommando - probleem opgelost.
 ingrepen (board-vervanging, transport, ...) eerst de fysieke
 motor-voedingsschakelaar op het OpenCR-bord controleren, niet enkel de
 software-status vertrouwen.
+
+## Statuspagina: layout herwerkt naar twee pagina's (2026-09-21)
+
+Feedback: de statuspagina was één lange `.grid` van 8 even grote kaarten
+(batterij, lidar, IMU, odometrie, systeem, instellingen, camera, teleop)
+- om te kunnen rijden moest je naar beneden scrollen, en de systeem-/
+instellingen-tabellen namen evenveel plaats in als camera/teleop terwijl
+ze zelden nodig zijn tijdens het rijden.
+
+Herwerkt naar twee pagina's:
+- **`index.html`** (startpagina): compacte statusbalk bovenaan (batterij%,
+  lidar-Hz, IMU-Hz, odom x/y - kleine badges, één regel), daaronder een
+  vaste twee-koloms layout: camera links (groot), teleop-kaart (D-pad +
+  snelheidsslider + motor-torque-knop) rechts. Alles past op één scherm
+  zonder scrollen op een normaal laptopscherm; op smalle schermen
+  (`max-width: 820px`) valt de layout terug op één kolom.
+- **`system.html`** (nieuw, via link rechtsboven op `index.html`):
+  systeeminfo-kaart (hostname/IP/MAC/CPU-load/CPU per core met min-max/
+  geheugen/uptime) en de instellingen-kaart (volledige `config`-tabel uit
+  `/system_info`) - ongewijzigd overgenomen uit de oude layout, enkel
+  verplaatst.
+
+Om duplicatie tussen de twee pagina's te vermijden is de gedeelde
+rosbridge-/tracking-logica (`connectRos()` - verbinding + connectie-
+badge, `timeAgo()`, `rateTracker()`, `startAgeTicker()`) uitgetrokken
+naar een nieuw bestand `status_page/common.js`, dat beide pagina's via
+`<script src="common.js">` inladen (na `roslib.min.js`, voor de
+paginaspecifieke inline `<script>`). De Dockerfile-regel
+`COPY ./status_page /root/turtlebot3_ws/status_page` kopieert de hele map
+en hoefde niet aangepast te worden - `common.js`/`system.html` komen
+automatisch mee.
+
+Camera-, teleop- en motor-torque-logica in `index.html` zijn functioneel
+ongewijzigd (zelfde topics/service: `/camera/image_raw/compressed`,
+`/cmd_vel`, `/motor_power`, `/sensor_state`) - enkel de HTML/CSS rond
+de compacte statusbalk en het teleop-kaartje is nieuw.
+
+Nog **niet live getest** op turtlebot09 - de robot was op het moment van
+deze wijziging niet bereikbaar (uitgeschakeld/offline). Gecommit maar
+bewust nog niet naar Docker Hub herbouwd, zoals de vorige statuspagina-
+wijzigingen. Eerstvolgende sessie: `docker cp` naar de draaiende
+container (snelle iteratie, geen rebuild nodig, zoals eerder gedaan) en
+visueel bevestigen dat alles zonder scrollen zichtbaar is.

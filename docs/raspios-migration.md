@@ -178,9 +178,19 @@ tijdens het draaien - wijzigingen daarvan vereisen een herstart van
 camera - `ENABLE_CAMERA` staat per robot in `turtlebot_config.csv`.
 
 Statuspagina (draait automatisch, geen commando nodig): open
-`http://<robot-ip>:8080` in een browser voor een live overzicht
-(batterij, lidar, IMU, odometrie, camera) - werkt volledig offline, geen
-internet nodig. Zie `turtlebot_docker/status_page/`.
+`http://<robot-ip>:8080` in een browser. Twee pagina's:
+- `index.html` (start): compacte statusbalk (batterij/lidar-Hz/IMU-Hz/
+  odom) + camera-beeld en teleop-bediening naast elkaar, alles zichtbaar
+  zonder scrollen - dit is de pagina waarmee je effectief rijdt.
+- `system.html` (via de link rechtsboven): systeeminfo (IP/MAC/CPU per
+  core met min/max/geheugen/uptime) en de volledige robot-configuratie
+  (alle env vars uit `turtlebot_config.csv`) - minder vaak nodig, dus
+  apart van de rij-pagina.
+
+Beide pagina's delen dezelfde rosbridge-verbindingslogica via
+`status_page/common.js` (`connectRos()`, `rateTracker()`, ...) om
+duplicatie te vermijden. Werkt volledig offline, geen internet nodig.
+Zie `turtlebot_docker/status_page/`.
 
 I2C (vanuit de container, als er I2C-peripherals aangesloten zijn):
 ```bash
