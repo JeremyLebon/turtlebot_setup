@@ -1,0 +1,283 @@
+# Uitvoeringslogboek - raspios-migration
+
+Logboek van wat er effectief al uitgevoerd is op de eerste testrobot, zodat
+je dit ook zelfstandig (of op de volgende robot) kan herhalen. Volgorde
+volgt `raspios-migration.md`. Enkel echt uitgevoerde stappen staan hier -
+voor de volledige/generieke instructies zie `raspios-migration.md`.
+
+**Testrobot:** RPi5, hostname `raspberrypi`, IP `192.168.60.69`,
+user `turtlebot` (wachtwoord: zie eigen wachtwoordbeheer, niet hier
+genoteerd).
+
+**Sessie:** 2026-09-21
+
+## Stap 0 - Verkenning (read-only, vóór wijzigingen)
+
+Bevindingen (zie ook chat voor volledig verslag):
+- OS: Debian 13 (trixie) op Raspberry Pi OS, kernel `6.18.50+rpt-rpi-2712`, arm64.
+- I2C al werkend: `/dev/i2c-1`, `/dev/i2c-13`, `/dev/i2c-14` aanwezig,
+  `dtparam=i2c_arm=on` staat al in `/boot/firmware/config.txt`.
+- `camera_auto_detect=1` staat al aan, `rpicam-hello` aanwezig, maar
+  `rpicam-hello --list-cameras` -> "No cameras available!" (nog geen
+  CSI-camera fysiek aangesloten op deze robot - volgt later).
+- Docker: nog niet geinstalleerd.
+- Netwerk: enkel wlan0 actief (192.168.60.69/24), eth0 down/niet aangesloten.
+
+Conclusie: stap 1 (flashen) en stap 2 (I2C) uit `raspios-migration.md` waren
+op deze robot al gebeurd/standaard aanwezig. Verdergegaan bij stap 4
+(Docker) - stap 3 (camera-sanity-check) volgt later zodra de camera
+fysiek aangesloten is.
+
+## Stap 4 - Docker installeren (uitgevoerd, 2026-09-21)
+
+Commando's, uitgevoerd via SSH op `turtlebot@192.168.60.69`:
+
+```bash
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo usermod -aG docker turtlebot
+rm -f get-docker.sh
+# nieuwe SSH-sessie openen zodat de docker-groep actief is (relogin vereist)
+```
+
+Resultaat:
+- Docker Engine **29.8.1** geinstalleerd (community, arm64), incl.
+  `docker-compose-plugin` (**Docker Compose v5.5.1**) en `docker-buildx-plugin`.
+  Geinstalleerd via het officiele Debian-apt-repo (`download.docker.com/linux/debian trixie`).
+- Docker-service via systemd enabled + gestart (`systemctl enable --now docker.service`).
+- `turtlebot`-gebruiker toegevoegd aan de `docker`-groep -> `docker ps` en
+  `docker compose version` werken zonder `sudo` (geverifieerd in een
+  nieuwe SSH-sessie).
+
+Nog te doen op deze robot (volgende sessie): stap 5 (repo's clonen - branch
+`raspios-migration` moet dan wel eerst gepusht zijn naar GitHub, staat nu
+nog enkel lokaal), stap 6 (image bouwen), stap 7 (systemd-unit), stap 8
+(stack testen), camera fysiek aansluiten + stap 3 opnieuw.
+
+## Stap 6 (voorbereiding) - Remote buildx-builder op de RPi5 (uitgevoerd, 2026-09-21)
+
+In plaats van bouwen op de RPi5 zelf (te traag) of via QEMU-emulatie op de
+laptop (traag voor de nieuwe `libcamera`-build), is gekozen voor een
+buildx-builder die vanaf de laptop getriggerd wordt maar native op de RPi5
+compileert. Uitgevoerd op de laptop (niet op de robot):
+
+```bash
+ssh-copy-id -i ~/.ssh/id_ed25519.pub turtlebot@192.168.60.69
+ssh turtlebot@192.168.60.69 'echo passwordless OK'   # verificatie
+
+docker buildx create --name rpi5 --driver docker-container \
+  --platform linux/arm64 "ssh://turtlebot@192.168.60.69"
+docker buildx inspect rpi5 --bootstrap
+```
+
+Resultaat:
+- Passwordless SSH van laptop (`jeremy@rosdrivenjeremy`, key `~/.ssh/id_ed25519`)
+  naar `turtlebot@192.168.60.69` werkt.
+- Builder `rpi5` aangemaakt en bootstrapped: BuildKit v0.32.2, driver
+  `docker-container`, endpoint `ssh://turtlebot@192.168.60.69`, platform
+  `linux/arm64` als **native** primair platform (geverifieerd met een
+  test-build: `uname -m` -> `aarch64`, gebouwd in ~1s, geen QEMU-vertraging).
+- Nog te doen: de effectieve `turtlebot-rpi5:raspios`-image bouwen/pushen
+  met `docker buildx build --builder rpi5 --platform linux/arm64 -f
+  docker/Dockerfile -t nobel86/turtlebot-rpi5:raspios --push .` (dit is de
+  volgende, langere stap - nog niet uitgevoerd; `raspios-migration`-branch
+  moet ook nog gepusht worden naar GitHub of lokaal beschikbaar zijn op het
+  build-pad).
+
+## Stap 6 - Image build, poging 1: gefaald (2026-09-21)
+
+`docker buildx build --builder rpi5 ...` gestart (lokaal working-tree pad,
+branch nog niet gepusht). Faalde op de libcamera-buildstap:
+
+```
+meson.build:3:0: ERROR: Value "rpi/pisp" for option "pipelines" is not in
+allowed choices: "all, auto, imx8-isi, ipu3, mali-c55, rkisp1, rpi/vc4,
+simple, uvcvideo, vimc, virtual"
+```
+
+Oorzaak: `docker/Dockerfile` clonede tag `v0.4.0` van
+`raspberrypi/libcamera`, en die versie kent de `rpi/pisp`-pipeline (nodig
+voor de RPi5 ISP) nog niet - die is pas later toegevoegd.
+
+Fix: `git ls-remote --tags` gebruikt om recente tags op te lijsten, tag in
+`docker/Dockerfile` gewijzigd naar `v0.7.2+rpt20260817` (meest recente
+gedateerde Raspberry Pi-release op moment van build). Build opnieuw gestart.
+
+## Stap 6 - Image build, poging 2: geslaagd (2026-09-21)
+
+Zelfde commando als hierboven, met de gefixte libcamera-tag. `libcamera`
+bouwde succesvol (169.7s), colcon-build (turtlebot3-packages, ld08_driver,
+camera_ros) geslaagd, image geëxporteerd en gepusht naar
+`nobel86/turtlebot-rpi5:raspios`.
+
+**Push bevestigd afgerond**: `docker.io/nobel86/turtlebot-rpi5:raspios`,
+digest `sha256:b4987376446e10a07f1f957883e1f5d1fa4a1183db9ff97f88c7c122c56947c5`.
+Push zelf duurde ~718s (~12 min) - logisch gezien de wifi-uplink van de
+robot en de omvang van de image (libcamera + nav2 + cartographer).
+`docker compose pull` op de testrobot zou deze nu moeten kunnen ophalen
+(compose gebruikt al de `:raspios`-tag, zie stap 6 hierboven in
+`raspios-migration.md`).
+
+## Stap 3/2 - I2C-test (uitgevoerd, 2026-09-21)
+
+Camera nog niet fysiek aangesloten (I2C-shield zit ervoor), dus eerst I2C
+getest i.p.v. camera (stap 3 uit de gids).
+
+```bash
+sudo apt-get install -y i2c-tools   # was al geinstalleerd, versie 4.4-2
+sudo i2cdetect -y 1
+sudo i2cdetect -y 13
+sudo i2cdetect -y 14
+```
+
+Resultaat:
+- **Bus 1** (GPIO-header I2C): 1 device gevonden op **adres 0x38**
+  (vermoedelijk het I2C-shield zelf of een sensor erop, bv.
+  AHT10/AHT20-temp/vocht-sensor of PCF8574 I/O-expander). Bevestigt dat
+  I2C end-to-end werkt op deze Raspberry Pi OS-build.
+- **Bus 13 en 14**: elk adres antwoordt - geen echte devices, vermoedelijk
+  HDMI-DDC/CEC-buslijnen, niet relevant voor peripherals. Genegeerd.
+
+Nog te doen: camera fysiek aansluiten zodra het I2C-shield dat toelaat,
+dan stap 3 (camera-sanity-check) alsnog uitvoeren.
+
+## Grove Base Hat - analoge poorten (uitgevoerd, 2026-09-21)
+
+Het I2C-shield op deze testrobot is een **Grove Base Hat voor Raspberry
+Pi**. Diens ADC-chip zit op I2C-adres **0x04** (bus 1) - niet zichtbaar in
+een gewone `i2cdetect -y 1` scan, want 0x00-0x07 is het gereserveerde
+adresbereik dat standaard wordt overgeslagen. Wel zichtbaar met:
+
+```bash
+sudo i2cdetect -y -a 1   # -a = scan ook gereserveerde adressen
+```
+
+Officiele Seeed-library geinstalleerd en getest:
+
+```bash
+sudo pip3 install --break-system-packages grove.py
+sudo python3 -c "
+from grove.adc import ADC
+adc = ADC()
+for ch in range(8):
+    print(ch, adc.read_raw(ch), adc.read_voltage(ch))
+"
+```
+
+Resultaat: alle 8 kanalen lezen consistente waarden (geen fouten) - ADC en
+I2C-pad werken end-to-end. Waarden zelf zijn ruis (~1.6-1.8V), want er
+hangt nog geen sensor aan de poorten - normaal voor zwevende ingangen.
+
+Nog te doen: een echte analoge sensor (potentiometer, lichtsensor, ...) op
+een Grove-poort aansluiten en het bijhorende kanaal opnieuw uitlezen ter
+bevestiging.
+
+## Stap 8 - Volledige stack testen (uitgevoerd, 2026-09-21)
+
+`docker-compose.yaml` (raspios-migration) naar de testrobot gekopieerd
+(`~/turtlebot_setup_test/`, branch nog niet gepusht dus via `scp`). Testwaarden
+in `.env`: `TURTLEBOT_NR=99`, `ROS_DOMAIN_ID=99`, `LDS_MODEL=LDS-01` (dummy
+- deze robot staat niet in `turtlebot_config.csv`).
+
+Eerste poging: `/dev/ttyUSB0` (LIDAR) en `/dev/input/js0` (gamepad)
+ontbraken nog op deze testrobot -> tijdelijke
+`docker-compose.override.yaml` gebruikt om enkel `ttyACM0` + `i2c-1` te
+mounten. Na het aansluiten van de ontbrekende hardware: override verwijderd,
+volledige compose gebruikt.
+
+```bash
+docker compose pull
+docker compose up -d
+docker exec turtlebot_99 bash -c "source /root/turtlebot3_ws/install/setup.bash; ros2 launch turtlebot3_bringup robot.launch.py"
+```
+
+Resultaat:
+- `ros2 pkg list` bevestigt `camera_ros` en `ld08_driver` aanwezig naast de
+  standaard turtlebot3-packages.
+- Bringup geslaagd: OpenCR verbonden op `/dev/ttyACM0`, gyro-kalibratie
+  voltooid, alle publishers/servers gestart zonder fouten.
+- `/imu` publiceert stabiel op 20Hz (geverifieerd met `ros2 topic hz`).
+- `/scan` (LIDAR): publisher-proces start zonder fout, maar geen data
+  binnen 4s - vermoedelijk LIDAR-motor niet actief in deze bank-opstelling
+  (geen softwareprobleem, verder na te kijken met de LIDAR effectief
+  gemonteerd/gevoed).
+- Teleop en SLAM nog niet getest.
+
+Container `turtlebot_99` staat nog actief op de testrobot voor verder
+gebruik.
+
+## Stap 8 (vervolg) - LIDAR `/scan` fix: verkeerd LDS_MODEL (2026-09-21)
+
+Root cause voor het ontbrekende `/scan` hierboven: de test-`.env` had
+`LDS_MODEL=LDS-01` (dummy waarde), maar deze testrobot heeft fysiek een
+**LDS-02**. Met LDS-01 ingesteld start `robot.launch.py` de verkeerde
+driver (`hlds_laser_publisher`, voor LDS-01) i.p.v. `ld08_driver` (voor
+LDS-02) - die leest wel ruwe bytes van `/dev/ttyUSB0` (bevestigd:
+~25.8KB/2s via `timeout 2 cat /dev/ttyUSB0 | wc -c`), maar kan ze niet
+correct parsen naar `/scan`-berichten.
+
+Fix: processen gestopt (`pkill`/`kill -9` op robot_state_publisher,
+hlds_laser_publisher/turtlebot3_ros, meerdere pogingen nodig - PID's
+manueel opgezocht via `ps aux`), bringup herstart met `LDS_MODEL=LDS-02`.
+Resultaat: `ld08_driver` meldt zelf `FOUND LDS-02` /
+`LDS-02 started successfully`, `/scan` publiceert op ~9.8Hz
+(`ros2 topic hz /scan`).
+
+**Belangrijk voor de fleet-uitrol:** `turtlebot_config.csv` bevat al het
+juiste LIDAR-model per robot (kolom `lidar`, LDS-01 voor turtlebot01-03,
+LDS-02 voor turtlebot04-09) en `setup_turtlebot.sh` zet dat automatisch in
+`LDS_MODEL` - dit probleem was enkel een gevolg van de dummy testwaarde
+hier, geen bug in de bestaande fleet-configuratie.
+
+## Stap 8 (vervolg) - Teleop getest (uitgevoerd, 2026-09-21)
+
+Interactieve `ros2 run turtlebot3_teleop teleop_keyboard` is niet
+bruikbaar over een niet-interactieve SSH-sessie. In plaats daarvan
+rechtstreeks op `/cmd_vel` gepubliceerd (dezelfde onderliggende
+mechaniek als teleop_keyboard):
+
+```bash
+# odom voor
+ros2 topic echo /odom --field pose.pose.position --once
+# 1.2s vooruit aan 0.05 m/s
+ros2 topic pub -r 10 /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.05}}"   # timeout 2s
+ros2 topic pub --once /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.0}}"  # expliciete stop
+# odom na
+ros2 topic echo /odom --field pose.pose.position --once
+```
+
+Resultaat: positie ging van `(0.176, 0.027)` naar `(0.284, 0.067)` -
+~11.5cm verplaatsing, robot stopte correct na de expliciete stop-command.
+Bevestigt de volledige besturingsketen (`cmd_vel` -> OpenCR -> wielen ->
+odom) werkt end-to-end op Raspberry Pi OS.
+
+Nog te doen: SLAM (`navigation2.launch.py slam:=True`), camera zodra
+aangesloten.
+
+## Stap 8 (vervolg) - SLAM getest (uitgevoerd, 2026-09-21)
+
+```bash
+ros2 launch turtlebot3_navigation2 navigation2.launch.py slam:=True use_sim_time:=False
+```
+
+Resultaat:
+- Volledige nav2 lifecycle-stack activeert zonder fouten: controller_server,
+  smoother_server, planner_server (GridBased/NavfnPlanner), behavior_server
+  (spin/backup/drive_on_heading/wait), bt_navigator, waypoint_follower,
+  velocity_smoother - allemaal "Activating" + bond met lifecycle_manager,
+  geen errors in het log.
+- `slam_toolbox` (sync-node) start correct: Ceres-solver (SCHUR_JACOBI
+  preconditioner), registreert de LIDAR als sensor.
+- `/map` (nav_msgs/OccupancyGrid) wordt gepubliceerd door `slam_toolbox`,
+  correct geabonneerd door `global_costmap`. Update-rate stabiel **0.2Hz**
+  (elke 5s), normaal gedrag voor een stilstaande robot.
+- Map-afmetingen: 122x97 cellen, resolutie 0.05m/cel (~6,1m x 4,85m
+  gebied), origin bij (-0.664, -1.092).
+
+Niet afgerond: gedetailleerde occupancy-celstatistiek (bezet/vrij/
+onbekend) via een los python-scriptje - liep vast door quoting-problemen
+over geneste SSH/bash/python-aanroepen, proces manueel gestopt. Niet
+essentieel, de bovenstaande resultaten bevestigen SLAM werkt end-to-end.
+
+Nog te doen: camera zodra aangesloten. SLAM-proces staat nog actief op de
+testrobot.

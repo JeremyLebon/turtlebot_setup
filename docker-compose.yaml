@@ -1,6 +1,6 @@
 services:
   turtlebot-core:
-    image: nobel86/turtlebot-rpi5:latest
+    image: nobel86/turtlebot-rpi5:raspios  # Raspberry Pi OS test image - keep :latest (Ubuntu) untouched until validated
     network_mode: host
     stdin_open: true
     tty: true  
@@ -26,4 +26,8 @@ services:
       - /dev/ttyACM0:/dev/ttyACM0  # OpenCR
       - /dev/ttyUSB0:/dev/ttyUSB0  # LDS 01 - laser lidar
       - /dev/input/js0:/dev/input/js0  # Logitech F710 Gamepad
-      - /dev/video0:/dev/video0  # Camera
+      - /dev/i2c-1:/dev/i2c-1  # I2C bus (RPi5, Raspberry Pi OS)
+      # CSI camera (libcamera/camera_ros) replaces the old USB webcam
+      # (/dev/video0). libcamera on RPi5 exposes several /dev/video* and
+      # /dev/media* nodes - already covered by privileged:true above, kept
+      # here only as documentation. Verify exact nodes on real hardware.

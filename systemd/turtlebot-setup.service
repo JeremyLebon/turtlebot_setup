@@ -1,0 +1,12 @@
+[Unit]
+Description=Turtlebot per-robot config (hostname, ROS_DOMAIN_ID, LIDAR) from MAC address
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/setup_turtlebot.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
