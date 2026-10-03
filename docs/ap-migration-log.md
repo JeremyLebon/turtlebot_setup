@@ -173,3 +173,56 @@ Geen Dockerfile-wijziging nodig voor deze twee - `system_info_node.py`,
 `launch_control_node.py` en `status_page/` worden al in hun geheel
 gekopieerd door bestaande `COPY`-instructies, dus een volgende
 image-rebuild neemt dit automatisch mee.
+
+## Launch-status-bug + actieve-nodes-lijst (2026-10-03)
+
+Jeremy meldde: bringup gestart en kon rijden, maar de status-dot op
+`system.html` bleef "gestopt" tonen. Oorzaak: de status hield enkel bij
+wat de knoppen zélf gestart hadden (een intern Popen-lijstje in
+`launch_control_node.py`) - een robot die via de terminal (les 1-stijl)
+of in een vorige node-instantie gestart was, kwam daar niet in voor.
+
+**Fix**: status + de "draait al"-check gebruiken nu `pgrep` tegen de
+effectieve commandoregel per launch (bringup/slam/navigation delen
+`navigation2.launch.py`, onderscheiden via `slam:=True` vs `map:=`),
+i.p.v. zelf-gerapporteerde bookkeeping. `stop_all` stuurt nu ook signalen
+naar alles wat `pgrep` vindt, niet enkel wat het zelf startte.
+
+**Erbij**: `/active_nodes` (volledige `ros2 node list`, via
+`get_node_names_and_namespaces()`, elke 2s) - nieuwe kaart op
+`system.html` met alle actieve ROS2-nodes, ongeacht hoe gestart. Dit was
+een expliciete vraag van Jeremy ("zicht op wat draait van packages"),
+en lost tegelijk hetzelfde onderliggende probleem op maar dan algemeen
+i.p.v. enkel voor de 3 launch-knoppen.
+
+Getest op turtlebot09: bringup manueel gestart via een losse
+`ros2 launch`-commando (niet via de knop) -> `/launch_status` toonde
+meteen correct `bringup: true`. `stop_all` ruimde dat nadien samen met
+een vergeten SLAM-sessie van eerdere tests netjes op (bevestigd via
+`ros2 node list`, terug naar enkel de permanente services).
+
+## Losse stop-knoppen + kaart tonen/opslaan (2026-10-03)
+
+Drie vragen van Jeremy in één keer: (1) launches ook apart kunnen
+stoppen, niet enkel allemaal samen, (2) een kaart kunnen opslaan, (3)
+een kaart kunnen zien op de pagina.
+
+- **Apart stoppen**: `/launch/stop_bringup`, `/launch/stop_slam`,
+  `/launch/stop_navigation` toegevoegd naast `/launch/stop_all` -
+  dezelfde `pgrep`-aanpak, enkel het proces van die ene launch krijgt
+  SIGINT. Getest: SLAM apart gestopt terwijl bringup bleef draaien
+  (bevestigd via `ros2 node list`).
+- **Kaart tonen**: nieuwe kaart "Kaart (/map)" op `system.html` -
+  abonneert op `/map` (`nav_msgs/OccupancyGrid`) en tekent die
+  rechtstreeks op een canvas (grijswaarden: onbekend=grijs, vrij=wit,
+  bezet=zwart, verticaal gespiegeld om de bottom-left-origin van de
+  grid te matchen met canvas' top-left). Getest: live 87x106-grid
+  (0.05m/cel) kwam binnen tijdens een SLAM-sessie.
+- **Kaart opslaan**: knop roept nav2's eigen `/map_saver/save_map`
+  (`nav2_msgs/srv/SaveMap`) rechtstreeks aan via rosbridge vanuit de
+  browser - geen nieuwe backend-code nodig, `map_saver` draait al mee
+  in de SLAM/navigation-launch. Pad: `/root/turtlebot3_ws/maps/map`
+  (zelfde als de `NAV_MAP_YAML`-fallback in `launch_control_node.py`).
+  Getest: `map.pgm` + `map.yaml` effectief op schijf bevestigd.
+- **Dockerfile aangepast**: `RUN mkdir -p /root/turtlebot3_ws/maps`
+  toegevoegd - `map_saver` maakt de map niet zelf aan als die ontbreekt.
