@@ -156,12 +156,20 @@ dit meeneemt).
   al"), en `stop_all` stuurde SIGINT en alles sloot netjes af (geen
   achterblijvende processen).
 
-**Nieuwe todo's (geopperd door Jeremy, nog niet gebouwd):**
-- **Netwerkload** als extra veld op de systeempagina (bv. bytes/s
-  in/uit op `wlan0` via `/proc/net/dev`, zelfde patroon als de
-  bestaande CPU/mem-stats in `system_info_node.py`).
-- **Zicht op wat er draait** (packages/launches): status-indicatoren
-  bij de launch-knoppen (actief/gestopt per bringup/slam/navigation),
-  i.p.v. enkel een eenmalige succes/foutmelding na een klik. Kan via
-  een topic die `launch_control_node.py` publiceert met de huidige
-  proces-status, getoond op `system.html` naast de knoppen.
+**Beide hierboven opgeperde todo's zijn gebouwd en getest (2026-10-03):**
+- **Netwerkload**: `system_info_node.py` publiceert nu `net_rx_kbps`/
+  `net_tx_kbps` (delta over `/proc/net/dev` op `wlan0`, elke 2s, zelfde
+  patroon als de bestaande per-core CPU-delta-berekening). Getoond op
+  `system.html` naast Geheugen. Bevestigd met echte waarden
+  (`rx: 2.4 kbps, tx: 5.4 kbps` tijdens idle).
+- **Status-indicatoren bij de launch-knoppen**: `launch_control_node.py`
+  publiceert elke seconde `/launch_status` (JSON: welke van
+  bringup/slam/navigation een levend proces heeft). Groene stip op de
+  knop zodra actief. Bevestigd end-to-end: status ging live van
+  `false` naar `true` bij het starten van bringup, en terug naar
+  `false` na `stop_all` - in stap met de effectieve proces-staat.
+
+Geen Dockerfile-wijziging nodig voor deze twee - `system_info_node.py`,
+`launch_control_node.py` en `status_page/` worden al in hun geheel
+gekopieerd door bestaande `COPY`-instructies, dus een volgende
+image-rebuild neemt dit automatisch mee.
