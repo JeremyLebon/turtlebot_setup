@@ -116,3 +116,52 @@ dit nieuwe netwerk.
 - Bevestigen of elke AP uit de doos al in router-modus start zodra WAN
   aangesloten is (gezien bij deze unit), of dat dit toeval/al een vorige
   configuratie was.
+
+## Statuspagina-vervolg: layout, browserterminal, launch control (2026-10-03)
+
+Alles hieronder live getest op turtlebot09 via `docker cp` (snelle
+iteratie, zie eerder), en gecommit op `raspios-migration` in
+`turtlebot_docker` (incl. Dockerfile zodat een volgende image-rebuild
+dit meeneemt).
+
+- **Layout-balans gefixt**: camera/teleop-kolommen waren 1.6fr/1fr,
+  camera leek te dominant tegenover de compacte teleop-kaart -> nu 50/50,
+  D-pad-knoppen vergroot (60px -> 84px) zodat de teleop-kaart zijn helft
+  opvult.
+- **Browserterminal toegevoegd** (`ttyd`, poort 7681, basic-auth
+  `turtlebot`/`TurtleBot@P<nr>` - zelfde patroon als de AP-wifi-
+  wachtwoorden, 1 wachtwoord per robot i.p.v. 2). Link op de statuspagina
+  ("Terminal ->"). Bedoeld voor les 2+: les 1 blijft een echte terminal
+  gebruiken om te leren, dit is gemak voor nadien.
+  - **Bug gevonden en gefixt**: een fout/onbestaand commando intikken in
+    de browserterminal deed de hele sessie telkens reconnecten. Root
+    cause: `/ros_entrypoint.sh` (standaard ROS-image-entrypoint, bevat
+    `set -e`) werd in `.bashrc` **gesourced** i.p.v. enkel als
+    entrypoint gebruikt - dat lekte `errexit` in elke interactieve shell,
+    waardoor een "command not found" (exit 127) de hele shell deed
+    afsluiten. Opgelost door die regel uit `.bashrc` te verwijderen
+    (`install/setup.bash`, die er al apart in staat, sourcet via
+    colcon's underlay-chain toch al `/opt/ros/humble/setup.bash` -
+    niets verloren). Gereproduceerd/bevestigd via een rauwe
+    `pty.fork()`-test buiten ttyd om (dus geen ttyd-specifieke bug).
+- **Launch control toegevoegd**: `launch_control_node.py` (rclpy) stelt
+  vaste `std_srvs/Trigger`-services bloot (`/launch/bringup`,
+  `/launch/slam`, `/launch/navigation`, `/launch/stop_all`) - enkel
+  voorgedefinieerde `ros2 launch`-commando's, geen vrije shell-toegang.
+  Knoppen staan op `system.html` (niet de hoofdpagina, om die niet
+  nog drukker te maken). `navigation` vereist `NAV_MAP_YAML` (env var)
+  naar een bestaande kaart, anders duidelijke foutmelding i.p.v. een
+  crash. Live getest via een echte rosbridge-service-call: bringup
+  startte alle nodes correct, dubbele start wordt geweigerd ("draait
+  al"), en `stop_all` stuurde SIGINT en alles sloot netjes af (geen
+  achterblijvende processen).
+
+**Nieuwe todo's (geopperd door Jeremy, nog niet gebouwd):**
+- **Netwerkload** als extra veld op de systeempagina (bv. bytes/s
+  in/uit op `wlan0` via `/proc/net/dev`, zelfde patroon als de
+  bestaande CPU/mem-stats in `system_info_node.py`).
+- **Zicht op wat er draait** (packages/launches): status-indicatoren
+  bij de launch-knoppen (actief/gestopt per bringup/slam/navigation),
+  i.p.v. enkel een eenmalige succes/foutmelding na een klik. Kan via
+  een topic die `launch_control_node.py` publiceert met de huidige
+  proces-status, getoond op `system.html` naast de knoppen.
