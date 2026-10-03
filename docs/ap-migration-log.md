@@ -226,3 +226,14 @@ een kaart kunnen zien op de pagina.
   Getest: `map.pgm` + `map.yaml` effectief op schijf bevestigd.
 - **Dockerfile aangepast**: `RUN mkdir -p /root/turtlebot3_ws/maps`
   toegevoegd - `map_saver` maakt de map niet zelf aan als die ontbreekt.
+
+**Nieuwe todo (geopperd door Jeremy, nog niet gebouwd):** een pad/
+waypoint uitzetten via de webpagina (klikken op de kaart om een
+doelpositie of route te geven aan Nav2, zoals rviz2's "set goal pose"),
+i.p.v. enkel de kaart passief tonen. Zou gebruik maken van Nav2's
+`navigate_to_pose`-actie of `/goal_pose`-topic, met de klik-coördinaten
+op het canvas omgerekend naar map-coördinaten via `msg.info.resolution`/
+`msg.info.origin`.
+
+Sessie gestopt op 2026-10-03 - volgende sessie: deze todo, en/of verder
+met de AP-uitrol voor turtlebot01-08.
