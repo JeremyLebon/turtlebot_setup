@@ -87,6 +87,38 @@ reservatie op `.10`, buiten die range).
   robot inloggen. Eenvoudig patroon (robotnummer in het wachtwoord) houdt
   het toch nog overzichtelijk om aan 9 groepjes te communiceren.
 
+## Robot bereiken: hostname of IP
+
+Elke robot is binnen zijn eigen AP-netwerk op twee manieren bereikbaar:
+
+- **Hostname via mDNS**: `turtlebot<XX>.local` (bv. `turtlebot09.local`).
+  `avahi-daemon` draait op de robot (ingesteld door `setup_turtlebot.sh`).
+  Getest op turtlebot09 (2026-10-04): `turtlebot09.local` -> `10.0.9.10`,
+  statuspagina bereikbaar via `http://turtlebot09.local:8080`.
+- **Vast IP**: robot N zit altijd op `10.0.N.10` (DHCP-reservatie, zie
+  tabel hierboven).
+
+**Afspraak - wat gebruik je waar:**
+
+| Gebruik | Adres | Voorbeeld |
+|---|---|---|
+| Statuspagina in de browser (Windows) | hostname | `http://turtlebot09.local:8080` |
+| Browserterminal | hostname | `http://turtlebot09.local:7681` |
+| SSH | hostname | `ssh turtlebot@turtlebot09.local` |
+| Zenoh/ROS2-client in WSL | **vast IP** | `tcp/10.0.9.10:7447` |
+
+**Beperkingen van de hostname:**
+- Enkel met het `.local`-suffix - gewoon `turtlebot09` resolvet niet (de
+  TP-Link-router publiceert DHCP-hostnames niet via DNS).
+- Enkel binnen het eigen AP-netwerk (mDNS = multicast op het lokale
+  segment) - niet vanaf de WAN-/campuskant. Past bij de opzet: studenten
+  zitten op de wifi van hun eigen robot.
+- **WSL2 in de standaard NAT-netwerkmodus resolvet `.local` meestal
+  niet** - daarom het vaste IP voor de Zenoh-config in WSL. Alternatief
+  (nog niet getest): WSL in *mirrored networking mode*
+  (`networkingMode=mirrored` in `.wslconfig`). Nog te testen op een
+  studentenlaptop.
+
 ## WAN-kant (switch-uplink)
 
 Alle 9 ethernetpoorten -> gedeelde switch -> 1 uplink naar het

@@ -281,5 +281,12 @@ restart-policy: na een reboot van de Pi bleef de container gewoon
   krap: oude image + nieuwe image + buildkit-cache passen er nauwelijks
   naast elkaar.
 
-**Nog te doen**: `.env` op turtlebot09 staat nog op `TURTLEBOT_NR=99`
-(ttyd-wachtwoord dus `TurtleBot@P99`), gelijkzetten naar 09.
+**`.env` op turtlebot09 gelijkgezet** met `turtlebot_config.csv`:
+`TURTLEBOT_NR=9`, `ROS_DOMAIN_ID=9` (was 99/99, backup in `.env.bak`).
+Container heet nu `turtlebot_9`, `TURTLEBOT3_NAME=TB3_9`, ttyd-wachtwoord
+`TurtleBot@P09` (getest: HTTP 200 met die credentials). Let op: ROS2-
+clients moeten nu ook `ROS_DOMAIN_ID=9` gebruiken.
+
+**Hostname i.p.v. IP**: mDNS (`turtlebot09.local`) werkt al dankzij
+avahi - afspraak hostname vs. vast IP vastgelegd in `ap-migration.md`
+("Robot bereiken: hostname of IP").
