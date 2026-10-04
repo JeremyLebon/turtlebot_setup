@@ -17,6 +17,9 @@ herhalen. Laatst bijgewerkt: 2026-10-04.
       5,17 GB naar 7,64 GB. Uitzoeken met `docker history` (apt-cache,
       libcamera/colcon build-artefacten in lagen?). Relevant voor 8 robots
       die over wifi pullen op SD-kaarten van 32 GB.
+- [ ] **Image herbouwen + pushen** met de wifi-signaalweergave
+      (2026-10-04, nu enkel via `docker cp` live in `turtlebot_9` - verdwijnt
+      bij het opnieuw aanmaken van de container).
 - [ ] **Buildkit-cache opruimen** op turtlebot09 na de Docker Hub-push
       (SD-kaart van 32 GB loopt vol bij builds op de robot).
 
@@ -28,6 +31,30 @@ herhalen. Laatst bijgewerkt: 2026-10-04.
       toe enkel op turtlebot09 gevalideerd).
 - [ ] **`raspios-migration` mergen naar `master`** - bewust pas na
       volledige validatie (zie beslissing 2026-10-03).
+
+## Bugs
+
+- [ ] **SLAM-knop geeft geen kaart** (gevonden 2026-10-04, turtlebot09).
+      `navigation2.launch.py slam:=True` (wat launch control start):
+      slam_toolbox registreert de lidar, verwerkt de eerste scan en hangt
+      dan - geen logs meer (ook niet de periodieke "Graph size"-debugregel),
+      bijna 0% CPU, nooit een `/map`. Ook zo bij rechtstreeks starten,
+      dus niet de schuld van launch control.
+      Werkt wél: slam_toolbox alleen (`ros2 run`, `online_sync_launch.py`)
+      en `nav2_bringup slam_launch.py` - 5/5 keer kaart binnen seconden.
+      Scans (~10 Hz, 215-220 punten) en TF `odom -> base_scan` zijn OK; de
+      "LaserRangeScan contains X range readings, expected Y"-meldingen
+      (LDS-02 met variabele lengte) zijn niet de oorzaak.
+      Vermoeden (niet bewezen): een blokkerende publish in `rmw_zenoh`
+      (RELIABLE publisher, congestion control "block") zodra de Nav2-stack
+      meeluistert op `/map`. Gisteren werkte dezelfde knop wel; de versies
+      (`rmw_zenoh 0.1.9`, `slam_toolbox 2.6.10`, `nav2 1.1.20`) lijken
+      ongewijzigd. Wel anders: services via entrypoint, `ROS_DOMAIN_ID`
+      99 -> 9, container opnieuw aangemaakt.
+      Volgende stappen: `gdb` in de container voor een stacktrace van de
+      hangende node; test met `rmw_cyclonedds_cpp`; workaround = SLAM-knop
+      enkel `nav2_bringup slam_launch.py` laten starten (kaart maken met
+      teleop, opslaan, dan Navigation met de kaart).
 
 ## Testen
 
