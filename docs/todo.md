@@ -62,6 +62,27 @@ herhalen. Laatst bijgewerkt: 2026-10-04.
          (>30 fps), maar hardware-aankoop per robot. Hailo-drivers worden
          goed ondersteund onder Raspberry Pi OS.
 
+## Gebruikers en rechten
+
+- [ ] **Aparte `student`-gebruiker met minder rechten** - doel: ongelukken
+      voorkomen (`sudo apt upgrade`, wifi wijzigen, compose-bestanden
+      wissen), géén echte security-grens. Let op: lidmaatschap van de
+      `docker`-groep = root-equivalent, en de container draait
+      `privileged: true`, dus elke shell in de container (ook via ttyd) kan
+      in de praktijk alles op de host. Opties:
+      1. `student` zonder `sudo`/`netdev`/`docker`-groep; `.env` en
+         `docker-compose.yaml` blijven van `turtlebot` (enkel leesbaar).
+      2. Docker-toegang via een sudoers-whitelist i.p.v. de `docker`-
+         groep, bv. enkel `docker ps`, `docker logs`,
+         `docker exec -it turtlebot_* bash`.
+      3. (Later, echte hardening) `privileged: true` vervangen door
+         expliciete `devices:` + `cap_add` (OpenCR, lidar, I2C, camera:
+         `/dev/media*`, `/dev/video*`, `/dev/dma_heap`) - opnieuw testen,
+         vooral de camera.
+      **Eerst beslissen**: wat moeten studenten in les 1 concreet kunnen op
+      de robot - enkel in de container ROS2-commando's typen, ook zelf
+      `docker compose up/down`/`ps`/`logs`, of ook Linux-basics op de host?
+
 ## Afspraken / te beslissen
 
 - [ ] **Campus-netwerkbeheer** bevestigen dat 9 AP's achter 1 switch-
