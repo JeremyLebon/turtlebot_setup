@@ -1,5 +1,9 @@
 services:
   turtlebot-core:
+    # Come back up after a reboot / crash / network switch. Background
+    # services (Zenoh, status page, ...) start from the image's entrypoint
+    # (services_start.sh), so a restarted container is fully functional.
+    restart: unless-stopped
     image: nobel86/turtlebot-rpi5:raspios-zenoh  # Combined RPi OS + Zenoh test image - keep :latest/:raspios/:zenoh untouched until validated
     network_mode: host
     stdin_open: true
@@ -18,6 +22,9 @@ services:
       - LDS_MODEL=${LDS_MODEL}
       - TURTLEBOT3_MODEL=burger
       - TURTLEBOT3_NAME=TB3_${TURTLEBOT_NR}
+      # Needed inside the container by terminal_start.sh (ttyd password
+      # TurtleBot@P<nr>) - without it the password falls back to ...P00.
+      - TURTLEBOT_NR=${TURTLEBOT_NR}
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
       # Not every turtlebot has a CSI camera attached at all times - set to
       # "true" only on robots with a camera physically connected (see

@@ -237,3 +237,49 @@ op het canvas omgerekend naar map-coördinaten via `msg.info.resolution`/
 
 Sessie gestopt op 2026-10-03 - volgende sessie: deze todo, en/of verder
 met de AP-uitrol voor turtlebot01-08.
+
+## Services automatisch starten bij container-start (2026-10-04)
+
+Opgelost: de open follow-up "robot-services moeten robuust opstarten na
+een reboot/netwerkwissel" (zie "Nog open voor de fleet-uitrol" hierboven).
+
+**Probleem**: alle achtergrondservices (zenoh-router, camera,
+rosbridge/statuspagina/system_info, ttyd, launch control) werden enkel
+via `/root/.bashrc` gestart, dus pas bij een interactieve shell in de
+container. Daarnaast had geen enkele `docker-compose.yaml` een
+restart-policy: na een reboot van de Pi bleef de container gewoon
+`Exited`. Vandaag zo aangetroffen na een reboot (`turtlebot_99 Exited (255)`).
+
+**Fix** (`turtlebot_docker` + `turtlebot_setup`, branch `raspios-migration`):
+- Nieuw `docker/services_start.sh` als `ENTRYPOINT` van de image: sourcet
+  ROS + workspace, roept de vijf `*_start.sh`-scripts aan (zenoh eerst),
+  daarna `exec "$@"` (`CMD ["bash"]`). De vijf `.bashrc`-regels zijn uit
+  de Dockerfile verwijderd. De scripts zijn idempotent (`pgrep`-check).
+- `restart: unless-stopped` in beide `docker-compose.yaml`'s.
+- Bug onderweg gevonden: `TURTLEBOT_NR` werd niet aan de container
+  doorgegeven, waardoor het ttyd-wachtwoord terugviel op `TurtleBot@P00`.
+  Nu als env-variabele toegevoegd in `turtlebot_setup/docker-compose.yaml`.
+
+**Getest op turtlebot09** (image `55e13c894c8c`):
+- `docker compose up -d`: alle 7 processen draaien zonder login, poorten
+  8080 (200), 9090 (400 = websocket verwacht) en 7681 (401 = auth) OK
+  vanaf de laptop.
+- `sudo reboot`: container en alle services kwamen zelf terug binnen
+  ~30s na boot, zelfde poortresultaten.
+
+**Gotchas bij het bouwen:**
+- De `rpi5`-buildx-builder verwees nog naar het oude IP
+  (`192.168.60.249`); opnieuw aangemaakt op `ssh://turtlebot@10.0.9.10`
+  met dezelfde naam, zodat de bestaande `buildx_buildkit_rpi50`-container
+  hergebruikt werd.
+- `--load` met een remote builder laadt de image in de Docker van de
+  **client** (laptop), niet in die van de robot. Overgezet met
+  `docker save | ssh ... docker load` (~12 min over de AP).
+- SD-kaart turtlebot09 is 32 GB (`SD32G`); een eerste build faalde op
+  "No space left on device". Oude images opgeruimd (2 dangling
+  `raspios-zenoh`-builds + `:raspios`). Bouwen op de robot zelf blijft
+  krap: oude image + nieuwe image + buildkit-cache passen er nauwelijks
+  naast elkaar.
+
+**Nog te doen**: `.env` op turtlebot09 staat nog op `TURTLEBOT_NR=99`
+(ttyd-wachtwoord dus `TurtleBot@P99`), gelijkzetten naar 09.
