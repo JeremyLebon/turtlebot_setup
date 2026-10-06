@@ -35,6 +35,11 @@ herhalen. Laatst bijgewerkt: 2026-10-06.
       build op de robot start dus van nul) op turtlebot09 na de Docker Hub-push
       (SD-kaart van 32 GB loopt vol bij builds op de robot).
 
+- [ ] **Hostname in `/etc/hosts`** op de robot: `sudo` meldt
+      `kan computernaam turtlebot09 niet herleiden` (en wacht telkens op een
+      DNS-timeout). Toevoegen aan de setup: `127.0.1.1 turtlebot<nr>` in
+      `/etc/hosts`, mee met het instellen van de hostname.
+
 ## Uitrol
 
 - [ ] **AP + robot configureren voor turtlebot01-08** (tabel in
