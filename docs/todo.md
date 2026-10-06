@@ -63,6 +63,51 @@ herhalen. Laatst bijgewerkt: 2026-10-06.
 - [ ] **`raspios-migration` mergen naar `master`** - bewust pas na
       volledige validatie (zie beslissing 2026-10-03).
 
+## Uitrolmethode: SD-kaart klonen (golden image)
+
+Idee (2026-10-06): de SD-kaart van turtlebot09 als image nemen en naar
+de andere robots kopieren - Raspberry Pi OS, Docker en de 5,6 GB-image
+staan er dan meteen op (geen pull over wifi). Kan, omdat
+`setup_turtlebot.sh` (systemd `turtlebot-setup.service`, bij elke boot)
+de robot herkent aan het **MAC-adres** via `turtlebot_config.csv`. Maar
+dat script dekt nu niet alles wat per robot verschilt:
+
+- [ ] **Hoe komt `docker-compose.yaml` op een robot?** Nu met de hand
+      (`scp` naar `~/turtlebot_setup_test`). Kiezen: meekomen in de
+      golden image, `git pull` van een clone van `turtlebot_setup` op de
+      robot, of door `setup_turtlebot.sh` laten kopieren.
+- [ ] **`setup_turtlebot.sh` bijwerken voor Raspberry Pi OS**:
+  - pad `CONFIG_FILE` wijst nog naar `/home/turtlebot-rpi5/...` (oude
+    user; nu `turtlebot`).
+  - schrijft enkel `/etc/profile.d/turtlebot_config.sh` (en met `>>`:
+    groeit bij elke boot). Docker Compose leest die niet bij een
+    automatische herstart -> **`.env` naast `docker-compose.yaml`
+    schrijven** (`TURTLEBOT_NR`, `ROS_DOMAIN_ID`, `LDS_MODEL`,
+    `ENABLE_CAMERA`), overschrijven i.p.v. toevoegen.
+  - **`/etc/hosts`** mee aanpassen (`127.0.1.1 turtlebot<nr>`, zie
+    hostname-punt hierboven).
+  - na een wijziging van `.env` de container opnieuw aanmaken
+    (`docker compose up -d`), anders blijft de geklonede `turtlebot_9`
+    draaien met nr 9.
+- [ ] **Wifi per robot**: de kloon bevat het NetworkManager-profiel van
+      `TB-AP-09`. Elke robot moet naar zijn eigen AP (`TB-AP-<nr>`,
+      wachtwoord `TurtleBot@P<nr>`, zie `ap-migration.md`) - door het
+      setup-script laten aanmaken op basis van het nr (oude profiel weg).
+- [ ] **Unieke identiteit na het klonen**: `/etc/machine-id` en de SSH-
+      host-keys zijn anders identiek op alle robots (DHCP-client-ID,
+      "host key changed"-waarschuwingen). Eenmalig bij de eerste boot
+      van een kloon opnieuw genereren.
+- [ ] **Golden image opkuisen voor het klonen**: container `turtlebot_9`
+      en de `buildx_buildkit_rpi50`-builder + cache verwijderen (enkel
+      nodig op de bouwrobot), `/tmp`-logs, bash-history, testkaarten.
+- [ ] **Image verkleinen**: turtlebot09 heeft een kaart van 32 GB - het
+      image eerst inkrimpen (bv. PiShrink) zodat het ook op een iets
+      kleinere 32 GB-kaart past en sneller schrijft.
+- [ ] **Alternatief afwegen**: verse Raspberry Pi OS via Raspberry Pi
+      Imager (hostname/wifi/user per kaart ingesteld) + setup-script +
+      `docker compose pull` via de ethernet-switch. Trager per robot, maar
+      geen kloon-valkuilen.
+
 ## Bugs
 
 - [x] **SLAM-knop geeft geen kaart** - opgelost 2026-10-06 door de knop
