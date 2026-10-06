@@ -32,10 +32,10 @@ herhalen. Laatst bijgewerkt: 2026-10-06.
       (2026-10-06: OK op smartphone en laptop).
 - [ ] **Bij elke wijziging aan `common.js`** het versienummer in de
       `<script src="common.js?v=N">`-tags ophogen (index.html + system.html).
-- [x] **Buildkit-cache opruimen** (2026-10-06, 6,7 GB vrijgemaakt; volgende
-      build op de robot start dus van nul) op turtlebot09 na de Docker Hub-push
-      (SD-kaart van 32 GB loopt vol bij builds op de robot).
-
+- [x] **Buildkit-cache NIET meer opruimen** op turtlebot09 (afspraak
+      2026-10-06): opruimen maakte van een build van ~3 min een volledige
+      rebuild + push van ~20 min. Plaats vrijmaken via oude images
+      (`docker image prune`), niet via `docker buildx prune`.
 - [ ] **Hostname in `/etc/hosts`** op de robot: `sudo` meldt
       `kan computernaam turtlebot09 niet herleiden` (en wacht telkens op een
       DNS-timeout). Oorzaak: hostname is `turtlebot09`, maar `/etc/hosts`
