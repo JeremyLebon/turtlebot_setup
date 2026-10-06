@@ -43,8 +43,19 @@ herhalen. Laatst bijgewerkt: 2026-10-06.
       te werken). Fix in de setup: die regel vervangen door
       `127.0.1.1 turtlebot<nr>` (of `raspi-config`/`hostnamectl` + hosts).
 
+- [ ] **Uitschakel-knop nakijken**: op 2026-10-06 voor het eerst gebruikt
+      (Jeremy sloot turtlebot09 zo af). Bij de volgende opstart controleren
+      dat het een nette shutdown was (`journalctl -b -1 | tail`, geen
+      fsck/dirty-meldingen) en of het uit-melodietje klonk.
+- [ ] **"error"-melodie testen**: bv. tijdelijk een service laten falen
+      (poort 9090 bezet) en nagaan dat na 90 s de error-melodie klinkt.
+
 ## Uitrol
 
+- [ ] **Nieuw `docker-compose.yaml` naar elke robot** (met de mount
+      `/run/dbus/system_bus_socket`, nodig voor de aan/uit-knoppen; zonder
+      die mount geven ze een foutmelding). Image `raspios-zenoh` van
+      2026-10-06 of later.
 - [ ] **AP + robot configureren voor turtlebot01-08** (tabel in
       `ap-migration.md`, status "open").
 - [ ] **Overige 8 robots naar Raspberry Pi OS + Docker** (alles is tot nu
