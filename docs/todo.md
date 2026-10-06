@@ -54,36 +54,24 @@ herhalen. Laatst bijgewerkt: 2026-10-06.
 
 ## Bugs
 
-- [ ] **SLAM-knop geeft geen kaart** (gevonden 2026-10-04, turtlebot09).
-      `navigation2.launch.py slam:=True` (wat launch control start):
-      slam_toolbox registreert de lidar, verwerkt de eerste scan en hangt
-      dan - geen logs meer (ook niet de periodieke "Graph size"-debugregel),
-      bijna 0% CPU, nooit een `/map`. Ook zo bij rechtstreeks starten,
-      dus niet de schuld van launch control.
-      Werkt wél: slam_toolbox alleen (`ros2 run`, `online_sync_launch.py`)
-      en `nav2_bringup slam_launch.py` - 5/5 keer kaart binnen seconden.
-      Scans (~10 Hz, 215-220 punten) en TF `odom -> base_scan` zijn OK; de
-      "LaserRangeScan contains X range readings, expected Y"-meldingen
-      (LDS-02 met variabele lengte) zijn niet de oorzaak.
-      Vermoeden (niet bewezen): een blokkerende publish in `rmw_zenoh`
-      (RELIABLE publisher, congestion control "block") zodra de Nav2-stack
-      meeluistert op `/map`. Gisteren werkte dezelfde knop wel; de versies
-      (`rmw_zenoh 0.1.9`, `slam_toolbox 2.6.10`, `nav2 1.1.20`) lijken
-      ongewijzigd. Wel anders: services via entrypoint, `ROS_DOMAIN_ID`
-      99 -> 9, container opnieuw aangemaakt.
-      **Update 2026-10-06 - waarschijnlijke oorzaak gevonden:** geen hang.
-      `gdb`-backtrace: alle threads wachten (executor idle, geen blokkerende
-      publish -> rmw_zenoh-vermoeden ontkracht). In de mislukte run volgt op
-      `Registering sensor` meteen `LaserRangeScan contains 220 range
-      readings, expected 221`: de eerste scan wordt geweigerd, de kaart blijft
-      leeg en een stilstaande robot levert geen nieuwe scan (minimum travel)
-      -> nooit `/map`. Toeval welke scan eerst binnenkomt = waarom het soms
-      wel werkt. Te bevestigen door te rijden. Structurele fix: `ld08_driver`
-      altijd een vast aantal stralen laten publiceren (bv. 360 bins van 1°).
-      Oude volgende stappen: `gdb` in de container voor een stacktrace van de
-      hangende node; test met `rmw_cyclonedds_cpp`; workaround = SLAM-knop
-      enkel `nav2_bringup slam_launch.py` laten starten (kaart maken met
-      teleop, opslaan, dan Navigation met de kaart).
+- [x] **SLAM-knop geeft geen kaart** - opgelost 2026-10-06 door de knop
+      naar **Cartographer** om te zetten (turtlebot_docker
+      `cartographer_headless.launch.py`, zoals de TurtleBot3 ROS2 e-manual,
+      zonder rviz2, met `map_saver` voor de opslaan-knop). Oorzaak was geen
+      hang (gdb: alle threads idle) maar slam_toolbox die elke scan weigert
+      waarvan het aantal stralen afwijkt van de eerste (LDS-02: 220/221);
+      werd de eerste scan geweigerd, dan bleef de kaart leeg tot de robot
+      reed. Getest: 4x starten/stoppen via de services, telkens kaart
+      stilstaand, geen achterblijvers, kaart opslaan OK. Nog niet in de
+      Docker Hub-image (enkel `docker cp` in `turtlebot_9`).
+      Gevolg: kaart maken en navigeren zijn nu gescheiden stappen (mappen
+      met teleop -> opslaan -> Navigation met kaart), zoals in de e-manual.
+- [ ] **slam_toolbox + LDS-02** (enkel als studenten later zelf
+      slam_toolbox gebruiken): `ld08_driver` een vast aantal stralen laten
+      publiceren (bv. 360 bins van 1 graad).
+- [ ] **Debug-valkuil**: een `ros2 launch` gestart als achtergrondproces
+      (`cmd &`) in een niet-interactieve bash negeert SIGINT - stoppen met
+      SIGTERM. De launch-knoppen (Popen) hebben dit probleem niet.
 
 ## Testen
 
@@ -108,6 +96,14 @@ herhalen. Laatst bijgewerkt: 2026-10-06.
       i.p.v. `sudo` - als whitelisted service in `launch_control_node`
       (zelfde patroon als de launch-knoppen). Let op: een reboot vanuit
       Claude Code via SSH wordt door de auto-mode-classifier geblokkeerd.
+- [ ] **Piep bij correcte opstart**: zodra alle services draaien (einde
+      `services_start.sh`, eventueel na een health-check van poorten
+      7447/8080/9090) een kort signaal via de OpenCR-buzzer. Kan via de
+      `/sound`-service van `turtlebot3_node` (`turtlebot3_msgs/srv/Sound`),
+      maar die draait enkel tijdens bringup - bij opstart dus rechtstreeks
+      via dynamixel_sdk naar het OpenCR-control-table-adres `sound` (50)
+      schrijven, of een Grove-buzzer op de Base Hat. Eventueel ook een
+      ander piepje bij een fout (service die niet opkomt).
 - [ ] **Objectdetectie (YOLO) op de camera-topic**
       (`/camera/image_raw/compressed`). Drie opties, op volgorde van
       voorkeur:
