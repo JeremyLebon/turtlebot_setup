@@ -89,21 +89,20 @@ herhalen. Laatst bijgewerkt: 2026-10-06.
       Nav2 `navigate_to_pose` / `/goal_pose`, klik-coordinaten omrekenen
       via `msg.info.resolution`/`msg.info.origin` (zie
       `ap-migration-log.md`).
-- [ ] **Robot uitschakelen / herstarten vanuit de webpagina**
-      (`system.html`), met bevestigingsstap. De container moet daarvoor de
-      host kunnen aansturen: bv. `/run/dbus/system_bus_socket` mounten en
-      via logind (`busctl call org.freedesktop.login1 ... PowerOff/Reboot`)
-      i.p.v. `sudo` - als whitelisted service in `launch_control_node`
-      (zelfde patroon als de launch-knoppen). Let op: een reboot vanuit
-      Claude Code via SSH wordt door de auto-mode-classifier geblokkeerd.
-- [ ] **Piep bij correcte opstart**: zodra alle services draaien (einde
-      `services_start.sh`, eventueel na een health-check van poorten
-      7447/8080/9090) een kort signaal via de OpenCR-buzzer. Kan via de
-      `/sound`-service van `turtlebot3_node` (`turtlebot3_msgs/srv/Sound`),
-      maar die draait enkel tijdens bringup - bij opstart dus rechtstreeks
-      via dynamixel_sdk naar het OpenCR-control-table-adres `sound` (50)
-      schrijven, of een Grove-buzzer op de Base Hat. Eventueel ook een
-      ander piepje bij een fout (service die niet opkomt).
+- [~] **Robot uitschakelen / herstarten vanuit de webpagina** - gebouwd
+      2026-10-06 (turtlebot_docker `4e953d5`, turtlebot_setup `0d18e99`):
+      kaart "Robot" op `system.html` met bevestiging -> `/system/reboot` /
+      `/system/shutdown` in `launch_control_node` (launches stoppen,
+      uit-melodie, logind via gemounte `/run/dbus/system_bus_socket`).
+      logind-rechten bevestigd (`CanReboot`/`CanPowerOff` = yes). Nog te
+      testen in de nieuwe image. Let op: compose op elke robot heeft de
+      extra D-Bus-mount nodig.
+- [~] **Piep bij correcte opstart** - gebouwd 2026-10-06 (turtlebot_docker
+      `4e953d5`): `beep.py` (OpenCR-melodie via 1 Dynamixel-2.0-write op
+      adres 50, of `/sound` tijdens bringup) - beide paden live bevestigd
+      (2 melodietjes gehoord). `services_start.sh` speelt "on" als poorten
+      7447/8080/9090/7681 open zijn, "error" na 90 s. Nog te testen in de
+      nieuwe image.
 - [ ] **Objectdetectie (YOLO) op de camera-topic**
       (`/camera/image_raw/compressed`). Drie opties, op volgorde van
       voorkeur:
