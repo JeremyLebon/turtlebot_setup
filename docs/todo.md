@@ -18,7 +18,8 @@ herhalen. Laatst bijgewerkt: 2026-10-06.
       libcamera/colcon build-artefacten in lagen?). Relevant voor 8 robots
       die over wifi pullen op SD-kaarten van 32 GB.
 - [x] **Image herbouwen + pushen** (2026-10-06, digest
-      `sha256:74c5692b...`, turtlebot09 draait erop) met de wifi-signaalweergave
+      `sha256:74c5692b...`, turtlebot09 draait erop; herstart-test OK:
+      alle services binnen ~1 min terug) met de wifi-signaalweergave
       (2026-10-04, nu enkel via `docker cp` live in `turtlebot_9` - verdwijnt
       bij het opnieuw aanmaken van de container). Idem voor de no-cache-
       webserver (`status_page_server.py`, i.p.v. `python3 -m http.server`).
@@ -37,8 +38,10 @@ herhalen. Laatst bijgewerkt: 2026-10-06.
 
 - [ ] **Hostname in `/etc/hosts`** op de robot: `sudo` meldt
       `kan computernaam turtlebot09 niet herleiden` (en wacht telkens op een
-      DNS-timeout). Toevoegen aan de setup: `127.0.1.1 turtlebot<nr>` in
-      `/etc/hosts`, mee met het instellen van de hostname.
+      DNS-timeout). Oorzaak: hostname is `turtlebot09`, maar `/etc/hosts`
+      bevat nog `127.0.1.1 raspberrypi` (hostname gewijzigd zonder hosts bij
+      te werken). Fix in de setup: die regel vervangen door
+      `127.0.1.1 turtlebot<nr>` (of `raspi-config`/`hostnamectl` + hosts).
 
 ## Uitrol
 
