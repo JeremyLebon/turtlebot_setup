@@ -71,7 +71,16 @@ herhalen. Laatst bijgewerkt: 2026-10-06.
       (`rmw_zenoh 0.1.9`, `slam_toolbox 2.6.10`, `nav2 1.1.20`) lijken
       ongewijzigd. Wel anders: services via entrypoint, `ROS_DOMAIN_ID`
       99 -> 9, container opnieuw aangemaakt.
-      Volgende stappen: `gdb` in de container voor een stacktrace van de
+      **Update 2026-10-06 - waarschijnlijke oorzaak gevonden:** geen hang.
+      `gdb`-backtrace: alle threads wachten (executor idle, geen blokkerende
+      publish -> rmw_zenoh-vermoeden ontkracht). In de mislukte run volgt op
+      `Registering sensor` meteen `LaserRangeScan contains 220 range
+      readings, expected 221`: de eerste scan wordt geweigerd, de kaart blijft
+      leeg en een stilstaande robot levert geen nieuwe scan (minimum travel)
+      -> nooit `/map`. Toeval welke scan eerst binnenkomt = waarom het soms
+      wel werkt. Te bevestigen door te rijden. Structurele fix: `ld08_driver`
+      altijd een vast aantal stralen laten publiceren (bv. 360 bins van 1°).
+      Oude volgende stappen: `gdb` in de container voor een stacktrace van de
       hangende node; test met `rmw_cyclonedds_cpp`; workaround = SLAM-knop
       enkel `nav2_bringup slam_launch.py` laten starten (kaart maken met
       teleop, opslaan, dan Navigation met de kaart).
@@ -92,6 +101,13 @@ herhalen. Laatst bijgewerkt: 2026-10-06.
       Nav2 `navigate_to_pose` / `/goal_pose`, klik-coordinaten omrekenen
       via `msg.info.resolution`/`msg.info.origin` (zie
       `ap-migration-log.md`).
+- [ ] **Robot uitschakelen / herstarten vanuit de webpagina**
+      (`system.html`), met bevestigingsstap. De container moet daarvoor de
+      host kunnen aansturen: bv. `/run/dbus/system_bus_socket` mounten en
+      via logind (`busctl call org.freedesktop.login1 ... PowerOff/Reboot`)
+      i.p.v. `sudo` - als whitelisted service in `launch_control_node`
+      (zelfde patroon als de launch-knoppen). Let op: een reboot vanuit
+      Claude Code via SSH wordt door de auto-mode-classifier geblokkeerd.
 - [ ] **Objectdetectie (YOLO) op de camera-topic**
       (`/camera/image_raw/compressed`). Drie opties, op volgorde van
       voorkeur:
