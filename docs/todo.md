@@ -17,7 +17,8 @@ herhalen. Laatst bijgewerkt: 2026-10-06.
       5,17 GB naar 7,64 GB. Uitzoeken met `docker history` (apt-cache,
       libcamera/colcon build-artefacten in lagen?). Relevant voor 8 robots
       die over wifi pullen op SD-kaarten van 32 GB.
-- [ ] **Image herbouwen + pushen** met de wifi-signaalweergave
+- [x] **Image herbouwen + pushen** (2026-10-06, digest
+      `sha256:74c5692b...`, turtlebot09 draait erop) met de wifi-signaalweergave
       (2026-10-04, nu enkel via `docker cp` live in `turtlebot_9` - verdwijnt
       bij het opnieuw aanmaken van de container). Idem voor de no-cache-
       webserver (`status_page_server.py`, i.p.v. `python3 -m http.server`).
@@ -30,7 +31,8 @@ herhalen. Laatst bijgewerkt: 2026-10-06.
       (2026-10-06: OK op smartphone en laptop).
 - [ ] **Bij elke wijziging aan `common.js`** het versienummer in de
       `<script src="common.js?v=N">`-tags ophogen (index.html + system.html).
-- [ ] **Buildkit-cache opruimen** op turtlebot09 na de Docker Hub-push
+- [x] **Buildkit-cache opruimen** (2026-10-06, 6,7 GB vrijgemaakt; volgende
+      build op de robot start dus van nul) op turtlebot09 na de Docker Hub-push
       (SD-kaart van 32 GB loopt vol bij builds op de robot).
 
 ## Uitrol
