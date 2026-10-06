@@ -46,6 +46,9 @@ services:
       # though /dev/media*, /dev/video* are otherwise accessible (privileged
       # mode does not bind-mount /run/udev automatically).
       - /run/udev:/run/udev:ro
+      # Host system D-Bus: lets launch_control_node reboot / power off the
+      # Pi through logind (status page buttons) without sudo or SSH.
+      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket
     command: bash
     devices:
       - /dev/ttyACM0:/dev/ttyACM0  # OpenCR
