@@ -3,7 +3,7 @@
 Centrale lijst van open punten (branch `raspios-migration`). Details en
 achtergrond staan in de migratielogs (`raspios-migration-log.md`,
 `ap-migration-log.md`); deze lijst verwijst ernaar i.p.v. alles te
-herhalen. Laatst bijgewerkt: 2026-10-04.
+herhalen. Laatst bijgewerkt: 2026-10-06.
 
 ## Voor de fleet-uitrol
 
@@ -21,9 +21,13 @@ herhalen. Laatst bijgewerkt: 2026-10-04.
       (2026-10-04, nu enkel via `docker cp` live in `turtlebot_9` - verdwijnt
       bij het opnieuw aanmaken van de container). Idem voor de no-cache-
       webserver (`status_page_server.py`, i.p.v. `python3 -m http.server`).
-- [ ] **Wifi-vakje op smartphone nakijken** na de no-cache-fix
-      (laptop OK; smartphone toonde `--` door een gecachte oude
-      `common.js`).
+      Let op: na `docker cp` het execute-bit controleren - op 2026-10-06
+      startte de statuspagina niet na een reboot omdat
+      `status_page_start.sh` via `docker cp` als 644 binnenkwam
+      (`Permission denied`). Scripts staan nu als 755 in git
+      (turtlebot_docker `4c33649`).
+- [x] **Wifi-vakje op smartphone nakijken** na de no-cache-fix
+      (2026-10-06: OK op smartphone en laptop).
 - [ ] **Bij elke wijziging aan `common.js`** het versienummer in de
       `<script src="common.js?v=N">`-tags ophogen (index.html + system.html).
 - [ ] **Buildkit-cache opruimen** op turtlebot09 na de Docker Hub-push
