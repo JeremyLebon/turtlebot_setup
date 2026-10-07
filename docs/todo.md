@@ -216,6 +216,25 @@ dat script dekt nu niet alles wat per robot verschilt:
          (>30 fps), maar hardware-aankoop per robot. Hailo-drivers worden
          goed ondersteund onder Raspberry Pi OS.
 
+## Inspiratie: OpenAMRobot (github.com/openAMRobot)
+
+- [ ] **`openamrobot-ui` demo-modus bekijken** (`docker compose up`,
+      `http://127.0.0.1:5050`, "Explore without a robot") - welke pagina's
+      zijn nuttig in de les? MIT-licentie; ROS 2 Jazzy (wij: Humble).
+      Interessant: click-to-goal + waypoints/routes, kaartbeheer, Blockly-
+      programma's, rosbag opnemen/afspelen, health/console/parameters.
+      Lessen in `docs/lessons/` (o.a. 03 browser <-> ROS, 10 topics as the
+      contract, 12 debugging met ROS CLI) passen bij onze rosbridge-opzet.
+- [ ] **Experiment: openamrobot-ui op de laptop tegen de rosbridge van
+      turtlebot09** (`ws://10.0.9.10:9090`). Verwacht: kaart/teleop/doelen/
+      camera/console werken (standaard topics/Nav2-acties), routes/
+      kaartbeheer/missies niet (hun Jazzy-backend-nodes). Let op: zelfde
+      poorten 9090/8080 als onze robot.
+- [ ] **Ideeën/code overnemen** in onze statuspagina (MIT): click-to-goal +
+      waypoints, rosbag-opname, kaartbeheer.
+- [ ] `openamr-platform-sw`: AprilTag-docking als studentenproject met de
+      TB3-camera; "ROS 2 Complete Course" in `docs/` als extra lesmateriaal.
+
 ## Gebruikers en rechten
 
 - [ ] **Aparte `student`-gebruiker met minder rechten** - doel: ongelukken
