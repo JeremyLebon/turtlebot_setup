@@ -130,8 +130,19 @@ dat script dekt nu niet alles wat per robot verschilt:
       de clone (`git pull` werkt alles bij, ook units/polkit), buildkit wordt
       verwijderd op elke robot behalve 09, persistente journal (max 100 MB),
       `apt full-upgrade` op turtlebot09 (Docker 29.8.2, kernel ongewijzigd).
-- [ ] **Kloontest op turtlebot06** (kaart van 09 -> 06): identiteit,
-      hostname, wifi `TB-AP-06`, container `turtlebot_6`, buildkit weg.
+- [x] **Kloontest op turtlebot06** (2026-10-08): golden image van 09
+      (`~/turtlebot_clone/sdclone.sh` op de laptop, PiShrink in een
+      `debian:trixie`-container want de e2fsck van Ubuntu 22.04 kent
+      `orphan_file` niet; 30 -> 21 GB). Eerste boot op 06 volledig automatisch:
+      nieuwe machine-id + SSH-keys, partitie vergroot (128 GB-kaart),
+      hostname/hosts, wifi `TB-AP-06`, `.env` nr 6, `turtlebot_9` en
+      buildkit weg, `turtlebot_6` + alle services up met piep. Drie kleine
+      fixes daarna (keys na hostname, gekloonde journal, buildkit-image).
+      Let op: de golden image zelf heeft die fixes nog niet - na het klonen
+      eenmaal "Software bijwerken" (git pull + setup), of de image opnieuw
+      maken.
+- [ ] **Uitrol naar 01-05, 07, 08** met de golden image (AP per robot
+      eerst configureren; MAC in `turtlebot_config.csv` nakijken).
 
 ## Bugs
 
