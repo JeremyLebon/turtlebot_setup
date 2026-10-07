@@ -3,7 +3,7 @@
 # SD-kaart als golden image. Daarna: robot uitschakelen, kaart inlezen met
 # sdclone.sh (laptop). Zie docs/todo.md, "Uitrolmethode: SD-kaart klonen".
 #
-#   sudo ~/turtlebot_setup/tools/golden_prepare.sh
+#   sudo ~/turtlebot_setup/tools/golden_prepare.sh [major.minor.patch]
 set -eu
 
 SETUP_DIR=/home/turtlebot/turtlebot_setup
@@ -22,12 +22,20 @@ docker compose --project-directory "$SETUP_DIR" pull
 docker image prune -f >/dev/null
 
 # Stempel: zichtbaar op de statuspagina van elke kloon (host_info.json).
-# Volgnummer: teller op de bouwrobot (v1 = eerste kloon naar turtlebot06,
-# 2026-10-07).
-COUNTER=/var/lib/turtlebot-setup/golden-count
-N=$(( $(cat "$COUNTER" 2>/dev/null || echo 1) + 1 ))
-mkdir -p "$(dirname "$COUNTER")" && echo "$N" > "$COUNTER"
-STAMP="golden v$N - $(date '+%F %H:%M') - van $(hostname), setup $(runuser -u turtlebot -- git -C "$SETUP_DIR" log -1 --format=%h)"
+# Versie V<major>.<minor>.<patch>.<build>: major.minor.patch kies je zelf
+# (eerste argument, bv. "1.0.0" voor een uitrol naar de vloot; zonder
+# argument blijft de vorige), build telt altijd op. Bijgehouden op de
+# bouwrobot. Historiek: build 1 = eerste kloon naar turtlebot06 (2026-10-07).
+VERSION_FILE=/var/lib/turtlebot-setup/golden-version
+PREV=$(cat "$VERSION_FILE" 2>/dev/null || echo "0.1.0.1")
+BASE="${1:-${PREV%.*}}"
+if ! [[ "$BASE" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "Ongeldige versie '$BASE' - verwacht major.minor.patch, bv. 1.0.0"; exit 1
+fi
+BUILD=$(( ${PREV##*.} + 1 ))
+VERSION="$BASE.$BUILD"
+mkdir -p "$(dirname "$VERSION_FILE")" && echo "$VERSION" > "$VERSION_FILE"
+STAMP="V$VERSION - $(date '+%F %H:%M') - van $(hostname), setup $(runuser -u turtlebot -- git -C "$SETUP_DIR" log -1 --format=%h)"
 echo "$STAMP" > /etc/turtlebot-golden
 echo "🏷️  $STAMP"
 
