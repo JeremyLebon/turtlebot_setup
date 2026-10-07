@@ -69,7 +69,7 @@ else
 fi
 
 # Avahi herstarten zodat de nieuwe hostname meteen zichtbaar is via .local
-if systemctl list-unit-files | grep -q avahi-daemon.service; then
+if systemctl cat avahi-daemon.service >/dev/null 2>&1; then
   systemctl restart avahi-daemon
 else
   echo "⚠️ Avahi-daemon niet gevonden — controleer of Avahi is geïnstalleerd."
@@ -118,7 +118,7 @@ install_if_changed "$SETUP_DIR/polkit/50-turtlebot-networkmanager.rules" \
 # `journalctl -b -1` na een crash/shutdown nog werkt. Begrensd tot 100 MB.
 install_if_changed "$SETUP_DIR/systemd/journald-turtlebot.conf" \
   /etc/systemd/journald.conf.d/50-turtlebot.conf 644 \
-  && systemctl restart systemd-journald
+  && systemctl restart systemd-journald && journalctl --flush
 
 # --- Omgevingsvariabelen -----------------------------------------------------
 # .env naast docker-compose.yaml: die leest Docker Compose zelf, ook bij een
