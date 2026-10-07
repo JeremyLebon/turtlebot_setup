@@ -21,8 +21,13 @@ runuser -u turtlebot -- git -C "$SETUP_DIR" pull --ff-only
 docker compose --project-directory "$SETUP_DIR" pull
 docker image prune -f >/dev/null
 
-# Stempel: zichtbaar op de statuspagina van elke kloon (host_info.json)
-STAMP="golden $(date +%F) van $(hostname), setup $(runuser -u turtlebot -- git -C "$SETUP_DIR" log -1 --format=%h)"
+# Stempel: zichtbaar op de statuspagina van elke kloon (host_info.json).
+# Volgnummer: teller op de bouwrobot (v1 = eerste kloon naar turtlebot06,
+# 2026-10-07).
+COUNTER=/var/lib/turtlebot-setup/golden-count
+N=$(( $(cat "$COUNTER" 2>/dev/null || echo 1) + 1 ))
+mkdir -p "$(dirname "$COUNTER")" && echo "$N" > "$COUNTER"
+STAMP="golden v$N - $(date '+%F %H:%M') - van $(hostname), setup $(runuser -u turtlebot -- git -C "$SETUP_DIR" log -1 --format=%h)"
 echo "$STAMP" > /etc/turtlebot-golden
 echo "🏷️  $STAMP"
 
