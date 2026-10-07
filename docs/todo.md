@@ -265,6 +265,18 @@ dat script dekt nu niet alles wat per robot verschilt:
       `ENABLE_CAMERA` uit de CSV). `camera_node` start enkel als er een
       sensor is (`camera_present.sh`, v4l-subdev-naam; `cam -l` segfault).
       Getest op 09 (aan/uit, onthouden na container-herstart).
+- [x] **Software-versies + diagnose op de statuspagina** (2026-10-08,
+      turtlebot_docker `7aa8cfd`, turtlebot_setup `b84f740`): golden-stempel
+      (`/etc/turtlebot-golden`, gezet door `tools/golden_prepare.sh`), setup-
+      commit, OS/kernel/Docker/bootloader (`state/host_info.json`, geschreven
+      door `setup_turtlebot.sh`), vorige afsluiting netjes/onverwacht, klok-
+      verschil robot-laptop + NTP (timesyncd-config: be.pool, Debian als
+      terugval), ping/jitter naar het AP, diensten, container-starts,
+      SD-kaartfouten (dmesg). Live op 09, `system_info_node` blijft ~0 % CPU.
+- [ ] **Nieuwe golden image** maken: `sudo ~/turtlebot_setup/tools/golden_prepare.sh`
+      op 09 (apt upgrade, pull, stempel, opkuis), uitschakelen, kaart inlezen
+      met `~/turtlebot_clone/sdclone.sh read /dev/mmcblk0` (in een echte
+      terminal, sudo).
 - [ ] **Camera-knop testen op een robot zonder camera** (turtlebot06):
       update via "Software bijwerken", dan camera AAN -> melding "geen camera
       gevonden", geen crash; container herstarten -> "[camera] ingeschakeld
