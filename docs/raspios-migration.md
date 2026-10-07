@@ -102,8 +102,13 @@ docker buildx inspect rpi5 --bootstrap
 
 cd turtlebot_docker
 docker buildx build --builder rpi5 --platform linux/arm64 \
-  -f docker/Dockerfile -t nobel86/turtlebot-rpi5:raspios --push .
+  -f docker/Dockerfile \
+  --build-arg IMAGE_VERSION="$(date +%F) $(git rev-parse --short HEAD)" \
+  -t nobel86/turtlebot-rpi5:raspios-zenoh --push .
 ```
+
+`IMAGE_VERSION` verschijnt als "Image-versie" op de statuspagina
+(`system.html`); zonder build-arg staat er `dev`.
 
 De `camera_ros`/`libcamera`-build in de Dockerfile is het meest
 hardware-gevoelige stuk (zie commentaar in `docker/Dockerfile`). Verwacht
