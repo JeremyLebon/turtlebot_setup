@@ -37,27 +37,9 @@ NR2=$(printf '%02d' "$NR")
 
 echo "✅ Instellingen gevonden voor $HOSTNAME (nr $NR, ROS_DOMAIN_ID=$ROS_DOMAIN_ID)"
 
-# --- Unieke identiteit na het klonen --------------------------------------
-# Een gekloonde kaart heeft dezelfde machine-id (DHCP-client-ID) en SSH-
-# host-keys als het origineel. Eenmalig per MAC-adres opnieuw genereren;
-# daarna een reboot zodat alle services de nieuwe machine-id gebruiken.
-REBOOT_NEEDED=false
-mkdir -p "$STATE_DIR"
-IDENTITY_MARKER="$STATE_DIR/identity-$(echo "$MAC" | tr -d ':')"
-if [ ! -f "$IDENTITY_MARKER" ]; then
-  echo "🔑 Nieuw bord ($MAC): machine-id en SSH-host-keys opnieuw genereren"
-  rm -f "$STATE_DIR"/identity-*
-  rm -f /etc/machine-id
-  systemd-machine-id-setup
-  rm -f /etc/ssh/ssh_host_*
-  ssh-keygen -A
-  touch "$IDENTITY_MARKER"
-  REBOOT_NEEDED=true
-fi
-
 # --- Rootpartitie vergroten --------------------------------------------------
 # De golden image is ingekrompen met PiShrink -s (zonder diens rc.local-
-# auto-expand, die zou met de reboot hierboven botsen). Hier groeit de
+# auto-expand, die zou met de identiteits-reboot hieronder botsen). Hier groeit de
 # rootpartitie online tot het einde van de kaart, als er meer dan 1 GB vrij is.
 ROOT_PART=$(findmnt -no SOURCE /)                       # bv. /dev/mmcblk0p2
 ROOT_DISK="/dev/$(lsblk -no PKNAME "$ROOT_PART")"       # bv. /dev/mmcblk0
@@ -83,6 +65,30 @@ if grep -q '^127\.0\.1\.1' /etc/hosts; then
 else
   printf '127.0.1.1\t\t%s\n' "$HOSTNAME" >> /etc/hosts
 fi
+
+# --- Unieke identiteit na het klonen --------------------------------------
+# Een gekloonde kaart heeft dezelfde machine-id (DHCP-client-ID) en SSH-
+# host-keys als het origineel. Eenmalig per MAC-adres opnieuw genereren;
+# daarna een reboot zodat alle services de nieuwe machine-id gebruiken.
+# Na de hostname, zodat de nieuwe SSH-keys root@<nieuwe hostname> heten.
+REBOOT_NEEDED=false
+mkdir -p "$STATE_DIR"
+IDENTITY_MARKER="$STATE_DIR/identity-$(echo "$MAC" | tr -d ':')"
+if [ ! -f "$IDENTITY_MARKER" ]; then
+  echo "🔑 Nieuw bord ($MAC): machine-id en SSH-host-keys opnieuw genereren"
+  rm -f "$STATE_DIR"/identity-*
+  rm -f /etc/machine-id
+  systemd-machine-id-setup
+  rm -f /etc/ssh/ssh_host_*
+  ssh-keygen -A
+  touch "$IDENTITY_MARKER"
+  REBOOT_NEEDED=true
+fi
+
+# Journal-mappen van een andere machine-id (meegekloond van het origineel)
+for d in /var/log/journal/*/; do
+  [ "$(basename "$d")" = "$(cat /etc/machine-id)" ] || rm -rf "$d"
+done
 
 # Avahi herstarten zodat de nieuwe hostname meteen zichtbaar is via .local
 if systemctl cat avahi-daemon.service >/dev/null 2>&1; then
@@ -178,6 +184,8 @@ if [ "$NR" != "$BUILD_ROBOT_NR" ]; then
     docker rm -f "$c" && docker volume rm -f "${c}_state" >/dev/null \
       && echo "🗑️ Buildkit-builder $c + cache verwijderd"
   done
+  docker image rm moby/buildkit:buildx-stable-1 >/dev/null 2>&1 \
+    && echo "🗑️ Image moby/buildkit verwijderd"
 fi
 
 # --- Container ---------------------------------------------------------------
