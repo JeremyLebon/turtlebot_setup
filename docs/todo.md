@@ -170,8 +170,10 @@ dat script dekt nu niet alles wat per robot verschilt:
 
 ## Testen
 
-- [ ] **Zenoh-client vanaf een studentenlaptop in WSL** (`ros2 topic list`
+- [x] **Zenoh-client vanaf een studentenlaptop in WSL** (`ros2 topic list`
       over het AP-netwerk, `ROS_DOMAIN_ID=9` voor turtlebot09).
+      **Getest 2026-10-08 door Jeremy: werkt** (turtlebot_vis branch `zenoh`,
+      image `nobel86/turtlebot-rpi5-vis:zenoh` van 2026-10-08, rmw_zenoh 0.1.9).
 - [ ] **WSL mirrored networking mode** testen, zodat `.local`-hostnames
       ook in WSL werken (zie "Robot bereiken: hostname of IP" in
       `ap-migration.md`).
