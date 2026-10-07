@@ -347,14 +347,18 @@ dat script dekt nu niet alles wat per robot verschilt:
       laatste 5 setup-commits, "Update beschikbaar" (robot controleert om de
       30 min GitHub + Docker Hub-digest). Golden-stempel nu
       `V<major>.<minor>.<patch>.<build>` (`golden_prepare.sh [x.y.z]`).
-- [ ] **Nieuwe golden image** maken: `sudo ~/turtlebot_setup/tools/golden_prepare.sh`
-      op 09 (apt upgrade, pull, stempel, opkuis), uitschakelen, kaart inlezen
-      met `~/turtlebot_clone/sdclone.sh read /dev/mmcblk0` (in een echte
-      terminal, sudo).
-- [ ] **Camera-knop testen op een robot zonder camera** (turtlebot06):
-      update via "Software bijwerken", dan camera AAN -> melding "geen camera
-      gevonden", geen crash; container herstarten -> "[camera] ingeschakeld
-      maar geen camera gevonden"; daarna terug UIT.
+- [x] **Golden image V0.1.0.2** (2026-10-08 00:54, setup `fb0696c`, image
+      `eb4442f`) op de laptop (`~/turtlebot_clone/turtlebot-golden.img`).
+      Geflasht op turtlebot06: volledig automatisch OK (identiteit, keys
+      `root@turtlebot06`, partitie, wifi, `.env`, buildkit + image weg,
+      services + piep, diagnose, update-hint -> update-service -> up-to-date).
+      Nieuwe golden: `sudo ~/turtlebot_setup/tools/golden_prepare.sh [x.y.z]`
+      op 09, uitschakelen, `sudo bash ~/turtlebot_clone/sdclone.sh read
+      /dev/mmcblk0` (echte terminal).
+- [x] **Camera-knop getest op een robot zonder camera** (turtlebot06,
+      2026-10-08): AAN -> "geen camera gevonden - 'aan' onthouden", geen
+      camera_node; container-herstart -> "[camera] ingeschakeld maar geen
+      camera gevonden", alle services up; UIT -> onthouden.
 - [ ] **Rosbag opnemen vanuit de webpagina**: start/stop-knop, bestand
       downloaden (studenten nemen data op de robot op en spelen thuis af).
 - [ ] **Camera-verversing instelbaar** (zoals de lidar-plot), om wifi-
