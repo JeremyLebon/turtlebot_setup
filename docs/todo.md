@@ -3,7 +3,7 @@
 Centrale lijst van open punten (branch `raspios-migration`). Details en
 achtergrond staan in de migratielogs (`raspios-migration-log.md`,
 `ap-migration-log.md`); deze lijst verwijst ernaar i.p.v. alles te
-herhalen. Laatst bijgewerkt: 2026-10-06.
+herhalen. Laatst bijgewerkt: 2026-10-07.
 
 ## Voor de fleet-uitrol
 
@@ -36,17 +36,24 @@ herhalen. Laatst bijgewerkt: 2026-10-06.
       2026-10-06): opruimen maakte van een build van ~3 min een volledige
       rebuild + push van ~20 min. Plaats vrijmaken via oude images
       (`docker image prune`), niet via `docker buildx prune`.
-- [ ] **Hostname in `/etc/hosts`** op de robot: `sudo` meldt
+- [x] **Hostname in `/etc/hosts`** op de robot: `sudo` meldt
       `kan computernaam turtlebot09 niet herleiden` (en wacht telkens op een
       DNS-timeout). Oorzaak: hostname is `turtlebot09`, maar `/etc/hosts`
       bevat nog `127.0.1.1 raspberrypi` (hostname gewijzigd zonder hosts bij
       te werken). Fix in de setup: die regel vervangen door
       `127.0.1.1 turtlebot<nr>` (of `raspi-config`/`hostnamectl` + hosts).
+      **2026-10-07**: op turtlebot09 met de hand gefixt (backup
+      `/etc/hosts.bak`), sudo nu direct. Moet nog in `setup_turtlebot.sh`
+      (zie uitrolmethode).
 
-- [ ] **Uitschakel-knop nakijken**: op 2026-10-06 voor het eerst gebruikt
+- [x] **Uitschakel-knop nakijken**: op 2026-10-06 voor het eerst gebruikt
       (Jeremy sloot turtlebot09 zo af). Bij de volgende opstart controleren
       dat het een nette shutdown was (`journalctl -b -1 | tail`, geen
       fsck/dirty-meldingen) en of het uit-melodietje klonk.
+      **2026-10-07**: boot erna schoon (geen `recovering journal`, enkel een
+      normale `orphan cleanup`). Vorige-boot-log niet te bekijken: geen
+      persistente journal (`/var/log/journal` bestaat niet). Melodie niet
+      nagevraagd.
 - [ ] **"error"-melodie testen**: bv. tijdelijk een service laten falen
       (poort 9090 bezet) en nagaan dat na 90 s de error-melodie klinkt.
 
