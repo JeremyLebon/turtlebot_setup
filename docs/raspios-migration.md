@@ -104,11 +104,14 @@ cd turtlebot_docker
 docker buildx build --builder rpi5 --platform linux/arm64 \
   -f docker/Dockerfile \
   --build-arg IMAGE_VERSION="$(date +%F) $(git rev-parse --short HEAD)" \
+  --build-arg IMAGE_COMMIT="$(git rev-parse HEAD)" \
+  --build-arg IMAGE_SUBJECT="$(git log -1 --format=%s)" \
   -t nobel86/turtlebot-rpi5:raspios-zenoh --push .
 ```
 
 `IMAGE_VERSION` verschijnt als "Image-versie" op de statuspagina
-(`system.html`); zonder build-arg staat er `dev`.
+(`system.html`); zonder build-arg staat er `dev`. `IMAGE_COMMIT`/
+`IMAGE_SUBJECT` geven de link naar de commit op GitHub.
 
 De `camera_ros`/`libcamera`-build in de Dockerfile is het meest
 hardware-gevoelige stuk (zie commentaar in `docker/Dockerfile`). Verwacht

@@ -167,6 +167,18 @@ write_host_info() {
   else
     prev_end=""; prev_clean=""
   fi
+  local git_as="runuser -u $SETUP_USER -- git -C $SETUP_DIR"
+  # Image uit de compose-file + de digest van de lokale image (voor de
+  # "update beschikbaar"-check tegen Docker Hub in system_info_node)
+  local image_ref image_digest
+  image_ref=$(docker compose --project-directory "$SETUP_DIR" config --images 2>/dev/null | head -1)
+  image_digest=$(docker image inspect "$image_ref" --format '{{range .RepoDigests}}{{println .}}{{end}}' 2>/dev/null \
+                 | head -1 | sed 's/.*@//')
+  SETUP_FULL="$($git_as rev-parse HEAD 2>/dev/null)" \
+  SETUP_BRANCH="$($git_as rev-parse --abbrev-ref HEAD 2>/dev/null)" \
+  SETUP_REPO="$($git_as remote get-url origin 2>/dev/null)" \
+  SETUP_LOG="$($git_as log -5 --format='%H%x09%cs%x09%s' 2>/dev/null)" \
+  IMAGE_REF="$image_ref" IMAGE_DIGEST="$image_digest" \
   GOLDEN="$(cat /etc/turtlebot-golden 2>/dev/null)" \
   SETUP_COMMIT="$(runuser -u "$SETUP_USER" -- git -C "$SETUP_DIR" log -1 --format='%h %cs' 2>/dev/null)" \
   OS_NAME="$(. /etc/os-release; echo "$PRETTY_NAME")" \
@@ -179,8 +191,22 @@ write_host_info() {
 import json, os, sys, time
 e = os.environ
 clean = {"true": True, "false": False}.get(e.get("PREV_CLEAN", ""))
+repo = (e.get("SETUP_REPO") or "").strip()
+if repo.endswith(".git"):
+    repo = repo[:-4]
+log = []
+for line in (e.get("SETUP_LOG") or "").splitlines():
+    parts = line.split("\t", 2)
+    if len(parts) == 3:
+        log.append({"hash": parts[0], "date": parts[1], "subject": parts[2]})
 info = {
     "golden": e.get("GOLDEN") or None,
+    "setup_commit_full": e.get("SETUP_FULL") or None,
+    "setup_branch": e.get("SETUP_BRANCH") or None,
+    "setup_repo_url": repo or None,
+    "setup_log": log,
+    "image_ref": e.get("IMAGE_REF") or None,
+    "image_digest": e.get("IMAGE_DIGEST") or None,
     "setup_commit": e.get("SETUP_COMMIT") or None,
     "os": e.get("OS_NAME") or None,
     "rpi_issue": e.get("RPI_ISSUE") or None,

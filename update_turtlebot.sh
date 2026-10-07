@@ -20,4 +20,6 @@ docker compose --project-directory "$SETUP_DIR" pull
 # Herstart enkel als image of compose-config veranderde
 docker compose --project-directory "$SETUP_DIR" up -d
 docker image prune -f >/dev/null
+# host_info.json opnieuw (nieuwe image-digest/commits voor de statuspagina)
+"$SETUP_DIR/setup_turtlebot.sh" >/dev/null
 echo "🎉 Update voltooid"
