@@ -1,7 +1,7 @@
 [Unit]
 Description=Turtlebot update: git pull of turtlebot_setup + docker compose pull/up
 # Gestart vanaf de statuspagina (launch_control_node -> systemd via D-Bus)
-# of met de hand: sudo systemctl start turtlebot-update
+# of met de hand: sudo systemctl restart turtlebot-update
 # Draait op de host, dus het opnieuw aanmaken van de container onderbreekt
 # de update niet. Log: journalctl -u turtlebot-update
 After=network-online.target docker.service
@@ -10,3 +10,6 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 ExecStart=/home/turtlebot/turtlebot_setup/update_turtlebot.sh
+# Laatste resultaat blijft zichtbaar (statuspagina); herstarten met
+# RestartUnit / systemctl restart turtlebot-update
+RemainAfterExit=yes
