@@ -49,6 +49,9 @@ services:
       # Host system D-Bus: lets launch_control_node reboot / power off the
       # Pi through logind (status page buttons) without sudo or SSH.
       - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket
+      # State that must survive updates/recreating the container, e.g. the
+      # camera on/off choice from the status page (camera_enabled).
+      - ./state:/root/turtlebot_state
     command: bash
     devices:
       - /dev/ttyACM0:/dev/ttyACM0  # OpenCR
