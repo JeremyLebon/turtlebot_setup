@@ -166,7 +166,8 @@ dat script dekt nu niet alles wat per robot verschilt:
 
 ## Features
 
-- [ ] **Waypoint/doel zetten via de webpagina**: klikken op de kaart ->
+- [ ] **Waypoint/doel zetten via de webpagina** (+ robotpositie en het
+      geplande Nav2-pad op de kaart tonen): klikken op de kaart ->
       Nav2 `navigate_to_pose` / `/goal_pose`, klik-coordinaten omrekenen
       via `msg.info.resolution`/`msg.info.origin` (zie
       `ap-migration-log.md`).
@@ -239,6 +240,17 @@ dat script dekt nu niet alles wat per robot verschilt:
       (git pull + setup + `docker compose pull`/`up -d`). Via de host getest
       (nieuwe image binnen 24 s, container opnieuw aangemaakt); de knop zelf
       nog te testen in de browser.
+- [x] **Statuspagina-uitbreiding** (2026-10-07, turtlebot_docker `6e9aa67`,
+      image live op turtlebot09 via de update-service): Pi-gezondheid
+      (temperatuur, onderspanning/throttling + 5V via `/dev/vcio`, SD-kaart),
+      lidar-plot met instelbare verversing (rosbridge `throttle_rate`),
+      labo-check-kaart, verbindingsinfo voor WSL met kopieerknop + verbonden
+      Zenoh-laptops, `/rosout`-logviewer. Nog na te kijken in de browser
+      (layout, lidar-plot oriëntatie, kopieerknop over http).
+- [ ] **Rosbag opnemen vanuit de webpagina**: start/stop-knop, bestand
+      downloaden (studenten nemen data op de robot op en spelen thuis af).
+- [ ] **Camera-verversing instelbaar** (zoals de lidar-plot), om wifi-
+      verkeer te beperken als veel pagina's open staan.
 - [ ] **Voortgangsbalk tijdens de update** (`docker compose pull`) op de
       webpagina.
 
