@@ -290,6 +290,51 @@ dat script dekt nu niet alles wat per robot verschilt:
       rechtstreeks naar Lyrical als ROBOTIS/cartographer dan klaar zijn,
       anders Jazzy als terugval. Opnieuw nakijken voorjaar 2027.
 
+## Studenten via VS Code
+
+- [ ] **Persistente studentenwerkmap**: code in de container verdwijnt nu bij
+      elke update (container wordt opnieuw aangemaakt). Bind mount bv.
+      `./state/student_ws` -> `/root/student_ws` in `docker-compose.yaml`
+      (zoals `camera_enabled`); colcon-workspace daar, `source` in `.bashrc`.
+      Eerst doen, los van welke VS Code-optie.
+- [ ] **Optie A: Remote-SSH rechtstreeks in de container** - `openssh-server`
+      in de image, `sshd` op poort 2222 (host-netwerk) gestart vanuit
+      `services_start.sh` (+ poort in de labo-check/diensten), eigen login
+      (bv. `student`, wachtwoord-patroon zoals ttyd `TurtleBot@P<nr>`),
+      startmap = studentenwerkmap. Studenten zitten zo meteen in de ROS-
+      omgeving zonder host-toegang (past bij "Aparte student-gebruiker").
+      Aandachtspunten: ~200-300 MB RAM per verbonden VS Code-server op de Pi
+      (meten met meerdere studenten op 1 robot); kaart "Verbinden vanaf je
+      laptop" uitbreiden met een kant-en-klare `~/.ssh/config`-regel.
+      Standaard blijft: ontwikkelen in VS Code op de laptop in `turtlebot_vis`
+      (geen belasting voor de Pi); A enkel voor code die op de robot moet draaien.
+
+## Offline gebruik (geen internet via de AP-WAN)
+
+Werkt offline: statuspagina (roslib lokaal), teleop, labo-check, camera,
+lidar, `turtlebot_vis` via Zenoh, SSH/ttyd, bringup/SLAM/Nav2 - alles blijft
+binnen het AP-netwerk van de robot.
+
+- [ ] **VS Code Remote-SSH offline**: de VS Code Server wordt bij de eerste
+      verbinding gedownload. Op de laptops `"remote.SSH.localServerDownload":
+      "always"` zetten (laptop downloadt de arm64-server en kopieert hem via
+      SSH), of de server vooraf in de golden image zetten (versie moet bij de
+      VS Code-client passen).
+- [ ] **Studentenlaptops wisselen van netwerk**: Windows ziet "geen internet"
+      op `TB-AP-<nr>` en kan automatisch naar eduroam springen -> robot weg.
+      In de lesinstructies: automatisch verbinden met andere netwerken uit,
+      of de AP's toch internet geven via de switch.
+- [ ] **Klok zonder NTP**: nagaan of de RTC van elke Pi 5 een batterij heeft;
+      zonder batterij kan de tijd na een stroomonderbreking verkeerd staan
+      (TF-problemen in rviz op de laptop; zichtbaar in de labo-check "Klok").
+      Eventueel de robot zelf als NTP-server voor de laptop, of omgekeerd.
+- [ ] **Vooraf ophalen**: Docker-images (`turtlebot_vis` in WSL, robot-image)
+      en apt/pip-pakketten die studenten nodig hebben, in het begin van het
+      semester - offline werkt `docker pull`/`apt install`/`pip install` niet.
+- [ ] **Update-knop offline**: mislukt (`git pull`/`docker pull`); de update-
+      hint toont "kon niet controleren". Melding op de pagina duidelijker maken
+      ("geen internet - update niet mogelijk").
+
 ## Gebruikers en rechten
 
 - [ ] **Aparte `student`-gebruiker met minder rechten** - doel: ongelukken
