@@ -235,6 +235,48 @@ dat script dekt nu niet alles wat per robot verschilt:
 - [ ] `openamr-platform-sw`: AprilTag-docking als studentenproject met de
       TB3-camera; "ROS 2 Complete Course" in `docs/` als extra lesmateriaal.
 
+## Andere repos om van af te kijken (gecontroleerd 2026-10-08)
+
+- [ ] **Foxglove-bridge / Lichtblick** (`foxglove/foxglove-sdk`, map `ros/`;
+      `lichtblick-suite/lichtblick` = open-source fork van Foxglove Studio):
+      visualisatie in de browser i.p.v. rviz2 in WSL, bridge is C++ en
+      efficienter dan rosbridge. Mogelijk alternatief voor `turtlebot_vis`.
+- [ ] **`dheera/rosboard`**: lichte webserver-node die elk ROS-topic toont -
+      vergelijken met onze statuspagina (generieke topic-viewer).
+- [ ] **`MoffKalast/vizanti`** (branch `ros2`): web-visualizer + missieplanner
+      via rosbridge (doelen/waypoints op de kaart) - voorbeeld voor click-to-goal.
+- [ ] **`robo-friends/m-explore-ros2`**: autonome exploratie (frontiers) -
+      mooie demo/oefening: TB3 brengt zelf een ruimte in kaart.
+- [ ] **`mgonzs13/yolo_ros`**: YOLO in ROS 2 (Humble) - voor het YOLO-
+      feature hierboven (op de laptop/WSL).
+- [ ] **`christianrauch/apriltag_ros`**: AprilTag-detectie (zelfde auteur
+      als `camera_ros`) - markers zoeken/volgen met de TB3-camera.
+- [ ] **`ROBOTIS-GIT/turtlebot3_applications`** en
+      **`turtlebot3_autorace`** (branches `humble`/`jazzy`): officiele TB3-
+      oefeningen met camera (lijnvolgen, autorace, parkeren) - kant-en-klare
+      opdrachten.
+- [ ] **`ros-navigation/navigation2_tutorials`** + Nav2 Simple Commander
+      (Python): waypoints/patrouilles programmeren.
+- [ ] **`linorobot/linorobot2`**: doe-het-zelf ROS 2-robot op een Pi, goede
+      documentatie (setup, Nav2-tuning) als referentie.
+
+## Migratie naar ROS 2 Jazzy (later)
+
+- [ ] **Jazzy afwegen**. Waarom: Humble is EOL in **mei 2027** (Jazzy: mei
+      2029); OpenAMRobot, linorobot2, TurtleBot4 en nieuwe Nav2-features
+      (docking server, route server) mikken op Jazzy; `rmw_zenoh` is in Jazzy
+      beter ondersteund; ROBOTIS heeft `jazzy`-branches voor `turtlebot3`,
+      `turtlebot3_applications` en `turtlebot3_autorace`. Wat het vraagt:
+      - robot-image (`turtlebot_docker`) en studenten-image (`turtlebot_vis`)
+        **tegelijk** migreren: Humble en Jazzy praten niet met elkaar
+        (berichttypes/type-hashes, ook niet via Zenoh);
+      - basisimage `ros:jazzy` (Ubuntu 24.04), eigen builds opnieuw nakijken:
+        `camera_ros`/libcamera/libpisp, `ld08_driver`, `cartographer_headless`;
+      - TB3-firmware/OpenCR en `turtlebot3_node` Jazzy-compatibel?
+      - les- en GitBook-materiaal nakijken op commando-/API-verschillen.
+      Liefst niet midden in een semester; eerst parallel op een testrobot met
+      een eigen tag (bv. `raspios-jazzy`).
+
 ## Gebruikers en rechten
 
 - [ ] **Aparte `student`-gebruiker met minder rechten** - doel: ongelukken
