@@ -110,21 +110,36 @@ hardware-gevoelige stuk (zie commentaar in `docker/Dockerfile`). Verwacht
 hier iteratie: package- of tagversies bijstellen tot de build slaagt en de
 camera op deze specifieke RPi5 + module werkt.
 
-## 7. Systemd-unit installeren
+## 7. Setup-repo, systemd-unit en polkit-regel installeren
 
-Vandaag wordt `setup_turtlebot.sh` manueel gedraaid na het flashen. Met
-Raspberry Pi OS voegen we een systemd-unit toe zodat dit automatisch bij
-elke boot gebeurt:
+`turtlebot_setup` wordt op de robot gecloned naar `~/turtlebot_setup`
+(branch `raspios-migration`); daar staan `docker-compose.yaml`,
+`turtlebot_config.csv` en de `.env` die `setup_turtlebot.sh` schrijft.
+Updates van compose/CSV: `git pull` in die map.
 
 ```bash
-sudo cp turtlebot_setup/setup_turtlebot.sh /usr/local/bin/setup_turtlebot.sh
-sudo chmod +x /usr/local/bin/setup_turtlebot.sh
-sudo mkdir -p /home/turtlebot-rpi5/turtlebot_setup
-sudo cp turtlebot_setup/turtlebot_config.csv /home/turtlebot-rpi5/turtlebot_setup/
-sudo cp turtlebot_setup/systemd/turtlebot-setup.service /etc/systemd/system/
+cd ~ && git clone -b raspios-migration https://github.com/JeremyLebon/turtlebot_setup.git
+sudo install -m 755 turtlebot_setup/setup_turtlebot.sh /usr/local/bin/
+sudo install -m 644 turtlebot_setup/systemd/turtlebot-setup.service /etc/systemd/system/
+sudo install -m 644 turtlebot_setup/polkit/50-turtlebot-networkmanager.rules /etc/polkit-1/rules.d/
 sudo systemctl daemon-reload
-sudo systemctl enable --now turtlebot-setup.service
+sudo systemctl enable turtlebot-setup.service
 ```
+
+Bij elke boot doet `setup_turtlebot.sh` (op basis van het wlan0-MAC-adres):
+hostname + `/etc/hosts`, wifi-profiel `TB-AP-<nr>` (andere `TB-AP-*`
+weg), `.env` + `/etc/profile.d/turtlebot_config.sh`, en bij een gewijzigde
+`.env` de container opnieuw aanmaken. Op een **nieuw bord** (MAC nog niet
+gezien, bv. een gekloonde SD-kaart) genereert het eerst eenmalig een nieuwe
+`machine-id` en nieuwe SSH-host-keys en herstart de robot (marker in
+`/var/lib/turtlebot-setup/`).
+
+**Let op bij een robot die al geconfigureerd is** (zoals turtlebot09): maak
+eerst de marker aan, anders krijgt hij nieuwe SSH-host-keys:
+`sudo mkdir -p /var/lib/turtlebot-setup && sudo touch /var/lib/turtlebot-setup/identity-<MAC zonder :>`.
+
+De polkit-regel laat de groep `netdev` NetworkManager bedienen zonder
+`sudo` (ook over SSH), zie `ap-migration-log.md`.
 
 Test eerst manueel (`sudo /usr/local/bin/setup_turtlebot.sh`), controleer de
 output, en test dan pas met een reboot of de service automatisch aanslaat.
@@ -150,10 +165,9 @@ up` (voorgrond) binnenin een `tmux`/`screen`-sessie op de robot als je
 echt de voorgrond-ervaring wil met behoud van robuustheid tegen
 verbindingsonderbrekingen.
 
-**Let op na een reboot/stroomonderbreking**: de container heeft
-momenteel geen restart-policy (bewuste keuze - studenten leren zo zelf
-Docker (her)starten). Na een reboot moet dus manueel opnieuw
-`docker compose up -d` gedraaid worden.
+**Na een reboot/stroomonderbreking** komt de container vanzelf terug
+(`restart: unless-stopped`, sinds 2026-10-04); de services starten via de
+entrypoint van de image.
 
 In de container:
 ```bash

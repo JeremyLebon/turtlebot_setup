@@ -7,9 +7,11 @@ herhalen. Laatst bijgewerkt: 2026-10-07.
 
 ## Voor de fleet-uitrol
 
-- [ ] **Polkit/NetworkManager-rechten** voor de `turtlebot`-user, zodat
+- [x] **Polkit/NetworkManager-rechten** voor de `turtlebot`-user, zodat
       `nmcli device wifi connect` geen `sudo` meer vraagt (zie
       `ap-migration-log.md`, gotchas turtlebot09).
+      **2026-10-07**: `polkit/50-turtlebot-networkmanager.rules` (groep
+      `netdev`), op turtlebot09 geinstalleerd: `nmcli` zonder sudo OK over SSH.
 - [ ] **AP router-modus uit de doos bevestigen**: start elke TL-WR902AC
       automatisch in router-modus zodra WAN aangesloten is, of was dat bij
       turtlebot09 toeval?
@@ -79,11 +81,14 @@ staan er dan meteen op (geen pull over wifi). Kan, omdat
 de robot herkent aan het **MAC-adres** via `turtlebot_config.csv`. Maar
 dat script dekt nu niet alles wat per robot verschilt:
 
-- [ ] **Hoe komt `docker-compose.yaml` op een robot?** Nu met de hand
+- [x] **Hoe komt `docker-compose.yaml` op een robot?** Nu met de hand
       (`scp` naar `~/turtlebot_setup_test`). Kiezen: meekomen in de
       golden image, `git pull` van een clone van `turtlebot_setup` op de
       robot, of door `setup_turtlebot.sh` laten kopieren.
-- [ ] **`setup_turtlebot.sh` bijwerken voor Raspberry Pi OS**:
+      **Gekozen 2026-10-07**: clone van `turtlebot_setup` in
+      `~/turtlebot_setup` (zit mee in de golden image, updates via `git pull`).
+      turtlebot09 draait nu vanuit die map (`~/turtlebot_setup_test` mag weg).
+- [x] **`setup_turtlebot.sh` bijwerken voor Raspberry Pi OS**:
   - pad `CONFIG_FILE` wijst nog naar `/home/turtlebot-rpi5/...` (oude
     user; nu `turtlebot`).
   - schrijft enkel `/etc/profile.d/turtlebot_config.sh` (en met `>>`:
@@ -96,14 +101,20 @@ dat script dekt nu niet alles wat per robot verschilt:
   - na een wijziging van `.env` de container opnieuw aanmaken
     (`docker compose up -d`), anders blijft de geklonede `turtlebot_9`
     draaien met nr 9.
-- [ ] **Wifi per robot**: de kloon bevat het NetworkManager-profiel van
+      **2026-10-07** gedaan (turtlebot_setup `7c7ddc8`), op turtlebot09
+      getest: container verhuisd naar de nieuwe map, tweede run doet niets.
+- [x] **Wifi per robot**: de kloon bevat het NetworkManager-profiel van
       `TB-AP-09`. Elke robot moet naar zijn eigen AP (`TB-AP-<nr>`,
       wachtwoord `TurtleBot@P<nr>`, zie `ap-migration.md`) - door het
       setup-script laten aanmaken op basis van het nr (oude profiel weg).
-- [ ] **Unieke identiteit na het klonen**: `/etc/machine-id` en de SSH-
+      **2026-10-07** in `setup_turtlebot.sh`. Nog te testen op een kloon
+      (turtlebot06).
+- [x] **Unieke identiteit na het klonen**: `/etc/machine-id` en de SSH-
       host-keys zijn anders identiek op alle robots (DHCP-client-ID,
       "host key changed"-waarschuwingen). Eenmalig bij de eerste boot
       van een kloon opnieuw genereren.
+      **2026-10-07** in `setup_turtlebot.sh` (marker per MAC, daarna reboot).
+      Nog te testen op een kloon (turtlebot06).
 - [ ] **Golden image opkuisen voor het klonen**: container `turtlebot_9`
       en de `buildx_buildkit_rpi50`-builder + cache verwijderen (enkel
       nodig op de bouwrobot), `/tmp`-logs, bash-history, testkaarten.
