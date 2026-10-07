@@ -1,5 +1,6 @@
 #!/bin/bash
-# /usr/local/bin/setup_turtlebot.sh
+# ~/turtlebot_setup/setup_turtlebot.sh (rechtstreeks uit de git-clone, zodat
+# een `git pull` ook dit script bijwerkt)
 #
 # Per-robot configuratie, bij elke boot uitgevoerd door
 # turtlebot-setup.service (als root). De robot wordt herkend aan het
@@ -16,6 +17,7 @@ SETUP_DIR="${SETUP_DIR:-/home/$SETUP_USER/turtlebot_setup}"   # clone van turtle
 CONFIG_FILE="${CONFIG_FILE:-$SETUP_DIR/turtlebot_config.csv}"
 NET_IFACE="wlan0"
 STATE_DIR="/var/lib/turtlebot-setup"
+BUILD_ROBOT_NR=9   # enkel deze robot bouwt images (buildx-builder "rpi5")
 
 # Lees MAC-adres
 MAC=$(tr '[:lower:]' '[:upper:]' < /sys/class/net/$NET_IFACE/address)
@@ -94,6 +96,30 @@ if ! nmcli -t -f NAME connection show | grep -qx "$AP_NAME"; then
     || echo "⚠️ $AP_NAME (nog) niet bereikbaar"
 fi
 
+# --- Systeembestanden uit de repo -------------------------------------------
+# systemd-units en polkit-regel uit de clone naar /etc kopiëren als ze
+# verschillen, zodat een `git pull` ze ook bijwerkt.
+install_if_changed() {  # bron doel modus
+  if ! cmp -s "$1" "$2"; then
+    install -D -m "$3" "$1" "$2" && echo "✅ $2 bijgewerkt" && return 0
+  fi
+  return 1
+}
+UNITS_CHANGED=false
+for unit in turtlebot-setup.service turtlebot-update.service; do
+  install_if_changed "$SETUP_DIR/systemd/$unit" "/etc/systemd/system/$unit" 644 \
+    && UNITS_CHANGED=true
+done
+[ "$UNITS_CHANGED" = true ] && systemctl daemon-reload
+install_if_changed "$SETUP_DIR/polkit/50-turtlebot-networkmanager.rules" \
+  /etc/polkit-1/rules.d/50-turtlebot-networkmanager.rules 644
+
+# Persistente journal (Raspberry Pi OS staat standaard op volatile), zodat
+# `journalctl -b -1` na een crash/shutdown nog werkt. Begrensd tot 100 MB.
+install_if_changed "$SETUP_DIR/systemd/journald-turtlebot.conf" \
+  /etc/systemd/journald.conf.d/50-turtlebot.conf 644 \
+  && systemctl restart systemd-journald
+
 # --- Omgevingsvariabelen -----------------------------------------------------
 # .env naast docker-compose.yaml: die leest Docker Compose zelf, ook bij een
 # automatische herstart (profile.d enkel bij een interactieve login).
@@ -126,6 +152,16 @@ if [ "$REBOOT_NEEDED" = true ]; then
   echo "🔄 Herstarten om de nieuwe identiteit te activeren..."
   systemctl --no-block reboot
   exit 0
+fi
+
+# --- Buildkit enkel op de bouwrobot ------------------------------------------
+# Een kloon van de bouwrobot erft de buildx-builder (container + cache van
+# enkele GB) - op de andere robots niet nodig.
+if [ "$NR" != "$BUILD_ROBOT_NR" ]; then
+  for c in $(docker ps -a --format '{{.Names}}' | grep '^buildx_buildkit_'); do
+    docker rm -f "$c" && docker volume rm -f "${c}_state" >/dev/null \
+      && echo "🗑️ Buildkit-builder $c + cache verwijderd"
+  done
 fi
 
 # --- Container ---------------------------------------------------------------
