@@ -273,6 +273,11 @@ dat script dekt nu niet alles wat per robot verschilt:
       verschil robot-laptop + NTP (timesyncd-config: be.pool, Debian als
       terugval), ping/jitter naar het AP, diensten, container-starts,
       SD-kaartfouten (dmesg). Live op 09, `system_info_node` blijft ~0 % CPU.
+- [x] **Commit-links + update-hint** (2026-10-08, turtlebot_docker `ebe002c`,
+      turtlebot_setup `e167150`): klikbare commits (setup, image, golden),
+      laatste 5 setup-commits, "Update beschikbaar" (robot controleert om de
+      30 min GitHub + Docker Hub-digest). Golden-stempel nu
+      `V<major>.<minor>.<patch>.<build>` (`golden_prepare.sh [x.y.z]`).
 - [ ] **Nieuwe golden image** maken: `sudo ~/turtlebot_setup/tools/golden_prepare.sh`
       op 09 (apt upgrade, pull, stempel, opkuis), uitschakelen, kaart inlezen
       met `~/turtlebot_clone/sdclone.sh read /dev/mmcblk0` (in een echte
