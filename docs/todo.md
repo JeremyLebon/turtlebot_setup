@@ -126,6 +126,13 @@ dat script dekt nu niet alles wat per robot verschilt:
       `docker compose pull` via de ethernet-switch. Trager per robot, maar
       geen kloon-valkuilen.
 
+- [x] **Voorbereiding golden image** (2026-10-07): setup-script draait uit
+      de clone (`git pull` werkt alles bij, ook units/polkit), buildkit wordt
+      verwijderd op elke robot behalve 09, persistente journal (max 100 MB),
+      `apt full-upgrade` op turtlebot09 (Docker 29.8.2, kernel ongewijzigd).
+- [ ] **Kloontest op turtlebot06** (kaart van 09 -> 06): identiteit,
+      hostname, wifi `TB-AP-06`, container `turtlebot_6`, buildkit weg.
+
 ## Bugs
 
 - [x] **SLAM-knop geeft geen kaart** - opgelost 2026-10-06 door de knop
@@ -224,6 +231,16 @@ dat script dekt nu niet alles wat per robot verschilt:
       uplink geen probleem is (DHCP-leases, eventueel apart VLAN).
 - [ ] **AP-kanaaltoewijzing** bijstellen zodra de tafelschikking in het
       lokaal vastligt.
+
+- [x] **Image-versie op de statuspagina** (2026-10-07, turtlebot_docker
+      `a08d4e5`): build-arg `IMAGE_VERSION`, getoond op `system.html`.
+- [x] **Software bijwerken vanuit de webpagina** (2026-10-07): knop op
+      `system.html` -> `/system/update` -> host-unit `turtlebot-update.service`
+      (git pull + setup + `docker compose pull`/`up -d`). Via de host getest
+      (nieuwe image binnen 24 s, container opnieuw aangemaakt); de knop zelf
+      nog te testen in de browser.
+- [ ] **Voortgangsbalk tijdens de update** (`docker compose pull`) op de
+      webpagina.
 
 ## Laag prioritair
 
