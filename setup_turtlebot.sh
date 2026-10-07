@@ -142,6 +142,61 @@ install_if_changed "$SETUP_DIR/systemd/journald-turtlebot.conf" \
   /etc/systemd/journald.conf.d/50-turtlebot.conf 644 \
   && systemctl restart systemd-journald && journalctl --flush
 
+# NTP: vaste servers (Belgische pool, Debian als terugval)
+install_if_changed "$SETUP_DIR/systemd/timesyncd-turtlebot.conf" \
+  /etc/systemd/timesyncd.conf.d/50-turtlebot.conf 644 \
+  && systemctl restart systemd-timesyncd
+
+# --- Host-info voor de statuspagina -------------------------------------------
+# De container ziet de host-software niet; schrijf ze in state/host_info.json
+# (bind-mounted in de container, gelezen door system_info_node).
+# /etc/turtlebot-golden: stempel gezet door tools/golden_prepare.sh bij het
+# maken van de golden image, meegekloond naar elke robot.
+write_host_info() {
+  mkdir -p "$SETUP_DIR/state"
+  local prev_end prev_clean
+  if journalctl -b -1 -n 0 >/dev/null 2>&1; then
+    prev_end=$(journalctl -b -1 -n 1 -o short-iso --no-pager 2>/dev/null | awk '{print $1}')
+    # Een nette afsluiting eindigt met systemd-shutdown + "Journal stopped";
+    # stroom weg / batterij uitgetrokken laat de journal halverwege stoppen.
+    if journalctl -b -1 -n 30 -o cat --no-pager 2>/dev/null | grep -q "Journal stopped"; then
+      prev_clean=true
+    else
+      prev_clean=false
+    fi
+  else
+    prev_end=""; prev_clean=""
+  fi
+  GOLDEN="$(cat /etc/turtlebot-golden 2>/dev/null)" \
+  SETUP_COMMIT="$(runuser -u "$SETUP_USER" -- git -C "$SETUP_DIR" log -1 --format='%h %cs' 2>/dev/null)" \
+  OS_NAME="$(. /etc/os-release; echo "$PRETTY_NAME")" \
+  RPI_ISSUE="$(head -1 /etc/rpi-issue 2>/dev/null)" \
+  KERNEL="$(uname -r)" \
+  DOCKER_VERSION="$(docker version --format '{{.Server.Version}}' 2>/dev/null)" \
+  BOOTLOADER="$(vcgencmd bootloader_version 2>/dev/null | head -1)" \
+  PREV_END="$prev_end" PREV_CLEAN="$prev_clean" \
+  python3 - "$SETUP_DIR/state/host_info.json" <<'PY'
+import json, os, sys, time
+e = os.environ
+clean = {"true": True, "false": False}.get(e.get("PREV_CLEAN", ""))
+info = {
+    "golden": e.get("GOLDEN") or None,
+    "setup_commit": e.get("SETUP_COMMIT") or None,
+    "os": e.get("OS_NAME") or None,
+    "rpi_issue": e.get("RPI_ISSUE") or None,
+    "kernel": e.get("KERNEL") or None,
+    "docker": e.get("DOCKER_VERSION") or None,
+    "bootloader": e.get("BOOTLOADER") or None,
+    "prev_boot_end": e.get("PREV_END") or None,
+    "prev_shutdown_clean": clean,
+    "written": int(time.time()),
+}
+with open(sys.argv[1], "w") as f:
+    json.dump(info, f, indent=1)
+PY
+}
+write_host_info
+
 # --- Omgevingsvariabelen -----------------------------------------------------
 # .env naast docker-compose.yaml: die leest Docker Compose zelf, ook bij een
 # automatische herstart (profile.d enkel bij een interactieve login).
