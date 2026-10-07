@@ -55,6 +55,22 @@ if [ ! -f "$IDENTITY_MARKER" ]; then
   REBOOT_NEEDED=true
 fi
 
+# --- Rootpartitie vergroten --------------------------------------------------
+# De golden image is ingekrompen met PiShrink -s (zonder diens rc.local-
+# auto-expand, die zou met de reboot hierboven botsen). Hier groeit de
+# rootpartitie online tot het einde van de kaart, als er meer dan 1 GB vrij is.
+ROOT_PART=$(findmnt -no SOURCE /)                       # bv. /dev/mmcblk0p2
+ROOT_DISK="/dev/$(lsblk -no PKNAME "$ROOT_PART")"       # bv. /dev/mmcblk0
+PART_NR=$(cat "/sys/class/block/$(basename "$ROOT_PART")/partition")
+DISK_SECTORS=$(cat "/sys/class/block/$(basename "$ROOT_DISK")/size")
+PART_END=$(( $(cat "/sys/class/block/$(basename "$ROOT_PART")/start") + \
+             $(cat "/sys/class/block/$(basename "$ROOT_PART")/size") ))
+if [ $(( DISK_SECTORS - PART_END )) -gt $(( 2 * 1024 * 1024 )) ]; then   # 512 B-sectoren
+  echo "💾 Rootpartitie vergroten tot het einde van de kaart..."
+  growpart "$ROOT_DISK" "$PART_NR" && resize2fs "$ROOT_PART" \
+    && echo "✅ Rootpartitie vergroot: $(df -h / | awk 'NR==2 {print $2}')"
+fi
+
 # --- Hostname ----------------------------------------------------------------
 if [ "$(hostname)" != "$HOSTNAME" ]; then
   hostnamectl set-hostname "$HOSTNAME"
