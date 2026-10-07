@@ -276,6 +276,14 @@ dat script dekt nu niet alles wat per robot verschilt:
       - les- en GitBook-materiaal nakijken op commando-/API-verschillen.
       Liefst niet midden in een semester; eerst parallel op een testrobot met
       een eigen tag (bv. `raspios-jazzy`).
+- [ ] **Of Jazzy overslaan -> Lyrical Luth** (LTS, mei 2026, Ubuntu 26.04,
+      EOL mei 2031). Stand 2026-10-08 (arm64-pakketten op packages.ros.org):
+      Lyrical heeft al navigation2, slam_toolbox, rmw_zenoh, rosbridge,
+      camera_ros, dynamixel_sdk, maar NOG GEEN turtlebot3-pakketten,
+      cartographer_ros en LDS-drivers (Jazzy wel). Voorstel: dit academiejaar
+      op Humble blijven (support tot mei 2027), migratie in de zomer van 2027
+      rechtstreeks naar Lyrical als ROBOTIS/cartographer dan klaar zijn,
+      anders Jazzy als terugval. Opnieuw nakijken voorjaar 2027.
 
 ## Gebruikers en rechten
 
