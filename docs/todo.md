@@ -258,6 +258,17 @@ dat script dekt nu niet alles wat per robot verschilt:
       labo-check-kaart, verbindingsinfo voor WSL met kopieerknop + verbonden
       Zenoh-laptops, `/rosout`-logviewer. Nog na te kijken in de browser
       (layout, lidar-plot oriëntatie, kopieerknop over http).
+- [x] **Camera aan/uit vanuit de webpagina** (2026-10-08, turtlebot_docker
+      `061c6b2`): knop op de camerakaart (`index.html`) + start/stop in
+      Launch control. Keuze onthouden in `~/turtlebot_setup/state/camera_enabled`
+      (bind mount, overleeft update/herstart; zonder bestand geldt
+      `ENABLE_CAMERA` uit de CSV). `camera_node` start enkel als er een
+      sensor is (`camera_present.sh`, v4l-subdev-naam; `cam -l` segfault).
+      Getest op 09 (aan/uit, onthouden na container-herstart).
+- [ ] **Camera-knop testen op een robot zonder camera** (turtlebot06):
+      update via "Software bijwerken", dan camera AAN -> melding "geen camera
+      gevonden", geen crash; container herstarten -> "[camera] ingeschakeld
+      maar geen camera gevonden"; daarna terug UIT.
 - [ ] **Rosbag opnemen vanuit de webpagina**: start/stop-knop, bestand
       downloaden (studenten nemen data op de robot op en spelen thuis af).
 - [ ] **Camera-verversing instelbaar** (zoals de lidar-plot), om wifi-
