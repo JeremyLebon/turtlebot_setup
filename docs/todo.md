@@ -61,10 +61,11 @@ herhalen. Laatst bijgewerkt: 2026-10-07.
 
 ## Uitrol
 
-- [ ] **Nieuw `docker-compose.yaml` naar elke robot** (met de mount
+- [x] **Nieuw `docker-compose.yaml` naar elke robot** (met de mount
       `/run/dbus/system_bus_socket`, nodig voor de aan/uit-knoppen; zonder
       die mount geven ze een foutmelding). Image `raspios-zenoh` van
       2026-10-06 of later.
+      **Opgelost 2026-10-08**: compose zit in de clone `~/turtlebot_setup` (golden image) en komt bij elke update mee via `git pull`.
 - [ ] **AP + robot configureren voor turtlebot01-08** (tabel in
       `ap-migration.md`, status "open").
 - [ ] **Overige 8 robots naar Raspberry Pi OS + Docker** (alles is tot nu
@@ -115,12 +116,14 @@ dat script dekt nu niet alles wat per robot verschilt:
       van een kloon opnieuw genereren.
       **2026-10-07** in `setup_turtlebot.sh` (marker per MAC, daarna reboot).
       Nog te testen op een kloon (turtlebot06).
-- [ ] **Golden image opkuisen voor het klonen**: container `turtlebot_9`
+- [x] **Golden image opkuisen voor het klonen**: container `turtlebot_9`
       en de `buildx_buildkit_rpi50`-builder + cache verwijderen (enkel
       nodig op de bouwrobot), `/tmp`-logs, bash-history, testkaarten.
-- [ ] **Image verkleinen**: turtlebot09 heeft een kaart van 32 GB - het
+      **Opgelost 2026-10-08**: `tools/golden_prepare.sh` + `setup_turtlebot.sh` (buildkit, container, journal, state op de kloon).
+- [x] **Image verkleinen**: turtlebot09 heeft een kaart van 32 GB - het
       image eerst inkrimpen (bv. PiShrink) zodat het ook op een iets
       kleinere 32 GB-kaart past en sneller schrijft.
+      **Opgelost 2026-10-08**: PiShrink (in `debian:trixie`) via `sdclone.sh read`, 30 -> 21 GB.
 - [ ] **Alternatief afwegen**: verse Raspberry Pi OS via Raspberry Pi
       Imager (hostname/wifi/user per kaart ingesteld) + setup-script +
       `docker compose pull` via de ethernet-switch. Trager per robot, maar
@@ -361,8 +364,9 @@ dat script dekt nu niet alles wat per robot verschilt:
       camera gevonden", alle services up; UIT -> onthouden.
 - [ ] **Rosbag opnemen vanuit de webpagina**: start/stop-knop, bestand
       downloaden (studenten nemen data op de robot op en spelen thuis af).
-- [ ] **Camera-verversing instelbaar** (zoals de lidar-plot), om wifi-
+- [x] **Camera-verversing instelbaar** (zoals de lidar-plot), om wifi-
       verkeer te beperken als veel pagina's open staan.
+      **Opgelost 2026-10-07** (turtlebot_docker `5eb79ec`): uit/1/5/max fps, standaard 5.
 - [ ] **Voortgangsbalk tijdens de update** (`docker compose pull`) op de
       webpagina.
 
