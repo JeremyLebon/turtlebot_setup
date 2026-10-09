@@ -435,6 +435,11 @@ Nieuwe wensen (2026-10-09):
       muur (pad gaat erom), voorkeurszone (+ kost in Geavanceerd), snelheidszone
       (vertraagt hij?), lege batterij -> rode melding en na wisselen komt
       turtlebot3_ros vanzelf terug (respawn).
+- [ ] **Kaart + zones + routes exporteren/importeren** naar andere robots
+      (vraag Jeremy 2026-10-09). Opties: (a) downloaden/uploaden als bundel
+      via nav.html (laptop wisselt van AP), (b) kaartenbibliotheek op de
+      fleet monitor: robot uploadt, andere robots halen op via het
+      opdrachtkanaal (werkt door de NAT, ook voor alle robots tegelijk).
 - [ ] **Noodstop / actieve stuurbron tonen** (twist_mux-vervolg): e-stop-knop
       op elke pagina (twist_mux lock-topic) + welke bron rijdt nu.
 - [x] **Kaartbeheer** (2026-10-09: hernoemen/kopie/verwijderen, routes per kaart, kaarteditor met origineel-backup; free_thresh-bug 0.25 -> 0.196 opgelost): kaarten hernoemen/verwijderen op de pagina, routes
