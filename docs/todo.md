@@ -149,6 +149,9 @@ dat script dekt nu niet alles wat per robot verschilt:
       **2026-10-09**: turtlebot05 en 07 getest met golden V0.1.0.2: werken
       perfect (samen met 06 en 09 nu 4 van 9). SD-kaarten voor 01-04 en 08
       zijn geschreven, nog niet getest op de robots.
+      Nog te doen op 05 en 07 (staan op school): eenmaal "Software bijwerken"
+      (golden V0.1.0.2 mist de fixes van na de kloontest). Idem op 01-04/08
+      na hun eerste boot.
 
 ## Bugs
 
