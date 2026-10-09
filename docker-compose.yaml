@@ -62,8 +62,11 @@ services:
       - /dev/input:/dev/input
     command: bash
     devices:
-      - /dev/ttyACM0:/dev/ttyACM0  # OpenCR
-      - /dev/ttyUSB0:/dev/ttyUSB0  # LDS 01 - laser lidar
+      # OpenCR (/dev/ttyACM0) en lidar (/dev/ttyUSB0) bewust NIET hier:
+      # in spaarstand staat de USB-stroom uit (usb_power in de image) en dan
+      # bestaan ze niet - een ontbrekend toestel onder devices: laat de
+      # container niet starten. privileged geeft toegang tot alle toestellen;
+      # usb_power maakt de /dev-nodes aan als ze pas na de start verschijnen.
       - /dev/i2c-1:/dev/i2c-1  # I2C bus (RPi5, Raspberry Pi OS)
       # CSI camera (libcamera/camera_ros) replaces the old USB webcam
       # (/dev/video0). libcamera on RPi5 exposes several /dev/video* and
