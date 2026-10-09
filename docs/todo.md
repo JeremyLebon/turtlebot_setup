@@ -244,6 +244,15 @@ dat script dekt nu niet alles wat per robot verschilt:
 - [ ] **I2C-shield / Grove Base Hat** terug aansluiten na de bordwissel en
       testen.
 
+## Morgen eerst (2026-10-10)
+- Image bouwen + op 09 zetten: `79b7222` (routepunten zonder sleep -> rijrichting,
+  MPPI GoalAngleCritic 0.25, piep = "on"-melodie, actielog). Mislukte op
+  2026-10-09 ~23:00: Docker Hub auth (`POST auth.docker.io/token` 504 met geldige
+  login, ook `docker login` met PAT). Lukt het niet: tijdelijk via ghcr.io.
+- Daarna: route "test" op buro_groot opnieuw aanklikken (oude punten hebben
+  vaste richting 0) en met MPPI testen; recoveries bij punt 1/2 weg?
+- buro_groot heeft 0 zones sinds 20:59 (zelf gewist? anders terugzetten).
+
 ## Features
 
 ### Ideeën navigatie (Jeremy, 2026-10-09) - voorgestelde volgorde
