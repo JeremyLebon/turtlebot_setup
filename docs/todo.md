@@ -391,13 +391,18 @@ Nieuwe wensen (2026-10-09):
       geen motorcommando, maar de USB-stroom van de Pi 5 kan uit - enkel voor
       alle 4 poorten samen (`uhubctl` op alle root hubs; enkel poort 3-1 uit
       zet de 5V niet af). Getest op 09: lidar stopt, OpenCR (op batterij) en
-      F710 komen na "aan" terug. Image: `usb_power on|off|status`;
+      F710 komen na "aan" terug. Schakelen gebeurt op de HOST
+      (`usb_power_host.sh`, `turtlebot-usb-power@on|off.service`, uhubctl via
+      setup): uhubctl in de container liet spooktoestellen achter. Image:
+      `usb_power on|off|status` (start de host-unit via D-Bus);
       `launch_control_node` zet de stroom uit na 2 min zonder gebruik (geen
       launch, geen proces met ttyACM0/ttyUSB0/input open) en aan voor
       bringup/SLAM/Navigatie/joystick; knop + "automatisch"-vinkje op
       system.html; `ros2 launch`-wrapper in de terminal zet ze aan.
       docker-compose: ttyACM0/ttyUSB0 uit `devices:` (container moet ook
-      starten met USB uit). Nog met Jeremy testen: hele cyclus via de pagina.
+      starten met USB uit). Getest op 09 (zonder rijden): auto-uit, bringup en
+      joystick vanuit "uit", weigeren van "uit" tijdens gebruik, terminal-
+      wrapper. Nog met Jeremy: knop/vinkje op system.html bekijken.
 - [ ] **Lidar-scan op het camerabeeld leggen**: vraagt de intrinsieke
       kalibratie (`camera_info`) en de extrinsieke (TF `base_scan` ->
       camera optisch frame, zie camerakalibratie hierboven). Dan per scanpunt
