@@ -431,6 +431,22 @@ Nieuwe wensen (2026-10-09):
       pagina met canvas).
 - [x] **MPPI-controller** aanbieden op `nav.html` (2026-10-09: 1000 trajecten, 8-15% van 1 kern, rijdt goed) (zit in de image, maar zwaar
       voor een Pi 5 naast de rest - eerst CPU meten met kleinere batch).
+- [x] **2026-10-09 avond - gebouwd** (handleiding: turtlebot_docker/docs/statuspagina.md):
+      tab Projecten (project.json per project): lidar_avoid, apriltag_demo,
+      nav_patrol, explore_demo (+ explore_lite uit de broncode); camera-
+      instellingen + intrinsieke kalibratie per resolutie (calibrate_camera.sh
+      in turtlebot_vis); kaart export/import als zip (+png), kaartenbibliotheek
+      in de monitor; "Aanpassingen"-icoon; zones ook tijdens SLAM/verkennen
+      (+ verkenningsgebied); Verkennen en SLAM/Navigatie sluiten elkaar uit;
+      rosbridge-waakhond (getest met SIGSTOP); odometrie start op 0;
+      turtlebot3_ros respawn; batterij 0 % = 11,0 V.
+      Lessen: twee Nav2-stacks tegelijk -> robot rijdt door + Pi overbelast ->
+      rosbridge (Zenoh) vast; "Alles standaard"/auto-wissen mag nooit werk van
+      de gebruiker wissen (map_buro-bewerking + 4 zones verloren).
+- [ ] **Testen met Jeremy (open)**: AprilTag (tag op gsm) + camerakalibratie
+      (dambord); lidar_avoid en nav_patrol rijdend; verkennen met
+      verkenningsgebied (raam); kaart naar andere robot via export of monitor;
+      monitor met vast IP (monitor.conf) en meerdere robots.
 - [ ] **Rijtests met batterij (open van 2026-10-09)**: verboden zone + virtuele
       muur (pad gaat erom), voorkeurszone (+ kost in Geavanceerd), snelheidszone
       (vertraagt hij?), lege batterij -> rode melding en na wisselen komt
