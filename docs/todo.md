@@ -180,6 +180,22 @@ dat script dekt nu niet alles wat per robot verschilt:
       `map`->`odom` van AMCL nooit kreeg ("map does not exist"). Fix: image-ENV
       `ZENOH_CONFIG_OVERRIDE` `mode="client"` naar `tcp/127.0.0.1:7447` (alles
       via de router, zoals op de laptops) + Nav2 met `use_composition:=False`.
+      **Correctie (later op 2026-10-09):** de echte oorzaak was tf2 0.25.23
+      (Humble-sync 2026-09-07): ABBA-deadlock waitForTransform /
+      testTransformableRequests (ros2/geometry2#982, #995) - de TF-listener van
+      een proces bevriest na enkele seconden, costmap-footprints blijven op een
+      oude tijd staan. Image haalt tf2 0.25.24 uit ros2-testing (Dockerfile-laag,
+      faalt bij < 0.25.24); `turtlebot_vis` heeft 0.25.22 + bewaking. Client-
+      modus blijft (kan geen kwaad). Snelle check bij twijfel:
+      `/local_costmap/published_footprint`-stamps moeten actueel zijn.
+- [x] **Eerste doel na wissel van planner faalde** - nieuwe BT = nieuwe
+      clients, Zenoh-ontdekking > Nav2's 20 ms: `bt_navigator`
+      `default_server_timeout` 1000 ms (gegenereerde Nav2-parameters).
+- [x] **Doelnauwkeurigheid** - keuze ruim/normaal/precies/eigen per doel
+      (nav_web_node zet `general_goal_checker` dynamisch), route-tussenpunten
+      ruim; standaard nu 10 cm / 0.15 rad i.p.v. TB3's 25 cm. Getest OK.
+- [x] **Kaart soms niet zichtbaar op nav.html** - latched `/map` gemist door
+      late pagina: nu ook `map_server`'s GetMap-service. Getest OK.
 - [x] **Nav2-processen bleven hangen na Stop** (`controller_server`,
       `planner_server` als wezen) - opgelost 2026-10-09: stoppen = SIGINT,
       SIGTERM, SIGKILL incl. kindprocessen (`CHILD_PATTERNS`).
