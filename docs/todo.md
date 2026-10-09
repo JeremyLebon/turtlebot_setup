@@ -59,7 +59,7 @@ herhalen. Laatst bijgewerkt: 2026-10-09.
 - [ ] **"error"-melodie testen**: bv. tijdelijk een service laten falen
       (poort 9090 bezet) en nagaan dat na 90 s de error-melodie klinkt.
 
-- [ ] **Robot blijft op een ander wifi-netwerk hangen** (2026-10-09:
+- [x] **Robot blijft op een ander wifi-netwerk hangen** (opgelost in setup_turtlebot.sh, 2026-10-09) (2026-10-09:
       turtlebot09 niet te vinden op `TB-AP-09` en ook niet op `RobotWifi`).
       NetworkManager gebruikt de prioriteit (100 voor `TB-AP-<nr>`) enkel bij
       het kiezen van een netwerk, en schakelt niet over van een verbonden
@@ -202,7 +202,7 @@ dat script dekt nu niet alles wat per robot verschilt:
 - [x] **Kaarten verdwenen bij elke update** (stonden in de container) - nu in
       `state/maps` (2026-10-09).
 
-- [ ] **`turtlebot_vis`: shell sluit bij elk mislukt commando** (bv. een
+- [x] **`turtlebot_vis`: shell sluit bij elk mislukt commando** (opgelost, turtlebot_vis `f9b9df5`) (bv. een
       typfout -> terug uit `docker exec -it turtlebot-vis bash`). Oorzaak: de
       `.bashrc` deed `source /ros_entrypoint.sh`, en dat script begint met
       `set -e`. In de oude `turtlebot_docker/docker_vis` was dit al omzeild
@@ -299,7 +299,7 @@ Nieuwe wensen (2026-10-09):
       Getest: rijden, turbo, LB loslaten = stop, joystick wint van webteleop
       (gemeten: webberichten tijdens joystickgebruik niet doorgegeven).
       Nog te testen: ontvanger uittrekken/insteken terwijl de container draait.
-- [ ] **Prioriteit tussen stuurbronnen met `twist_mux`** -
+- [x] **Prioriteit tussen stuurbronnen met `twist_mux`** - getest op 09 (joystick > web > /cmd_vel) -
       **gebouwd 2026-10-09** (turtlebot_docker `ed4c567`, fork turtlebot3
       `dba8cf8`), lokaal getest in een Humble-container; image nog te bouwen
       en op een robot te testen.
@@ -356,7 +356,7 @@ Nieuwe wensen (2026-10-09):
       Bouwt verder op de Nav2-webpagina; voorbeelden: `vizanti`, OpenAMRobot
       (zie hieronder).
 
-- [ ] **Waypoint/doel zetten via de webpagina** (+ robotpositie en het
+- [x] **Waypoint/doel zetten via de webpagina** (nav.html: doel, route, lus - getest) (+ robotpositie en het
       geplande Nav2-pad op de kaart tonen): klikken op de kaart ->
       Nav2 `navigate_to_pose` / `/goal_pose`, klik-coordinaten omrekenen
       via `msg.info.resolution`/`msg.info.origin` (zie
@@ -424,8 +424,14 @@ Nieuwe wensen (2026-10-09):
       camera optisch frame, zie camerakalibratie hierboven). Dan per scanpunt
       projecteren in het beeld (op de laptop in `turtlebot_vis` of op de
       pagina met canvas).
-- [ ] **MPPI-controller** aanbieden op `nav.html` (zit in de image, maar zwaar
+- [x] **MPPI-controller** aanbieden op `nav.html` (2026-10-09: 1000 trajecten, 8-15% van 1 kern, rijdt goed) (zit in de image, maar zwaar
       voor een Pi 5 naast de rest - eerst CPU meten met kleinere batch).
+- [ ] **Rijtests met batterij (open van 2026-10-09)**: verboden zone + virtuele
+      muur (pad gaat erom), voorkeurszone (+ kost in Geavanceerd), snelheidszone
+      (vertraagt hij?), lege batterij -> rode melding en na wisselen komt
+      turtlebot3_ros vanzelf terug (respawn).
+- [ ] **Noodstop / actieve stuurbron tonen** (twist_mux-vervolg): e-stop-knop
+      op elke pagina (twist_mux lock-topic) + welke bron rijdt nu.
 - [ ] **Kaartbeheer**: kaarten hernoemen/verwijderen op de pagina, routes
       opslaan per kaart.
 
@@ -500,7 +506,7 @@ Nieuwe wensen (2026-10-09):
 
 ## Studenten via VS Code
 
-- [ ] **Persistente studentenwerkmap**: code in de container verdwijnt nu bij
+- [x] **Persistente studentenwerkmap**: code in de container verdwijnt nu bij
       elke update (container wordt opnieuw aangemaakt).
       **Gebouwd 2026-10-09, getest op turtlebot09** (image `2026-10-09 ed4c567`,
       digest `sha256:215be0ff…`): pakket gebouwd in `/root/ros2_ws`, container
