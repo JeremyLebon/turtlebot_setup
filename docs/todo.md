@@ -69,7 +69,11 @@ herhalen. Laatst bijgewerkt: 2026-10-09.
       `TB-AP-<nr>`, en alle andere wifi-profielen verwijderen - enkel als de
       eigen AP zichtbaar is (anders zit een robot zonder geconfigureerde AP
       nergens meer op). Logica droog getest op de laptop; nog te testen op een
-      robot (na "Software bijwerken" of reboot). Gevolg: een robot op een
+      robot (na "Software bijwerken" of reboot).
+      **Getest op turtlebot09 2026-10-09**: oorzaak bevestigd - het met de hand
+      aangemaakte `TB-AP-09` had prioriteit 0, gelijk aan `RobotWifi`,
+      `RobotWifi 1` en `Wifi_turtlebots`. Na de update: die drie verwijderd,
+      `TB-AP-09` prioriteit 100 en retries 0. Gevolg: een robot op een
       ander netwerk zetten kan daarna enkel via scherm/ethernet of door zijn
       AP aan te zetten.
 
@@ -278,6 +282,10 @@ Nieuwe wensen (2026-10-09):
       Nog te doen: `teleop_twist_joy` naar `/cmd_vel_joy` (bij de
       joystick-knop), noodstop via een `lock` (let op: bij een lock stuurt
       `twist_mux` geen nulsnelheid - zelf eerst een stop publiceren),
+      **Op turtlebot09 (2026-10-09)**: `twist_mux` draait, met bringup is
+      `/cmd_vel_out` 1 pub (twist_mux) / 1 sub (turtlebot3_node) en heeft
+      `/cmd_vel` enkel twist_mux als subscriber. Rijtests (webteleop, Nav2,
+      overnemen) nog niet gedaan.
       actieve bron tonen op de statuspagina.
 - [ ] **Masterpagina: alle turtlebots in 1 overzicht** (batterij, temperatuur,
       services, versie, wie verbonden is). Let op: met een AP per robot in
@@ -415,8 +423,10 @@ Nieuwe wensen (2026-10-09):
 
 - [ ] **Persistente studentenwerkmap**: code in de container verdwijnt nu bij
       elke update (container wordt opnieuw aangemaakt).
-      **Gebouwd 2026-10-09** (nog niet getest op een robot, image nog niet
-      gebouwd): bind mount `./ros2_ws` -> `/root/ros2_ws`
+      **Gebouwd 2026-10-09, getest op turtlebot09** (image `2026-10-09 ed4c567`,
+      digest `sha256:215be0ff…`): pakket gebouwd in `/root/ros2_ws`, container
+      opnieuw aangemaakt -> code + build staan er nog, `ros2 pkg prefix` vindt
+      het zonder `source`: bind mount `./ros2_ws` -> `/root/ros2_ws`
       (`docker-compose.yaml`, gitignored), aangemaakt door `setup_turtlebot.sh`
       (als `turtlebot`, met `src/`), leeggemaakt door `golden_prepare.sh`.
       In de image: `.bashrc` sourcet `/root/ros2_ws/install/setup.bash`
