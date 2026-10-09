@@ -247,6 +247,9 @@ dat script dekt nu niet alles wat per robot verschilt:
 ## Features
 
 ### Ideeën navigatie (Jeremy, 2026-10-09) - voorgestelde volgorde
+1. ~~**Route pauzeren / verder**~~ en 2. ~~**Actie per locatie**~~ gebouwd
+   (b0ecbf0, nog te testen met rijden). Ook: doel/route tijdens Verkennen
+   pauzeert explore_lite (491a31c).
 1. **Route pauzeren / verder** - nav_web houdt de route (index) bij: Pauze =
    huidig doel annuleren, Verder = huidig punt opnieuw sturen. Klein.
 2. **Actie per locatie** - per routepunt: wachten N s, piepen, foto (camera
