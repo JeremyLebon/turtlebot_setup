@@ -153,13 +153,20 @@ install_if_changed() {  # bron doel modus
   return 1
 }
 UNITS_CHANGED=false
-for unit in turtlebot-setup.service turtlebot-update.service; do
+for unit in turtlebot-setup.service turtlebot-update.service turtlebot-usb-power@.service; do
   install_if_changed "$SETUP_DIR/systemd/$unit" "/etc/systemd/system/$unit" 644 \
     && UNITS_CHANGED=true
 done
 [ "$UNITS_CHANGED" = true ] && systemctl daemon-reload
 install_if_changed "$SETUP_DIR/polkit/50-turtlebot-networkmanager.rules" \
   /etc/polkit-1/rules.d/50-turtlebot-networkmanager.rules 644
+
+# uhubctl: USB-stroom aan/uit (lidar-spaarstand, usb_power_host.sh). Mag
+# mislukken zonder internet - dan blijft de USB-stroom gewoon aan.
+if ! command -v uhubctl >/dev/null; then
+  apt-get install -y uhubctl >/dev/null 2>&1 && echo "✅ uhubctl geïnstalleerd" \
+    || echo "⚠️ uhubctl niet geïnstalleerd (geen internet?) - USB-spaarstand werkt niet"
+fi
 
 # Persistente journal (Raspberry Pi OS staat standaard op volatile), zodat
 # `journalctl -b -1` na een crash/shutdown nog werkt. Begrensd tot 100 MB.
