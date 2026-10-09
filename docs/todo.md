@@ -209,13 +209,29 @@ Nieuwe wensen (2026-10-09):
       -> `set_parameters` via rosbridge, keuze bewaren in `state/` (zoals
       `camera_enabled`) en meegeven bij het starten van `camera_node`. Nagaan
       welke controls live aanpasbaar zijn en welke een herstart vragen.
-- [ ] **Camerakalibratie** (intrinsiek, dambordpatroon): `camera_calibration`
+- [ ] **Camerakalibratie - intrinsiek** (dambordpatroon): `camera_calibration`
       (`cameracalibrator`) op de laptop in `turtlebot_vis` (heeft een GUI,
       werkt via WSLg) tegen `/camera/image_raw`, resultaat naar de robot via
       `camera_ros` (`camera_info_url` / `set_camera_info`) en bewaren in
       `state/`. Alternatief: kalibratiemodus op de webpagina (hogere
       resolutie/fps tijdelijk, beelden vastleggen, kalibratie op de robot).
-      Nodig voor o.a. AprilTags.
+      Nodig voor o.a. AprilTags. Resultaat (`K`, `D`, `R`, `P`) per robot
+      bewaren, want elke cameramodule verschilt; nu staat er geen
+      `camera_info_url` in `camera_params.yaml` en publiceert `camera_ros`
+      een lege/onbekalibreerde `camera_info`. Per resolutie opnieuw
+      kalibreren (640x480 is de standaard).
+- [ ] **Camerakalibratie - extrinsiek** (waar zit de camera t.o.v. de robot):
+      de burger-URDF (`turtlebot3_burger.urdf`) heeft **geen camera-frame**,
+      dus er is geen TF `base_link` -> `camera_link` -> optisch frame, en het
+      `frame_id` van de beelden hangt nergens aan. Stappen: (1) statische TF
+      met de gemeten positie/hoek van onze CSI-montage (`static_transform_
+      publisher` in bringup, of een eigen URDF-uitbreiding), met de juiste
+      optische rotatie (z vooruit, x rechts, y omlaag) en `frame_id` gelijk
+      zetten in `camera_params.yaml`; (2) waarden per robot bewaren in
+      `state/` als de montage verschilt; (3) eventueel nauwkeuriger met een
+      AprilTag/dambord op een gekende plek t.o.v. de robot. Nodig om
+      detecties (AprilTag, YOLO) op de kaart of in rviz op de juiste plek te
+      zetten.
 - [ ] **Internetverbinding-indicator** op de statuspagina: `system_info_node`
       test om de ~30 s DNS + een TCP-verbinding (bv. `1.1.1.1:443`,
       `github.com`) -> vakje "Internet: ja/nee". Ook gebruiken voor de
@@ -227,8 +243,28 @@ Nieuwe wensen (2026-10-09):
       (`/dev/input/js0`). Nakijken: `docker-compose.yaml` heeft
       `/dev/input/js0` onder `devices:` - start de container nog als de
       USB-ontvanger ontbreekt? (Zo niet: weg uit `devices:`, `privileged`
-      dekt het al.) Ook: joystick en webteleop mogen niet tegen elkaar in
-      sturen (twist_mux of de ene uit als de andere aan staat).
+      dekt het al.)
+- [ ] **Prioriteit tussen stuurbronnen met `twist_mux`**
+      (`ros-humble-twist-mux`, nog niet in de image). Nu publiceren de
+      webteleop (`index.html`, elke 150 ms zolang een knop ingedrukt is) en
+      Nav2 allebei rechtstreeks op `/cmd_vel`, en de joystick zou dat ook
+      doen -> wie laatst publiceert, wint. Met `twist_mux` publiceert elke
+      bron op een eigen topic, en de mux geeft de bron met de hoogste
+      prioriteit door naar `/cmd_vel`; valt die stil (timeout ~0,5 s), dan
+      neemt de volgende het over. Voorstel:
+      | Bron | Topic | Prioriteit |
+      |---|---|---|
+      | Joystick F710 (docent/student naast de robot) | `/cmd_vel_joy` | 100 |
+      | Webteleop | `/cmd_vel_web` | 50 |
+      | Nav2 / studentencode | `/cmd_vel_nav` | 10 |
+      Plus een **lock** (`/e_stop`, `std_msgs/Bool`): noodstop-knop op de
+      webpagina en een knop op de F710 blokkeren alles. Aanpassen: webteleop
+      naar `/cmd_vel_web`, `teleop_twist_joy` naar `/cmd_vel_joy`, Nav2 (`cmd_vel`
+      van de velocity smoother) remappen naar `/cmd_vel_nav`, `twist_mux` mee
+      starten met bringup. Didactisch: studentencode publiceert op
+      `/cmd_vel_nav` (of krijgt een eigen ingang), zodat joystick/web altijd
+      kunnen ingrijpen. Op de statuspagina tonen welke bron actief is
+      (`twist_mux` publiceert dat niet zelf; afleiden uit de inputtopics).
 - [ ] **Masterpagina: alle turtlebots in 1 overzicht** (batterij, temperatuur,
       services, versie, wie verbonden is). Let op: met een AP per robot in
       router-modus (NAT) kan een laptop op de switch de robots niet
