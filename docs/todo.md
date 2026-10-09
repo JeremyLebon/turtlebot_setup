@@ -246,6 +246,26 @@ dat script dekt nu niet alles wat per robot verschilt:
 
 ## Features
 
+### Ideeën navigatie (Jeremy, 2026-10-09) - voorgestelde volgorde
+1. **Route pauzeren / verder** - nav_web houdt de route (index) bij: Pauze =
+   huidig doel annuleren, Verder = huidig punt opnieuw sturen. Klein.
+2. **Actie per locatie** - per routepunt: wachten N s, piepen, foto (camera
+   snapshot -> state/), 360° draaien, AprilTag zoeken. In nav_web (eigen
+   routelogica) i.p.v. waypoint_follower-taskplugins; bewaard met de route.
+3. **Lage batterij -> naar parkeerplaats** - per kaart een punt "laadplaats"
+   (Zones/markers); onder een drempel (bv. 11,4 V, instelbaar) route/doel
+   annuleren en daarheen rijden + melding. Geen echt docken (geen laadstation).
+4. **Positie (AMCL) automatisch** - laatste positie per kaart bewaren en bij
+   Navigatie-start als beginpositie zetten; knop "Robot zoekt zelf" =
+   `/reinitialize_global_localization` + traag ronddraaien (werkt slecht in
+   symmetrische ruimtes).
+5. **Rechte lijnen** - kan nu al: Theta* (any-angle, rechte stukken) + Regulated
+   Pure Pursuit. Echte "straight line planner" = eigen C++ plugin (Nav2-tutorial,
+   mooi studentproject).
+6. **Iets met BT** - BT-keuze per doel (bv. elke seconde herplannen, wachten bij
+   obstakel i.p.v. omrijden, andere recovery), actieve BT tonen; studentproject:
+   eigen BT-XML uploaden/kiezen op de pagina.
+
 Nieuwe wensen (2026-10-09):
 
 - [ ] **Camera-instellingen (RPi5 CSI) via de webpagina** + goede
