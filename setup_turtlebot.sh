@@ -113,9 +113,12 @@ if ! nmcli -t -f NAME connection show | grep -qx "$AP_NAME"; then
     connection.autoconnect yes connection.autoconnect-priority 100 \
     && echo "✅ Wifi-profiel $AP_NAME aangemaakt"
 fi
-# Oneindig opnieuw proberen: start de robot voor zijn AP (die trager opstart),
-# dan blokkeert NetworkManager het profiel anders ~5 min na enkele pogingen.
-nmcli connection modify "$AP_NAME" connection.autoconnect-retries 0
+# Ook op een bestaand profiel zetten (op turtlebot09 was TB-AP-09 met de hand
+# aangemaakt, met prioriteit 0 - even hoog als RobotWifi enz.). Oneindig opnieuw
+# proberen: start de robot voor zijn AP (die trager opstart), dan blokkeert
+# NetworkManager het profiel anders ~5 min na enkele pogingen.
+nmcli connection modify "$AP_NAME" connection.autoconnect yes \
+  connection.autoconnect-priority 100 connection.autoconnect-retries 0
 
 # Andere wifi-profielen (RobotWifi, Wifi_turtlebots, het profiel van Raspberry
 # Pi Imager, ...) verwijderen: NetworkManager schakelt niet zelf over van een
