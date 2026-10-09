@@ -432,7 +432,7 @@ Nieuwe wensen (2026-10-09):
       turtlebot3_ros vanzelf terug (respawn).
 - [ ] **Noodstop / actieve stuurbron tonen** (twist_mux-vervolg): e-stop-knop
       op elke pagina (twist_mux lock-topic) + welke bron rijdt nu.
-- [ ] **Kaartbeheer**: kaarten hernoemen/verwijderen op de pagina, routes
+- [x] **Kaartbeheer** (2026-10-09: hernoemen/kopie/verwijderen, routes per kaart, kaarteditor met origineel-backup; free_thresh-bug 0.25 -> 0.196 opgelost): kaarten hernoemen/verwijderen op de pagina, routes
       opslaan per kaart.
 
 ## Inspiratie: OpenAMRobot (github.com/openAMRobot)
