@@ -3,7 +3,7 @@
 Centrale lijst van open punten (branch `raspios-migration`). Details en
 achtergrond staan in de migratielogs (`raspios-migration-log.md`,
 `ap-migration-log.md`); deze lijst verwijst ernaar i.p.v. alles te
-herhalen. Laatst bijgewerkt: 2026-10-07.
+herhalen. Laatst bijgewerkt: 2026-10-09.
 
 ## Voor de fleet-uitrol
 
@@ -146,6 +146,9 @@ dat script dekt nu niet alles wat per robot verschilt:
       maken.
 - [ ] **Uitrol naar 01-05, 07, 08** met de golden image (AP per robot
       eerst configureren; MAC in `turtlebot_config.csv` nakijken).
+      **2026-10-09**: turtlebot05 en 07 getest met golden V0.1.0.2: werken
+      perfect (samen met 06 en 09 nu 4 van 9). SD-kaarten voor 01-04 en 08
+      zijn geschreven, nog niet getest op de robots.
 
 ## Bugs
 

@@ -54,9 +54,9 @@ geen gedeeld wachtwoord - zie toelichting onder de tabel). Robot-MAC's uit
 | turtlebot02 | 88:A2:9E:2C:D5:70 | 10.0.2.0/24 | 10.0.2.1 | 10.0.2.10 | `TB-AP-02` | `TurtleBot@P02` | 40 | 6 | open |
 | turtlebot03 | 2C:CF:67:75:70:6F | 10.0.3.0/24 | 10.0.3.1 | 10.0.3.10 | `TB-AP-03` | `TurtleBot@P03` | 44 | 11 | open |
 | turtlebot04 | 88:A2:9E:2C:ED:33 | 10.0.4.0/24 | 10.0.4.1 | 10.0.4.10 | `TB-AP-04` | `TurtleBot@P04` | 48 | 1 | open |
-| turtlebot05 | 88:A2:9E:2C:D3:8A | 10.0.5.0/24 | 10.0.5.1 | 10.0.5.10 | `TB-AP-05` | `TurtleBot@P05` | 36 | 6 | open |
-| turtlebot06 | 88:A2:9E:2C:D8:25 | 10.0.6.0/24 | 10.0.6.1 | 10.0.6.10 | `TB-AP-06` | `TurtleBot@P06` | 40 | 11 | open |
-| turtlebot07 | 88:A2:9E:2C:D5:07 | 10.0.7.0/24 | 10.0.7.1 | 10.0.7.10 | `TB-AP-07` | `TurtleBot@P07` | 44 | 1 | open |
+| turtlebot05 | 88:A2:9E:2C:D3:8A | 10.0.5.0/24 | 10.0.5.1 | 10.0.5.10 | `TB-AP-05` | `TurtleBot@P05` | 36 | 6 | **gedaan** (2026-10-08, golden V0.1.0.2) |
+| turtlebot06 | 88:A2:9E:2C:D8:25 | 10.0.6.0/24 | 10.0.6.1 | 10.0.6.10 | `TB-AP-06` | `TurtleBot@P06` | 40 | 11 | **gedaan** (2026-10-08, golden V0.1.0.2) |
+| turtlebot07 | 88:A2:9E:2C:D5:07 | 10.0.7.0/24 | 10.0.7.1 | 10.0.7.10 | `TB-AP-07` | `TurtleBot@P07` | 44 | 1 | **gedaan** (2026-10-08, golden V0.1.0.2) |
 | turtlebot08 | 88:A2:9E:2C:D6:67 | 10.0.8.0/24 | 10.0.8.1 | 10.0.8.10 | `TB-AP-08` | `TurtleBot@P08` | 48 | 6 | open |
 | turtlebot09 | 88:A2:9E:2C:EA:4D | 10.0.9.0/24 | 10.0.9.1 | 10.0.9.10 | `TB-AP-09` | `TurtleBot@P09` | 36 | 11 | **gedaan** (2026-10-03, jitter 1.4ms mdev, was ~55ms) |
 
