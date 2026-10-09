@@ -173,6 +173,19 @@ dat script dekt nu niet alles wat per robot verschilt:
 
 ## Bugs
 
+- [x] **Nav2 draaide ter plaatse (recoveries) i.p.v. naar het doel** -
+      opgelost 2026-10-09 (turtlebot_docker `13d567c`). Oorzaak: elk ROS-proces
+      op de robot was een Zenoh-*peer*; de rechtstreekse peer-verbindingen
+      lukten niet voor elk paar processen, waardoor `controller_server` de
+      `map`->`odom` van AMCL nooit kreeg ("map does not exist"). Fix: image-ENV
+      `ZENOH_CONFIG_OVERRIDE` `mode="client"` naar `tcp/127.0.0.1:7447` (alles
+      via de router, zoals op de laptops) + Nav2 met `use_composition:=False`.
+- [x] **Nav2-processen bleven hangen na Stop** (`controller_server`,
+      `planner_server` als wezen) - opgelost 2026-10-09: stoppen = SIGINT,
+      SIGTERM, SIGKILL incl. kindprocessen (`CHILD_PATTERNS`).
+- [x] **Kaarten verdwenen bij elke update** (stonden in de container) - nu in
+      `state/maps` (2026-10-09).
+
 - [ ] **`turtlebot_vis`: shell sluit bij elk mislukt commando** (bv. een
       typfout -> terug uit `docker exec -it turtlebot-vis bash`). Oorzaak: de
       `.bashrc` deed `source /ros_entrypoint.sh`, en dat script begint met
@@ -250,7 +263,9 @@ Nieuwe wensen (2026-10-09):
       AprilTag/dambord op een gekende plek t.o.v. de robot. Nodig om
       detecties (AprilTag, YOLO) op de kaart of in rviz op de juiste plek te
       zetten.
-- [ ] **Internetverbinding-indicator** op de statuspagina: `system_info_node`
+- [x] **Internetverbinding-indicator** - gebouwd 2026-10-09 (turtlebot_docker
+      `777077f`/`361b8b2`, nu wereldbol-icoon in de gedeelde kop met details
+      bij hoveren; "geen internet" in de update-hint). Oorspronkelijk plan: `system_info_node`
       test om de ~30 s DNS + een TCP-verbinding (bv. `1.1.1.1:443`,
       `github.com`) -> vakje "Internet: ja/nee". Ook gebruiken voor de
       update-knop (zie "Update-knop offline" bij Offline gebruik).
@@ -303,14 +318,23 @@ Nieuwe wensen (2026-10-09):
       (9x handwerk; elke pagina blijft rosbridge-verkeer kosten). Voorkeur:
       (a), met links naar de statuspagina per robot. Centrale server: de
       laptop van de docent of een extra Pi aan de switch.
-- [ ] **Nav2-navigatie op de webpagina**: kaart tonen (`/map`), robotpositie
+- [x] **Nav2-navigatie op de webpagina** - gebouwd 2026-10-09 (`nav.html` +
+      `nav_web_node`, turtlebot_docker `e4874ed`..`d8ff090`), door Jeremy getest:
+      robot rijdt naar het doel. Lag eerst aan Zenoh peer-modus (zie Bugs).
+      Daarna toegevoegd: planner per doel (NavFn Dijkstra/A*, Smac 2D, Theta*),
+      controller per doel (DWB, Regulated Pure Pursuit), kaart kiezen +
+      opslaan als, SLAM/Navigatie starten de bringup mee. Alle 4 planners
+      plannen een pad van 5,4 m (getest zonder rijden); **rijtests met
+      Theta*/Smac en RPP + routes in een lus nog te doen**. Oorspronkelijk plan: kaart tonen (`/map`), robotpositie
       (TF `map`->`base_footprint`), beginpositie zetten (`/initialpose`,
       zoals "2D Pose Estimate" in rviz), doel klikken (`navigate_to_pose`),
       gepland pad (`/plan`) en voortgang/annuleren. De Navigation-knop
       (`navigation2.launch.py` met opgeslagen kaart) bestaat al; dit maakt het
       bruikbaar zonder rviz. Vervangt/omvat het punt "Waypoint/doel zetten"
       hieronder.
-- [ ] **Traject tekenen op de kaart**: meerdere punten aanklikken -> route
+- [x] **Traject tekenen op de kaart** - route op `nav.html` (punten
+      aanklikken, lus, laatste punt weg/wissen) als reeks `navigate_to_pose`-
+      doelen. Nog niet: routes opslaan in `state/`. Oorspronkelijk plan: meerdere punten aanklikken -> route
       (Nav2 `navigate_through_poses` of `follow_waypoints`), routes opslaan
       in `state/` en opnieuw afspelen, eventueel in een lus (patrouille).
       Bouwt verder op de Nav2-webpagina; voorbeelden: `vizanti`, OpenAMRobot
@@ -354,6 +378,30 @@ Nieuwe wensen (2026-10-09):
       3. **Op de Pi 5 met Raspberry Pi AI HAT+ (Hailo-8L/8)**: realtime
          (>30 fps), maar hardware-aankoop per robot. Hailo-drivers worden
          goed ondersteund onder Raspberry Pi OS.
+
+- [x] **Gedeelde kop op alle pagina's** (2026-10-09, `d8ff090`): tabbladen
+      Status | Navigatie | Systeem + iconen batterij (staaf), wifi (streepjes),
+      Pi-temperatuur (thermometer, voeding/ventilator in tooltip), internet.
+- [x] **Lidar-draaiuren** (2026-10-09): de LDS-02 heeft geen motor-commando
+      en draait zolang hij USB-stroom krijgt, ook zonder bringup (gemeten: data
+      op `/dev/ttyUSB0` zonder driver). `system_info_node` telt de tijd dat
+      `/dev/ttyUSB0` bestaat -> `state/lidar_hours.json`, getoond op
+      `system.html`. Teller start op 2026-10-09 (geen historiek).
+- [ ] **Lidar uitzetten als hij niet nodig is**: geen software-commando
+      (LDS-02). Optie: USB-poort stroomloos met `uhubctl` - de lidar zit op
+      een eigen bus (bus 3, OpenCR op bus 1), maar nagaan of de Pi 5 de
+      poortstroom per poort of voor alle poorten samen schakelt (dan valt de
+      OpenCR mee weg). Samen testen, niet onbewaakt. Alternatief: hub met
+      per-poort-schakeling of relais.
+- [ ] **Lidar-scan op het camerabeeld leggen**: vraagt de intrinsieke
+      kalibratie (`camera_info`) en de extrinsieke (TF `base_scan` ->
+      camera optisch frame, zie camerakalibratie hierboven). Dan per scanpunt
+      projecteren in het beeld (op de laptop in `turtlebot_vis` of op de
+      pagina met canvas).
+- [ ] **MPPI-controller** aanbieden op `nav.html` (zit in de image, maar zwaar
+      voor een Pi 5 naast de rest - eerst CPU meten met kleinere batch).
+- [ ] **Kaartbeheer**: kaarten hernoemen/verwijderen op de pagina, routes
+      opslaan per kaart.
 
 ## Inspiratie: OpenAMRobot (github.com/openAMRobot)
 
