@@ -251,7 +251,6 @@ dat script dekt nu niet alles wat per robot verschilt:
   login, ook `docker login` met PAT). Lukt het niet: tijdelijk via ghcr.io.
 - Daarna: route "test" op buro_groot opnieuw aanklikken (oude punten hebben
   vaste richting 0) en met MPPI testen; recoveries bij punt 1/2 weg?
-- buro_groot heeft 0 zones sinds 20:59 (zelf gewist? anders terugzetten).
 
 ## Features
 
