@@ -32,6 +32,10 @@ services:
       # just crashes with "no cameras available". Set per-robot via .env or
       # turtlebot_config.csv (see setup_turtlebot.sh).
       - ENABLE_CAMERA=${ENABLE_CAMERA:-false}
+      # Fleet monitor (monitor/monitor.py op de laptop van de docent):
+      # system_info_node stuurt er elke 5 s de status naartoe. Uit monitor.conf
+      # via setup_turtlebot.sh -> .env; leeg = niets versturen.
+      - MONITOR_URL=${MONITOR_URL:-}
 
     container_name: turtlebot_${TURTLEBOT_NR}
     privileged: true

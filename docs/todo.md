@@ -323,7 +323,12 @@ Nieuwe wensen (2026-10-09):
       `/cmd_vel` enkel twist_mux als subscriber. Rijtests (webteleop, Nav2,
       overnemen) nog niet gedaan.
       actieve bron tonen op de statuspagina.
-- [ ] **Masterpagina: alle turtlebots in 1 overzicht** (batterij, temperatuur,
+- [x] **Masterpagina** - gebouwd 2026-10-09: `monitor/monitor.py` (laptop docent,
+      Windows of WSL, zie monitor/README.md), robots pushen via `MONITOR_URL`
+      (`monitor.conf` -> .env). Getest met turtlebot09 -> laptop op TB-AP-09.
+      Nog te doen: vast IP voor de laptop op het switch-subnet, adres in
+      monitor.conf, testen met meerdere robots via de switch.
+- [ ] ~~Masterpagina: alle turtlebots in 1 overzicht~~ (oorspronkelijke notitie) (batterij, temperatuur,
       services, versie, wie verbonden is). Let op: met een AP per robot in
       router-modus (NAT) kan een laptop op de switch de robots niet
       rechtstreeks bereiken - daarom is `turtlebot_monitor` (nmap op 1 subnet)

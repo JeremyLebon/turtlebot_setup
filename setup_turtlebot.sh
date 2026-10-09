@@ -258,10 +258,14 @@ write_host_info
 # --- Omgevingsvariabelen -----------------------------------------------------
 # .env naast docker-compose.yaml: die leest Docker Compose zelf, ook bij een
 # automatische herstart (profile.d enkel bij een interactieve login).
+# Fleet monitor op de laptop van de docent (monitor/monitor.py): adres voor
+# alle robots samen in monitor.conf (MONITOR_URL=...), leeg = uit.
+MONITOR_URL=$(sed -n 's/^MONITOR_URL=//p' "$SETUP_DIR/monitor.conf" 2>/dev/null | tr -d '[:space:]' | tail -1)
 ENV_CONTENT="TURTLEBOT_NR=$NR
 ROS_DOMAIN_ID=$ROS_DOMAIN_ID
 LDS_MODEL=$LIDAR
-ENABLE_CAMERA=$CAMERA"
+ENABLE_CAMERA=$CAMERA
+MONITOR_URL=$MONITOR_URL"
 
 cat > /etc/profile.d/turtlebot_config.sh <<EOF
 export TURTLEBOT_NR=$NR
