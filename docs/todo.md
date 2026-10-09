@@ -254,14 +254,20 @@ Nieuwe wensen (2026-10-09):
       test om de ~30 s DNS + een TCP-verbinding (bv. `1.1.1.1:443`,
       `github.com`) -> vakje "Internet: ja/nee". Ook gebruiken voor de
       update-knop (zie "Update-knop offline" bij Offline gebruik).
-- [ ] **Joystick (Logitech F710) aan/uit via de webpagina**: knop in Launch
-      control die `joy_node` + `teleop_twist_joy` start/stopt
-      (`ros-humble-teleop-twist-joy` zit al in de image), keuze onthouden in
-      `state/` zoals de camera, en tonen of de ontvanger aanwezig is
-      (`/dev/input/js0`). Nakijken: `docker-compose.yaml` heeft
-      `/dev/input/js0` onder `devices:` - start de container nog als de
-      USB-ontvanger ontbreekt? (Zo niet: weg uit `devices:`, `privileged`
-      dekt het al.)
+- [x] **Joystick (Logitech F710) aan/uit via de webpagina** - gebouwd en
+      getest 2026-10-09 op turtlebot09 (turtlebot_docker `e630352`, image
+      `sha256:fb7c98e8…`, setup `8995c87`). Knop + detectie ("Logitech Gamepad
+      F710 gedetecteerd") op de teleop-kaart, rij in de labo-check, knoppen op
+      `system.html`. `teleop_twist_joy` -> `/cmd_vel_joy` via
+      `launch_control_node` (`/launch/joystick`), los van bringup, niet
+      onthouden (na herstart uit). Config `docker/joystick_f710.yaml`: LB =
+      dodemansknop, linker stick vooruit/achteruit 0,1 m/s, rechter stick
+      draaien 1,0 rad/s, RB = turbo (0,22 m/s, 2,0 rad/s). Compose mount nu
+      heel `/dev/input` (i.p.v. `js0` onder `devices:`), zodat een later
+      ingestoken ontvanger zichtbaar is en de container ook zonder start.
+      Getest: rijden, turbo, LB loslaten = stop, joystick wint van webteleop
+      (gemeten: webberichten tijdens joystickgebruik niet doorgegeven).
+      Nog te testen: ontvanger uittrekken/insteken terwijl de container draait.
 - [ ] **Prioriteit tussen stuurbronnen met `twist_mux`** -
       **gebouwd 2026-10-09** (turtlebot_docker `ed4c567`, fork turtlebot3
       `dba8cf8`), lokaal getest in een Humble-container; image nog te bouwen
@@ -279,8 +285,7 @@ Nieuwe wensen (2026-10-09):
       diensten op `system.html`. Zonder `twist_mux` rijdt de robot niet.
       Testen op de robot: webteleop rijdt, Nav2-doel rijdt, webteleop tijdens
       Nav2 neemt over en Nav2 gaat daarna verder.
-      Nog te doen: `teleop_twist_joy` naar `/cmd_vel_joy` (bij de
-      joystick-knop), noodstop via een `lock` (let op: bij een lock stuurt
+      Webteleop rijdt (Jeremy 2026-10-09). Nog te doen: noodstop via een `lock` (let op: bij een lock stuurt
       `twist_mux` geen nulsnelheid - zelf eerst een stop publiceren),
       **Op turtlebot09 (2026-10-09)**: `twist_mux` draait, met bringup is
       `/cmd_vel_out` 1 pub (twist_mux) / 1 sub (turtlebot3_node) en heeft
