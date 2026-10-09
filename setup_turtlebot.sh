@@ -269,6 +269,14 @@ if [ "$NR" != "$BUILD_ROBOT_NR" ]; then
     && echo "🗑️ Image moby/buildkit verwijderd"
 fi
 
+# --- Studentenwerkmap ros2_ws -------------------------------------------------
+# Bind mount ./ros2_ws -> /root/ros2_ws (docker-compose.yaml). Zelf
+# aanmaken als turtlebot-user; anders maakt Docker ze aan als root.
+if [ -d "$SETUP_DIR" ] && [ ! -d "$SETUP_DIR/ros2_ws/src" ]; then
+  runuser -u "$SETUP_USER" -- mkdir -p "$SETUP_DIR/ros2_ws/src" \
+    && echo "📁 $SETUP_DIR/ros2_ws aangemaakt"
+fi
+
 # --- Container ---------------------------------------------------------------
 # Enkel na een gewijzigde .env (bv. eerste boot van een kloon, die nog de
 # container van de originele robot heeft). Anders zorgt

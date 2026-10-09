@@ -52,6 +52,9 @@ services:
       # State that must survive updates/recreating the container, e.g. the
       # camera on/off choice from the status page (camera_enabled).
       - ./state:/root/turtlebot_state
+      # Werkmap van de studenten (colcon-workspace ros2_ws, zelfde naam als in turtlebot_vis): overleeft updates en het
+      # opnieuw aanmaken van de container. Op de host: ~/turtlebot_setup/ros2_ws
+      - ./ros2_ws:/root/ros2_ws
     command: bash
     devices:
       - /dev/ttyACM0:/dev/ttyACM0  # OpenCR

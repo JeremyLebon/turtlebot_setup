@@ -155,6 +155,17 @@ dat script dekt nu niet alles wat per robot verschilt:
 
 ## Bugs
 
+- [ ] **`turtlebot_vis`: shell sluit bij elk mislukt commando** (bv. een
+      typfout -> terug uit `docker exec -it turtlebot-vis bash`). Oorzaak: de
+      `.bashrc` deed `source /ros_entrypoint.sh`, en dat script begint met
+      `set -e`. In de oude `turtlebot_docker/docker_vis` was dit al omzeild
+      (eigen `/ros_entrypoint.sh` met `set +e`), in `turtlebot_vis` niet.
+      **Gefixt 2026-10-09** in `turtlebot_vis/docker/Dockerfile` (`.bashrc`
+      sourcet nu rechtstreeks `/opt/ros/humble/setup.bash`). Image
+      `nobel86/turtlebot-rpi5-vis:zenoh` nog te pushen; studenten moeten
+      daarna opnieuw `docker compose pull`. (`docker_vis_on_rpi5` in
+      `turtlebot_docker` heeft dezelfde fout, maar wordt niet meer gebruikt.)
+
 - [x] **SLAM-knop geeft geen kaart** - opgelost 2026-10-06 door de knop
       naar **Cartographer** om te zetten (turtlebot_docker
       `cartographer_headless.launch.py`, zoals de TurtleBot3 ROS2 e-manual,
@@ -187,6 +198,60 @@ dat script dekt nu niet alles wat per robot verschilt:
       testen.
 
 ## Features
+
+Nieuwe wensen (2026-10-09):
+
+- [ ] **Camera-instellingen (RPi5 CSI) via de webpagina** + goede
+      standaardwaarden. `camera_ros` geeft de libcamera-controls als ROS-
+      parameters (o.a. `ExposureTime`, `AnalogueGain`, `AeEnable`,
+      `Brightness`, `Contrast`, `Saturation`, `Sharpness`, `AwbMode`), naast
+      resolutie/fps/`jpeg_quality` uit `camera_params.yaml`. Webpagina: sliders
+      -> `set_parameters` via rosbridge, keuze bewaren in `state/` (zoals
+      `camera_enabled`) en meegeven bij het starten van `camera_node`. Nagaan
+      welke controls live aanpasbaar zijn en welke een herstart vragen.
+- [ ] **Camerakalibratie** (intrinsiek, dambordpatroon): `camera_calibration`
+      (`cameracalibrator`) op de laptop in `turtlebot_vis` (heeft een GUI,
+      werkt via WSLg) tegen `/camera/image_raw`, resultaat naar de robot via
+      `camera_ros` (`camera_info_url` / `set_camera_info`) en bewaren in
+      `state/`. Alternatief: kalibratiemodus op de webpagina (hogere
+      resolutie/fps tijdelijk, beelden vastleggen, kalibratie op de robot).
+      Nodig voor o.a. AprilTags.
+- [ ] **Internetverbinding-indicator** op de statuspagina: `system_info_node`
+      test om de ~30 s DNS + een TCP-verbinding (bv. `1.1.1.1:443`,
+      `github.com`) -> vakje "Internet: ja/nee". Ook gebruiken voor de
+      update-knop (zie "Update-knop offline" bij Offline gebruik).
+- [ ] **Joystick (Logitech F710) aan/uit via de webpagina**: knop in Launch
+      control die `joy_node` + `teleop_twist_joy` start/stopt
+      (`ros-humble-teleop-twist-joy` zit al in de image), keuze onthouden in
+      `state/` zoals de camera, en tonen of de ontvanger aanwezig is
+      (`/dev/input/js0`). Nakijken: `docker-compose.yaml` heeft
+      `/dev/input/js0` onder `devices:` - start de container nog als de
+      USB-ontvanger ontbreekt? (Zo niet: weg uit `devices:`, `privileged`
+      dekt het al.) Ook: joystick en webteleop mogen niet tegen elkaar in
+      sturen (twist_mux of de ene uit als de andere aan staat).
+- [ ] **Masterpagina: alle turtlebots in 1 overzicht** (batterij, temperatuur,
+      services, versie, wie verbonden is). Let op: met een AP per robot in
+      router-modus (NAT) kan een laptop op de switch de robots niet
+      rechtstreeks bereiken - daarom is `turtlebot_monitor` (nmap op 1 subnet)
+      destijds afgevoerd. Opties: (a) **robots pushen** elke paar seconden een
+      klein JSON-statusbericht naar een centrale server op het
+      switch-netwerk (HTTP of MQTT; werkt door NAT, robots hebben die server
+      als vast adres in de setup), (b) port forwarding 8080/9090 op elke AP
+      (9x handwerk; elke pagina blijft rosbridge-verkeer kosten). Voorkeur:
+      (a), met links naar de statuspagina per robot. Centrale server: de
+      laptop van de docent of een extra Pi aan de switch.
+- [ ] **Nav2-navigatie op de webpagina**: kaart tonen (`/map`), robotpositie
+      (TF `map`->`base_footprint`), beginpositie zetten (`/initialpose`,
+      zoals "2D Pose Estimate" in rviz), doel klikken (`navigate_to_pose`),
+      gepland pad (`/plan`) en voortgang/annuleren. De Navigation-knop
+      (`navigation2.launch.py` met opgeslagen kaart) bestaat al; dit maakt het
+      bruikbaar zonder rviz. Vervangt/omvat het punt "Waypoint/doel zetten"
+      hieronder.
+- [ ] **Traject tekenen op de kaart**: meerdere punten aanklikken -> route
+      (Nav2 `navigate_through_poses` of `follow_waypoints`), routes opslaan
+      in `state/` en opnieuw afspelen, eventueel in een lus (patrouille).
+      Bouwt verder op de Nav2-webpagina; voorbeelden: `vizanti`, OpenAMRobot
+      (zie hieronder).
 
 - [ ] **Waypoint/doel zetten via de webpagina** (+ robotpositie en het
       geplande Nav2-pad op de kaart tonen): klikken op de kaart ->
@@ -299,10 +364,22 @@ dat script dekt nu niet alles wat per robot verschilt:
 ## Studenten via VS Code
 
 - [ ] **Persistente studentenwerkmap**: code in de container verdwijnt nu bij
-      elke update (container wordt opnieuw aangemaakt). Bind mount bv.
-      `./state/student_ws` -> `/root/student_ws` in `docker-compose.yaml`
-      (zoals `camera_enabled`); colcon-workspace daar, `source` in `.bashrc`.
-      Eerst doen, los van welke VS Code-optie.
+      elke update (container wordt opnieuw aangemaakt).
+      **Gebouwd 2026-10-09** (nog niet getest op een robot, image nog niet
+      gebouwd): bind mount `./ros2_ws` -> `/root/ros2_ws`
+      (`docker-compose.yaml`, gitignored), aangemaakt door `setup_turtlebot.sh`
+      (als `turtlebot`, met `src/`), leeggemaakt door `golden_prepare.sh`.
+      In de image: `.bashrc` sourcet `/root/ros2_ws/install/setup.bash`
+      als die bestaat; de browserterminal (ttyd) start in `/root/ros2_ws`.
+      Testen: pakket maken + `colcon build` in `/root/ros2_ws`, update
+      uitvoeren -> code en build staan er nog, overlay automatisch gesourcet.
+      Naam `ros2_ws` (zoals de officiele ROS 2-tutorials), **ook in
+      `turtlebot_vis`**: `./ros2_ws` naast `docker-compose.yaml` in WSL ->
+      `/root/ros2_ws`, overlay automatisch gesourcet (lokaal getest
+      2026-10-09). Let op: de containers draaien als root, dus `build/`,
+      `install/` en in de container aangemaakte bestanden zijn in WSL van root
+      -> vanuit VS Code in WSL niet bewerkbaar zonder sudo. Oplossen met
+      `user:` in compose of studenten enkel in de container laten werken.
 - [ ] **Optie A: Remote-SSH rechtstreeks in de container** - `openssh-server`
       in de image, `sshd` op poort 2222 (host-netwerk) gestart vanuit
       `services_start.sh` (+ poort in de labo-check/diensten), eigen login

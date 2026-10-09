@@ -45,6 +45,8 @@ echo "🏷️  $STAMP"
 rm -f /home/turtlebot/.bash_history /root/.bash_history
 rm -f "$SETUP_DIR"/state/camera_enabled "$SETUP_DIR"/state/container_starts
 rm -rf /tmp/* 2>/dev/null || true
+# Studentencode van de bouwrobot niet meeklonen (lege workspace laten staan)
+rm -rf "$SETUP_DIR"/ros2_ws && runuser -u turtlebot -- mkdir -p "$SETUP_DIR"/ros2_ws/src
 journalctl --vacuum-time=1s >/dev/null 2>&1 || true
 
 echo "✅ Klaar. Schakel de robot nu uit (statuspagina of 'sudo poweroff')"
