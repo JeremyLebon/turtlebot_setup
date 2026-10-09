@@ -59,6 +59,20 @@ herhalen. Laatst bijgewerkt: 2026-10-09.
 - [ ] **"error"-melodie testen**: bv. tijdelijk een service laten falen
       (poort 9090 bezet) en nagaan dat na 90 s de error-melodie klinkt.
 
+- [ ] **Robot blijft op een ander wifi-netwerk hangen** (2026-10-09:
+      turtlebot09 niet te vinden op `TB-AP-09` en ook niet op `RobotWifi`).
+      NetworkManager gebruikt de prioriteit (100 voor `TB-AP-<nr>`) enkel bij
+      het kiezen van een netwerk, en schakelt niet over van een verbonden
+      netwerk. Start de robot voor zijn AP (TP-Link start trager op), dan
+      neemt hij een ander bekend netwerk of blokkeert hij het profiel ~5 min.
+      **Aangepast in `setup_turtlebot.sh`**: `autoconnect-retries 0` op
+      `TB-AP-<nr>`, en alle andere wifi-profielen verwijderen - enkel als de
+      eigen AP zichtbaar is (anders zit een robot zonder geconfigureerde AP
+      nergens meer op). Logica droog getest op de laptop; nog te testen op een
+      robot (na "Software bijwerken" of reboot). Gevolg: een robot op een
+      ander netwerk zetten kan daarna enkel via scherm/ethernet of door zijn
+      AP aan te zetten.
+
 ## Uitrol
 
 - [x] **Nieuw `docker-compose.yaml` naar elke robot** (met de mount

@@ -112,8 +112,30 @@ if ! nmcli -t -f NAME connection show | grep -qx "$AP_NAME"; then
     ssid "$AP_NAME" wifi-sec.key-mgmt wpa-psk wifi-sec.psk "$AP_PSK" \
     connection.autoconnect yes connection.autoconnect-priority 100 \
     && echo "✅ Wifi-profiel $AP_NAME aangemaakt"
-  # Mag mislukken (AP nog niet geconfigureerd/buiten bereik): autoconnect
-  # probeert het later opnieuw.
+fi
+# Oneindig opnieuw proberen: start de robot voor zijn AP (die trager opstart),
+# dan blokkeert NetworkManager het profiel anders ~5 min na enkele pogingen.
+nmcli connection modify "$AP_NAME" connection.autoconnect-retries 0
+
+# Andere wifi-profielen (RobotWifi, Wifi_turtlebots, het profiel van Raspberry
+# Pi Imager, ...) verwijderen: NetworkManager schakelt niet zelf over van een
+# verbonden netwerk naar een met hogere prioriteit, dus een robot die bij het
+# opstarten zijn AP nog niet zag, bleef op dat andere netwerk hangen. Enkel als
+# de eigen AP effectief zichtbaar is - anders zit een robot waarvan de AP nog
+# niet geconfigureerd is nergens meer op.
+if nmcli -t -f SSID device wifi list ifname "$NET_IFACE" --rescan yes 2>/dev/null | grep -qx "$AP_NAME"; then
+  nmcli -t -f NAME,TYPE connection show | while IFS=: read -r con type; do
+    if [ "$type" = "802-11-wireless" ] && [ "$con" != "$AP_NAME" ]; then
+      nmcli connection delete "$con" >/dev/null && echo "🗑️ Wifi-profiel $con verwijderd"
+    fi
+  done
+else
+  echo "⚠️ $AP_NAME niet zichtbaar - andere wifi-profielen blijven staan"
+fi
+
+# Mag mislukken (AP nog niet geconfigureerd/buiten bereik): autoconnect
+# probeert het later opnieuw.
+if ! nmcli -t -f NAME connection show --active | grep -qx "$AP_NAME"; then
   nmcli --wait 20 connection up "$AP_NAME" >/dev/null 2>&1 \
     || echo "⚠️ $AP_NAME (nog) niet bereikbaar"
 fi
