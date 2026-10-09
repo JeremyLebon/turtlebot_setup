@@ -244,27 +244,27 @@ Nieuwe wensen (2026-10-09):
       `/dev/input/js0` onder `devices:` - start de container nog als de
       USB-ontvanger ontbreekt? (Zo niet: weg uit `devices:`, `privileged`
       dekt het al.)
-- [ ] **Prioriteit tussen stuurbronnen met `twist_mux`**
-      (`ros-humble-twist-mux`, nog niet in de image). Nu publiceren de
-      webteleop (`index.html`, elke 150 ms zolang een knop ingedrukt is) en
-      Nav2 allebei rechtstreeks op `/cmd_vel`, en de joystick zou dat ook
-      doen -> wie laatst publiceert, wint. Met `twist_mux` publiceert elke
-      bron op een eigen topic, en de mux geeft de bron met de hoogste
-      prioriteit door naar `/cmd_vel`; valt die stil (timeout ~0,5 s), dan
-      neemt de volgende het over. Voorstel:
+- [ ] **Prioriteit tussen stuurbronnen met `twist_mux`** -
+      **gebouwd 2026-10-09** (turtlebot_docker `ed4c567`, fork turtlebot3
+      `dba8cf8`), lokaal getest in een Humble-container; image nog te bouwen
+      en op een robot te testen.
       | Bron | Topic | Prioriteit |
       |---|---|---|
-      | Joystick F710 (docent/student naast de robot) | `/cmd_vel_joy` | 100 |
-      | Webteleop | `/cmd_vel_web` | 50 |
-      | Nav2 / studentencode | `/cmd_vel_nav` | 10 |
-      Plus een **lock** (`/e_stop`, `std_msgs/Bool`): noodstop-knop op de
-      webpagina en een knop op de F710 blokkeren alles. Aanpassen: webteleop
-      naar `/cmd_vel_web`, `teleop_twist_joy` naar `/cmd_vel_joy`, Nav2 (`cmd_vel`
-      van de velocity smoother) remappen naar `/cmd_vel_nav`, `twist_mux` mee
-      starten met bringup. Didactisch: studentencode publiceert op
-      `/cmd_vel_nav` (of krijgt een eigen ingang), zodat joystick/web altijd
-      kunnen ingrijpen. Op de statuspagina tonen welke bron actief is
-      (`twist_mux` publiceert dat niet zelf; afleiden uit de inputtopics).
+      | Joystick F710 (`teleop_twist_joy`) | `/cmd_vel_joy` | 100 |
+      | Webteleop (statuspagina) | `/cmd_vel_web` | 50 |
+      | Nav2 (ook via Simple Commander), `teleop_keyboard`, studentencode | `/cmd_vel` | 10 |
+      Uitgang `/cmd_vel_out` -> `turtlebot3_node` (remap in
+      `turtlebot3_bringup/launch/robot.launch.py` van de fork). Niet
+      `/cmd_vel_nav` als Nav2-ingang: dat is in Nav2 Humble al het interne
+      topic tussen controller en velocity smoother. `twist_mux` draait altijd
+      (`twist_mux_start.sh` vanuit `services_start.sh`) en staat bij de
+      diensten op `system.html`. Zonder `twist_mux` rijdt de robot niet.
+      Testen op de robot: webteleop rijdt, Nav2-doel rijdt, webteleop tijdens
+      Nav2 neemt over en Nav2 gaat daarna verder.
+      Nog te doen: `teleop_twist_joy` naar `/cmd_vel_joy` (bij de
+      joystick-knop), noodstop via een `lock` (let op: bij een lock stuurt
+      `twist_mux` geen nulsnelheid - zelf eerst een stop publiceren),
+      actieve bron tonen op de statuspagina.
 - [ ] **Masterpagina: alle turtlebots in 1 overzicht** (batterij, temperatuur,
       services, versie, wie verbonden is). Let op: met een AP per robot in
       router-modus (NAT) kan een laptop op de switch de robots niet
