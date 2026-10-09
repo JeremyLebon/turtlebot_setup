@@ -388,11 +388,15 @@ Nieuwe wensen (2026-10-09):
       `/dev/ttyUSB0` bestaat -> `state/lidar_hours.json`, getoond op
       `system.html`. Teller start op 2026-10-09 (geen historiek).
 - [ ] **Lidar uitzetten als hij niet nodig is**: geen software-commando
-      (LDS-02). Optie: USB-poort stroomloos met `uhubctl` - de lidar zit op
-      een eigen bus (bus 3, OpenCR op bus 1), maar nagaan of de Pi 5 de
-      poortstroom per poort of voor alle poorten samen schakelt (dan valt de
-      OpenCR mee weg). Samen testen, niet onbewaakt. Alternatief: hub met
-      per-poort-schakeling of relais.
+      (LDS-02). `uhubctl` getest op 09 (2026-10-09): `uhubctl -l 3 -p 1 -a off`
+      koppelt de lidar logisch af (verdwijnt van de bus, OpenCR/F710 blijven),
+      maar de Pi 5 schakelt de 5V niet: de lidar bleef draaien. Software-route
+      valt dus af. Opties: (a) PWM-pin van de LDS-02 (spec: 10-30 kHz, 0-100%
+      duty) naar een Pi-GPIO met hardware-PWM - eerst nagaan wat de pin doet
+      op het USB-interfacebordje en of duty 0 de motor echt stopt; (b) de 5V
+      van de lidar via een MOSFET/relais op een GPIO; (c) een USB-hub met echte
+      per-poort-stroomschakeling (uhubctl-compatibel); (d) USB-kabel met
+      schakelaar (manueel). `uhubctl` staat nog met de hand op 09 (niet in setup).
 - [ ] **Lidar-scan op het camerabeeld leggen**: vraagt de intrinsieke
       kalibratie (`camera_info`) en de extrinsieke (TF `base_scan` ->
       camera optisch frame, zie camerakalibratie hierboven). Dan per scanpunt
