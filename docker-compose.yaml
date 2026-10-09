@@ -55,11 +55,15 @@ services:
       # Werkmap van de studenten (colcon-workspace ros2_ws, zelfde naam als in turtlebot_vis): overleeft updates en het
       # opnieuw aanmaken van de container. Op de host: ~/turtlebot_setup/ros2_ws
       - ./ros2_ws:/root/ros2_ws
+      # Joystick (Logitech F710): heel /dev/input i.p.v. enkel /dev/input/js0
+      # onder devices:, zodat een ontvanger die na de containerstart wordt
+      # ingestoken ook zichtbaar is (privileged geeft anders enkel een kopie
+      # van /dev bij de start) - en de container start ook zonder ontvanger.
+      - /dev/input:/dev/input
     command: bash
     devices:
       - /dev/ttyACM0:/dev/ttyACM0  # OpenCR
       - /dev/ttyUSB0:/dev/ttyUSB0  # LDS 01 - laser lidar
-      - /dev/input/js0:/dev/input/js0  # Logitech F710 Gamepad
       - /dev/i2c-1:/dev/i2c-1  # I2C bus (RPi5, Raspberry Pi OS)
       # CSI camera (libcamera/camera_ros) replaces the old USB webcam
       # (/dev/video0). libcamera on RPi5 exposes several /dev/video* and
