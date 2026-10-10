@@ -637,6 +637,10 @@ binnen het AP-netwerk van de robot.
       (`TURTLEBOT_IMAGE`, door setup_turtlebot.sh uit `state/image_pin`), op
       system.html een keuzelijst met de versietags (Docker Hub API) +
       "Terug naar nieuwste". Update-hint en vlootmonitor tonen "vastgepind".
+      Eerste, kleine stap (zonder image-build): in update_turtlebot.sh de huidige
+      image voor de pull taggen als `:vorige` (nu ruimt `docker image prune -f`
+      de oude image meteen op -> geen lokale terugvaloptie), + knop/commando
+      "terug naar vorige". Let op schijfruimte (2 images van ~7.6 GB).
 - [ ] **Smartphone/laptop op AP zonder internet**: Android/iOS sturen het verkeer
       dan via mobiele data -> statuspagina laadt niet (2026-10-10 op school).
       In de lesinstructies: mobiele data uit, of "verbonden blijven" kiezen.
