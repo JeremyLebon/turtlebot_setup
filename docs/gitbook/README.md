@@ -1,9 +1,41 @@
-# GitBook updates (2026-10-11)
+# GitBook - lesboeken TurtleBot3 (bijgewerkt 2026-10-11)
 
-Updated pages for the two VIVES GitBooks, for the new lab setup (Raspberry Pi OS
-+ Docker, Zenoh, own access point per robot `TB-AP-<nr>`, Fenix status page,
-`ros2_ws`). Paste them into GitBook (or sync) - same file names/paths as the
-GitBook pages. **No passwords** in these pages ("see lab notes"): this repo is public.
+De twee VIVES-GitBooks, aangepast aan de nieuwe labo-opstelling (Raspberry Pi OS
++ Docker, Zenoh, eigen access point per robot `TB-AP-<nr>`, Fenix-statuspagina,
+`ros2_ws`). **Geen wachtwoorden** in deze pagina's ("see lab notes"): de repo is publiek.
+
+## Begin hier
+
+| Boek | Overzicht (status per pagina) | Alles achter elkaar lezen | Inhoudstafel (GitBook) |
+|---|---|---|---|
+| Turtlebot3 (echte robot) | [turtlebot3/OVERZICHT.md](turtlebot3/OVERZICHT.md) | [turtlebot3/BOOK.md](turtlebot3/BOOK.md) | [turtlebot3/SUMMARY.md](turtlebot3/SUMMARY.md) |
+| ROS2 - Simulation | [simulation/OVERZICHT.md](simulation/OVERZICHT.md) | [simulation/BOOK.md](simulation/BOOK.md) | [simulation/SUMMARY.md](simulation/SUMMARY.md) |
+
+Status: 🟠 gewijzigd, 🟢 nieuw, 🟡 kleine aanpassing (`ros_ws` -> `ros2_ws`), ⚪ ongewijzigd.
+
+## Structuur
+
+```
+docs/gitbook/
+  turtlebot3/            volledig boek: elke pagina op haar GitBook-pad
+    SUMMARY.md           inhoudstafel in GitBook-formaat (volgorde + nesting)
+    OVERZICHT.md         tabel: pagina + status (gegenereerd)
+    BOOK.md              alle pagina's in leesvolgorde (gegenereerd)
+  simulation/            idem voor het simulatieboek
+  _original/             de pagina's zoals ze op 2026-10-11 in GitBook stonden
+  _tools/build_books.py  maakt SUMMARY/OVERZICHT/BOOK opnieuw
+```
+
+## Werkwijze
+
+1. Pas een pagina aan in `turtlebot3/...` of `simulation/...`.
+2. `cd docs/gitbook && python3 _tools/build_books.py` - de status (vergeleken met
+   `_original`) en `BOOK.md` worden bijgewerkt.
+3. Naar GitBook:
+   * **Git Sync (aanbevolen)**: in GitBook het boek koppelen aan deze GitHub-repo,
+     map `docs/gitbook/turtlebot3` (resp. `simulation`); GitBook leest
+     `SUMMARY.md` en de pagina's. Daarna is GitHub de bron, geen kopiëren meer.
+   * of per pagina kopiëren en plakken (zie de tabellen hieronder: wat er veranderd is).
 
 ## Book "Turtlebot3" - https://vives-4.gitbook.io/turtlebot3/
 
