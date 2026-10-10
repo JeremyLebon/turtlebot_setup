@@ -252,6 +252,35 @@ dat script dekt nu niet alles wat per robot verschilt:
 - Daarna: route "test" op buro_groot opnieuw aanklikken (oude punten hebben
   vaste richting 0) en met MPPI testen; recoveries bij punt 1/2 weg?
 
+## Remote toegang (idee 2026-10-11)
+
+**Voorwaarde: eerst de veiligheidspunten** (wifi-wachtwoorden publiek in git,
+geen login op de statuspagina/rosbridge) - anders wordt een robot op internet
+een echt risico.
+
+- [ ] **Stap 1 - VPN voor de docent**: Tailscale (of zelf gehost: Headscale /
+      WireGuard) op de robots via setup_turtlebot.sh (sleutel buiten git), eerst
+      1 robot. Robot bouwt zelf de verbinding naar buiten op (geen poorten open in
+      de school-firewall, werkt door de NAT van de AP's). Dan van thuis
+      `http://turtlebot09:8080` en Zenoh/ROS 2 vanuit WSL (turtlebot_vis, rviz).
+      Toegang per persoon/robot (ACL). Navragen bij ICT of VPN-verkeer mag.
+- [ ] **Stap 2 - Fenix Hub (cloud, voor studenten / commercieel)**: eigen server
+      (VPS of school-VM) waar de robots naartoe verbinden (zoals de vlootmonitor nu,
+      maar via internet): login + rechten, overzicht welke robot vrij is,
+      tijdsloten reserveren, video via WebRTC (lage vertraging). Past bij
+      "Powered by LEBTEC" (remote lab als dienst).
+- [ ] **Alternatief - enkel ROS op afstand**: Zenoh-router op een server met TLS +
+      authenticatie; studenten werken van thuis in turtlebot_vis alsof ze in het
+      labo zitten (gevorderde opdrachten).
+- [ ] **Praktisch voor een remote lab**:
+      - afgebakende arena; stop bij verbindingsverlies (twist_mux-timeout bestaat)
+        + "dead man"-knop (blijven indrukken om te rijden)
+      - plafondcamera over de arena (overzicht, obstakels)
+      - batterij: TurtleBot3 heeft geen laadstation -> wisselen of zelf een
+        eenvoudig laadstation (contactplaatjes)
+      - robot terugzetten na botsing/vastzitten: arena slim opstellen
+      - vertraging via internet 100-300 ms: Nav2-doelen beter dan zelf sturen
+
 ## Features
 
 - [ ] **3D-viewer + cameramontage** (idee 2026-10-11, ~1 werksessie voor stap 1+2):
