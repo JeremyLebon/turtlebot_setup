@@ -290,8 +290,13 @@ dat script dekt nu niet alles wat per robot verschilt:
         (kaart + camera + teleop, onderste tabbalk), studenten mogen de kaart
         bewerken (origineel terugzetten blijft in Beheer), overal icoontjes met
         hover-tekst, aparte snelheid rechtdoor (m/s) en draaien (rad/s), logo +
-        naam (voorstel "TurtleDeck"), versienummer in de header (vX.Y.Z, hover =
-        image/setup/golden).
+        naam, versienummer in de header (vX.Y.Z, hover = image/setup/golden).
+      - Naam: werktitel **Fenix** (mockup v3, feniks-logo); definitieve naam nog kiezen.
+      - **Robot-onafhankelijk**: Jeremy wil de webpagina later ook op zijn andere
+        robots gebruiken -> robottype/capabilities uit config (camera, lidar,
+        teleop, Nav2 aan/uit per robot), TurtleBot-specifieke delen (OpenCR,
+        LDS-02, F710) als modules; op termijn eigen repo.
+      - Versienummer: `turtlebot_docker/VERSION` + CHANGELOG.md (sinds 2026-10-10).
       - Te beslissen: afsluiten voor studenten (voorstel: ja, bijwerken nee),
         1 PIN voor de vloot of per robot, labo-check op Rijden (icoon) of op Info.
 
