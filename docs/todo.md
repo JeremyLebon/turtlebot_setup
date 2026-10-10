@@ -286,6 +286,12 @@ dat script dekt nu niet alles wat per robot verschilt:
       - Icoontjes: inline SVG (bv. Lucide, vrije licentie), geen CDN (offline).
       - PIN = drempel tegen ongelukken, geen echte beveiliging (SSH + sudo
         `turtlebot`); echte scheiding = aparte student-gebruiker (zie Gebruikers en rechten).
+      - Feedback Jeremy 2026-10-10 (verwerkt in mockup v2): smartphone-layout
+        (kaart + camera + teleop, onderste tabbalk), studenten mogen de kaart
+        bewerken (origineel terugzetten blijft in Beheer), overal icoontjes met
+        hover-tekst, aparte snelheid rechtdoor (m/s) en draaien (rad/s), logo +
+        naam (voorstel "TurtleDeck"), versienummer in de header (vX.Y.Z, hover =
+        image/setup/golden).
       - Te beslissen: afsluiten voor studenten (voorstel: ja, bijwerken nee),
         1 PIN voor de vloot of per robot, labo-check op Rijden (icoon) of op Info.
 
