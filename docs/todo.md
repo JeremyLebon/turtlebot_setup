@@ -254,6 +254,30 @@ dat script dekt nu niet alles wat per robot verschilt:
 
 ## Features
 
+- [ ] **Layout-herziening statuspagina** (voorstel 2026-10-10, eerst mockup):
+      indelen volgens wat de student doet, niet volgens de techniek.
+      - Header op elke pagina: tabs, batterij/wifi/temp/internet, update-icoon
+        (licht op bij update), aan/uit-menu (afsluiten/herstarten), altijd
+        zichtbare rode STOP, chips van lopende launches (met stop per chip).
+      - **Rijden** (was Status): camera + teleop + live lidar/kaart samen,
+        "Start kaart maken" + "Kaart opslaan" hier; joystick/camera-schakelaar op
+        hun eigen kaart.
+      - **Navigatie**: camerabeeld als klein venster in de kaart (aan/uit);
+        "Geavanceerd" (Nav2) en kaarteditor-herstel naar Beheer.
+      - **Projecten**: ongewijzigd.
+      - **Info** (was Systeem): alleen-lezen - gezondheid, labo-check, WSL-verbinden,
+        nodes, logs.
+      - **Beheer** (docenten-PIN, server-side gecontroleerd, state/): bijwerken +
+        terugschakelen, robot-config, camera-instellingen, Nav2-instellingen,
+        kaart-origineel terugzetten, USB-spaarstand, monitor-toegang.
+      - Weg: kaartkaart op Systeem (dubbel, slaat op naar maps/map), "Launch
+        control (les 2)".
+      - Icoontjes: inline SVG (bv. Lucide, vrije licentie), geen CDN (offline).
+      - PIN = drempel tegen ongelukken, geen echte beveiliging (SSH + sudo
+        `turtlebot`); echte scheiding = aparte student-gebruiker (zie Gebruikers en rechten).
+      - Te beslissen: afsluiten voor studenten (voorstel: ja, bijwerken nee),
+        1 PIN voor de vloot of per robot, labo-check op Rijden (icoon) of op Info.
+
 ### Ideeën navigatie (Jeremy, 2026-10-09) - voorgestelde volgorde
 1. ~~**Route pauzeren / verder**~~ en 2. ~~**Actie per locatie**~~ gebouwd
    (b0ecbf0, nog te testen met rijden). Ook: doel/route tijdens Verkennen
