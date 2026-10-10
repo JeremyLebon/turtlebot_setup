@@ -18,8 +18,10 @@ git clone https://github.com/JeremyLebon/turtlebot_vis.git
 ```
 
 {% hint style="info" %}
-Already cloned in a previous year? Update it: `cd turtlebot_vis`, `git pull`,
-`git submodule update --init`. The old version (DDS) can't talk to the robots anymore.
+Already cloned in a previous year? Update it: `cd turtlebot_vis`,
+`git checkout .env` (throws away your old robot number, otherwise `git pull`
+refuses), `git pull`, `git submodule update --init`. The old version (DDS) can't
+talk to the robots anymore.
 {% endhint %}
 
 Go inside the directory:
