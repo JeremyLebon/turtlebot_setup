@@ -254,6 +254,13 @@ dat script dekt nu niet alles wat per robot verschilt:
 
 ## Features
 
+- [ ] **Desktop-extra's verwijderen op de vloot / golden image** (op turtlebot09
+      gedaan 2026-10-11, +1,3 GB): `apt-get remove --purge chromium chromium-l10n
+      chromium-common firefox vlc-l10n rpi-userguide rpd-wallpaper-trixie
+      pocketsphinx-en-us python3-mypy` (neemt ook rpi-chromium-mods, thonny, mypy
+      mee; geen systeempakketten) + ongebruikte image moby/buildkit:buildx-stable-1.
+      turtlebot09 (32 GB-kaart + buildkit-cache ~12 GB, groeit per build) blijft
+      krap: grotere SD-kaart of de builder naar een robot met 128 GB.
 - [x] **Desktop uit op de hele vloot** (2026-10-10, setup_turtlebot.sh: standaard
       `multi-user.target`, desktop terug per robot met `echo true >
       ~/turtlebot_setup/state/desktop` + herstart). Nog open: desktoppakketten
