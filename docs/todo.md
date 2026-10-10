@@ -266,6 +266,11 @@ dat script dekt nu niet alles wat per robot verschilt:
       desktoppakketten verwijderen in een nieuwe golden image.
 
 - [ ] **Layout-herziening statuspagina** (voorstel 2026-10-10, eerst mockup):
+      **Beslist 2026-10-10**: studenten mogen afsluiten/herstarten, NIET bijwerken;
+      1 PIN voor de hele vloot; labo-check als icoon met hover + uitklaplijst.
+      **Stap 1 (header) gebouwd: v0.6.0** (turtlebot_docker eaefdd1). Volgende:
+      stap 2 Rijden (Status + kaart maken) + camera in Navigatie, stap 3 Info +
+      Beheer met PIN (samen met de veiligheidsaanpak).
       indelen volgens wat de student doet, niet volgens de techniek.
       - Header op elke pagina: tabs, batterij/wifi/temp/internet, update-icoon
         (licht op bij update), aan/uit-menu (afsluiten/herstarten), altijd
