@@ -153,7 +153,8 @@ install_if_changed() {  # bron doel modus
   return 1
 }
 UNITS_CHANGED=false
-for unit in turtlebot-setup.service turtlebot-update.service turtlebot-usb-power@.service; do
+for unit in turtlebot-setup.service turtlebot-update.service turtlebot-rollback.service \
+            turtlebot-usb-power@.service; do
   install_if_changed "$SETUP_DIR/systemd/$unit" "/etc/systemd/system/$unit" 644 \
     && UNITS_CHANGED=true
 done
@@ -212,7 +213,15 @@ write_host_info() {
   SETUP_BRANCH="$($git_as rev-parse --abbrev-ref HEAD 2>/dev/null)" \
   SETUP_REPO="$($git_as remote get-url origin 2>/dev/null)" \
   SETUP_LOG="$($git_as log -5 --format='%H%x09%cs%x09%s' 2>/dev/null)" \
-  IMAGE_REF="$image_ref" IMAGE_DIGEST="$image_digest" \
+  # :vorige = image van voor de laatste update (rollback_turtlebot.sh)
+  local image_prev
+  image_prev=$(docker image inspect "${image_ref%:*}:vorige" \
+               --format '{{range .Config.Env}}{{println .}}{{end}}' 2>/dev/null \
+               | sed -n 's/^TURTLEBOT_IMAGE_VERSION=//p')
+  # oudere builds zonder versie-env: dan de bouwdatum
+  [ -z "$image_prev" ] && image_prev=$(docker image inspect "${image_ref%:*}:vorige" \
+               --format 'gebouwd {{.Created}}' 2>/dev/null | cut -c1-24)
+  IMAGE_REF="$image_ref" IMAGE_DIGEST="$image_digest" IMAGE_PREVIOUS="$image_prev" \
   GOLDEN="$(cat /etc/turtlebot-golden 2>/dev/null)" \
   SETUP_COMMIT="$(runuser -u "$SETUP_USER" -- git -C "$SETUP_DIR" log -1 --format='%h %cs' 2>/dev/null)" \
   OS_NAME="$(. /etc/os-release; echo "$PRETTY_NAME")" \
@@ -241,6 +250,7 @@ info = {
     "setup_log": log,
     "image_ref": e.get("IMAGE_REF") or None,
     "image_digest": e.get("IMAGE_DIGEST") or None,
+    "image_previous": e.get("IMAGE_PREVIOUS") or None,
     "setup_commit": e.get("SETUP_COMMIT") or None,
     "os": e.get("OS_NAME") or None,
     "rpi_issue": e.get("RPI_ISSUE") or None,

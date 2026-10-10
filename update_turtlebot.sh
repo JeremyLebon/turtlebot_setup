@@ -44,9 +44,28 @@ timeout 120 runuser -u "$SETUP_USER" -- git -C "$SETUP_DIR" pull --ff-only \
 status "⚙️ Setup toepassen"
 "$SETUP_DIR/setup_turtlebot.sh" || fail "setup_turtlebot.sh mislukt - details: journalctl -u turtlebot-update"
 
+# Huidige image onthouden: na de pull wordt ze :vorige (terugschakelen met
+# rollback_turtlebot.sh, ook zonder internet)
+IMAGE_REF=$(docker compose --project-directory "$SETUP_DIR" config --images | head -1)
+OLD_ID=$(docker image inspect -f '{{.Id}}' "$IMAGE_REF" 2>/dev/null || true)
+
 status "⬇️ Nieuwe image ophalen (docker compose pull, kan enkele minuten duren)"
 docker compose --project-directory "$SETUP_DIR" pull \
   || fail "docker compose pull mislukt - details: journalctl -u turtlebot-update"
+
+NEW_ID=$(docker image inspect -f '{{.Id}}' "$IMAGE_REF" 2>/dev/null || true)
+if [ -n "$OLD_ID" ] && [ "$OLD_ID" != "$NEW_ID" ]; then
+  # Enkel de verschillende lagen kosten ruimte; toch nooit de kaart vol laten
+  # lopen (turtlebot09: 32 GB + buildkit-cache)
+  FREE_GB=$(df -BG --output=avail / | tail -1 | tr -dc 0-9)
+  if [ "$FREE_GB" -ge 5 ]; then
+    docker tag "$OLD_ID" "${IMAGE_REF%:*}:vorige"
+    echo "💾 Vorige image bewaard als ${IMAGE_REF%:*}:vorige"
+  else
+    docker rmi "${IMAGE_REF%:*}:vorige" >/dev/null 2>&1 || true
+    echo "⚠️ Slechts ${FREE_GB} GB vrij - vorige image niet bewaard (geen terugschakelen mogelijk)"
+  fi
+fi
 
 # Herstart enkel als image of compose-config veranderde
 status "🔁 Container bijwerken"
