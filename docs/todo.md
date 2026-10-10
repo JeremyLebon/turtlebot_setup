@@ -616,9 +616,17 @@ binnen het AP-netwerk van de robot.
 - [ ] **Vooraf ophalen**: Docker-images (`turtlebot_vis` in WSL, robot-image)
       en apt/pip-pakketten die studenten nodig hebben, in het begin van het
       semester - offline werkt `docker pull`/`apt install`/`pip install` niet.
-- [ ] **Update-knop offline**: mislukt (`git pull`/`docker pull`); de update-
-      hint toont "kon niet controleren". Melding op de pagina duidelijker maken
-      ("geen internet - update niet mogelijk").
+- [x] **Update-knop offline** (2026-10-10, na labotest op school zonder
+      internet): `update_turtlebot.sh` controleert eerst internet (1.1.1.1/8.8.8.8,
+      DNS + github.com/registry-1.docker.io, max 10 s per test), git pull met
+      timeout 120 s, unit `TimeoutStartSec=30min`; laatste stap/fout in
+      `state/update_status.txt` -> system.html ("Update bezig: <stap>" /
+      "mislukt - Geen internet via de AP ..."). launch_control_node weigert de
+      update meteen zonder internet. Pagina-deel pas na een image-build
+      (turtlebot_docker), script-deel na de eerste update (git pull).
+- [ ] **Smartphone/laptop op AP zonder internet**: Android/iOS sturen het verkeer
+      dan via mobiele data -> statuspagina laadt niet (2026-10-10 op school).
+      In de lesinstructies: mobiele data uit, of "verbonden blijven" kiezen.
 
 ## Gebruikers en rechten
 
