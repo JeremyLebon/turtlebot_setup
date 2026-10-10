@@ -10,7 +10,7 @@ Make a new SSH connection with the turtlebot
 ssh turtlebot-rpi5@192.168.60.6x
 ```
 
-password: turtlebot
+password: see lab notes
 
 Connect to the Docker container inside with the following command
 
