@@ -254,6 +254,14 @@ dat script dekt nu niet alles wat per robot verschilt:
 
 ## Features
 
+- [ ] **Desktop uit op de hele vloot?** (2026-10-10) RaspiOS op de robots is de
+      desktopversie: lightdm/labwc draait (~400 MB RAM, 0 % CPU in rust),
+      Chromium + Firefox + Vulkan-drivers ~1,5-2 GB op de kaart. turtlebot09 staat
+      op `multi-user.target` (geen desktop; terug: `sudo systemctl set-default
+      graphical.target && sudo systemctl start lightdm`). Beslissen: ook in
+      setup_turtlebot.sh voor de vloot (met schakelaar in state/), en/of de
+      desktoppakketten verwijderen in een nieuwe golden image.
+
 - [ ] **Layout-herziening statuspagina** (voorstel 2026-10-10, eerst mockup):
       indelen volgens wat de student doet, niet volgens de techniek.
       - Header op elke pagina: tabs, batterij/wifi/temp/internet, update-icoon
