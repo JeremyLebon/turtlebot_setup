@@ -14,7 +14,7 @@ GitBook pages. **No passwords** in these pages ("see lab notes"): this repo is p
 | `turtlebot3/turtlebot3-startup/connect-to-the-turtlebot3.md` | Connect to the turtlebot3 | status page `http://10.0.<nr>.10:8080` first; web terminal or `ssh turtlebot@10.0.<nr>.10`; **password removed** |
 | `turtlebot3/turtlebot3-startup/startup-docker.md` | Startup docker | nothing to do anymore (no `docker compose pull/up` by students) |
 | `turtlebot3/turtlebot3-startup/startup-turtlebot-software.md` | Startup turtlebot software | bringup in the terminal (learn) or via the status page; **password removed** |
-| `turtlebot3/turtlebot3-startup/setup-laptop-student.md` | Setup laptop (student) | no firewall rules (Zenoh); `git clone -b zenoh`; `docker compose pull`; `.env`: `ROS_DOMAIN_ID` + `ROBOT_ZENOH_IP`; troubleshooting |
+| `turtlebot3/turtlebot3-startup/setup-laptop-student.md` | Setup laptop (student) | no firewall rules (Zenoh); `git clone` (Zenoh is on `master` now) / `git pull` for an old clone; `docker compose pull`; `.env`: `ROS_DOMAIN_ID` + `ROBOT_ZENOH_IP`; troubleshooting |
 | `turtlebot3/controlling-the-robot/manual-control-by-terminal.md` | Manual control by terminal | + twist_mux: who is in control (priorities) |
 | `turtlebot3/controlling-the-robot/manual-control-with-gamepad.md` | Manual control with gamepad | switch on via the status page; **LB** = enable (was "right joystick"), RB = faster |
 | `turtlebot3/ros2-nodes.md` | ROS2 nodes | workspace `/root/ros2_ws` on laptop and robot |
@@ -45,8 +45,8 @@ where it occurs.
 
 ## Still to check in the lab
 
-* `turtlebot-vis` (branch `zenoh`): `docker compose pull` works for students
+* `turtlebot-vis`: `docker compose pull` works for students
   (image `nobel86/turtlebot-rpi5-vis:zenoh` on Docker Hub) and `cartographer.launch.py`
   / `map_saver_cli` / `navigation2.launch.py params_file:=` run in it.
-* Merge branch `zenoh` into `main` of turtlebot_vis later -> then `-b zenoh` can go.
+* Done 2026-10-11: branch `zenoh` merged into `master` of turtlebot_vis (d000a60).
 * Web terminal login (`:7681`) currently = wifi password pattern -> see the security todo.

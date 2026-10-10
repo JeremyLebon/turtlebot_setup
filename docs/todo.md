@@ -286,8 +286,8 @@ een echt risico.
 - [ ] **GitBooks bijwerken** (2026-10-11): aangepaste pagina's staan klaar in
       `docs/gitbook/` (README = welk bestand welke pagina vervangt). In GitBook
       plakken; daarna in het labo nakijken (turtlebot-vis zenoh: pull,
-      cartographer, map_saver, params_file). turtlebot_vis `zenoh` naar `main`
-      mergen, dan kan `-b zenoh` uit de handleiding. Wachtwoord `turtlebot` staat
+      cartographer, map_saver, params_file). turtlebot_vis `zenoh` is gemerged naar
+      `master` (d000a60, 2026-10-11) - de handleiding gebruikt gewoon `git clone`. Wachtwoord `turtlebot` staat
       nu nog publiek in de oude GitBook-pagina "Startup turtlebot software".
 
 - [ ] **3D-viewer + cameramontage** (idee 2026-10-11, ~1 werksessie voor stap 1+2):

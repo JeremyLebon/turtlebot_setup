@@ -11,15 +11,15 @@ With Zenoh the laptop makes the connection itself, so the Windows/Hyper-V
 
 ## Docker container
 
-Open a WSL terminal and clone the repository - the **`zenoh` branch**:
+Open a WSL terminal and clone the repository:
 
 ```sh
-git clone -b zenoh https://github.com/JeremyLebon/turtlebot_vis.git
+git clone https://github.com/JeremyLebon/turtlebot_vis.git
 ```
 
-{% hint style="danger" %}
-Don't forget `-b zenoh`. Without it you get the old version (DDS), which can't
-talk to the robots anymore.
+{% hint style="info" %}
+Already cloned in a previous year? Update it: `cd turtlebot_vis`, `git pull`,
+`git submodule update --init`. The old version (DDS) can't talk to the robots anymore.
 {% endhint %}
 
 Go inside the directory:
