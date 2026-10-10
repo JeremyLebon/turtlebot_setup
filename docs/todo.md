@@ -624,6 +624,19 @@ binnen het AP-netwerk van de robot.
       "mislukt - Geen internet via de AP ..."). launch_control_node weigert de
       update meteen zonder internet. Pagina-deel pas na een image-build
       (turtlebot_docker), script-deel na de eerste update (git pull).
+- [x] **"Alles bijwerken" in de vlootmonitor in groepjes** (2026-10-10):
+      wachtrij in `monitor/monitor.py` (1/2/3 tegelijk, standaard 2), voortgang +
+      fouten per robot, "Wachtrij stoppen". Klaar-detectie via `launch.update`
+      (robot-image vanaf turtlebot_docker na cbde25f); oudere robots: klaar na
+      offline->online of na 6 min. Getest met nagebootste robots, nog niet met
+      de echte vloot.
+- [ ] **Terug naar een oudere versie (rollback)**: nu bestaat enkel de
+      meeschuivende tag `raspios-zenoh`, oude builds staan alleen nog als
+      digest op Docker Hub. Plan: elke build ook als versietag pushen
+      (`raspios-zenoh-<datum>-<commit>`), compose-image via `.env`
+      (`TURTLEBOT_IMAGE`, door setup_turtlebot.sh uit `state/image_pin`), op
+      system.html een keuzelijst met de versietags (Docker Hub API) +
+      "Terug naar nieuwste". Update-hint en vlootmonitor tonen "vastgepind".
 - [ ] **Smartphone/laptop op AP zonder internet**: Android/iOS sturen het verkeer
       dan via mobiele data -> statuspagina laadt niet (2026-10-10 op school).
       In de lesinstructies: mobiele data uit, of "verbonden blijven" kiezen.
