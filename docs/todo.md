@@ -268,9 +268,15 @@ dat script dekt nu niet alles wat per robot verschilt:
 - [ ] **Layout-herziening statuspagina** (voorstel 2026-10-10, eerst mockup):
       **Beslist 2026-10-10**: studenten mogen afsluiten/herstarten, NIET bijwerken;
       1 PIN voor de hele vloot; labo-check als icoon met hover + uitklaplijst.
-      **Stap 1 (header) gebouwd: v0.6.0** (turtlebot_docker eaefdd1). Volgende:
-      stap 2 Rijden (Status + kaart maken) + camera in Navigatie, stap 3 Info +
-      Beheer met PIN (samen met de veiligheidsaanpak).
+      **Stap 1 (header) gebouwd: v0.6.0** (turtlebot_docker eaefdd1).
+      **Stap 2 (Rijden + camera in Navigatie) en stap 3 (Info + Beheer met PIN):
+      v0.8.0** (turtlebot_docker 4d6f128). PIN via `fenix_admin.py set` op elke
+      robot (nog geen PIN ingesteld - Jeremy kiest). Nog open:
+      - [ ] PIN voor de hele vloot in 1 keer zetten (vlootmonitor-opdracht of
+            setup-bestand buiten git), samen met de veiligheidsaanpak.
+      - [ ] Navigatie verder opschonen volgens de mockup (zijpaneel: stappen 1-2
+            dubbel met Rijden; kaartbeheer naar Beheer; icoontjes in de toolbar).
+      - [ ] Projecten: icoontjes.
       indelen volgens wat de student doet, niet volgens de techniek.
       - Header op elke pagina: tabs, batterij/wifi/temp/internet, update-icoon
         (licht op bij update), aan/uit-menu (afsluiten/herstarten), altijd
