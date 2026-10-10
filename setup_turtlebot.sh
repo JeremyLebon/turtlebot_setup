@@ -185,7 +185,9 @@ install_if_changed "$SETUP_DIR/systemd/timesyncd-turtlebot.conf" \
 # /etc/turtlebot-golden: stempel gezet door tools/golden_prepare.sh bij het
 # maken van de golden image, meegekloond naar elke robot.
 write_host_info() {
-  mkdir -p "$SETUP_DIR/state"
+  # maps/: map_saver maakt geen mappen aan -> eerste "Kaart opslaan" op een
+  # verse robot mislukte (2026-10-10, turtlebot05)
+  mkdir -p "$SETUP_DIR/state/maps"
   local prev_end prev_clean
   if journalctl -b -1 -n 0 >/dev/null 2>&1; then
     prev_end=$(journalctl -b -1 -n 1 -o short-iso --no-pager 2>/dev/null | awk '{print $1}')
