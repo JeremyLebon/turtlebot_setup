@@ -286,6 +286,12 @@ dat script dekt nu niet alles wat per robot verschilt:
       - [x] Navigatie opgeschoond (v0.9.0): icoontjes in de werkbalken, zijpaneel
             "Navigatie" (kaart maken verwezen naar Rijden, bringup-stap weg).
       - [x] Projecten: start/stop-icoontjes (v0.9.0).
+      - [ ] **Projecten als kaarten zoals in de mockup** (Jeremy vond die titels
+            mooi, 2026-10-11): per voorbeeld/oefening een kaart met titel, korte
+            beschrijving, labels (camera, lidar, kaart nodig, SLAM + Nav2, niveau)
+            en een startknop; klik = details (stappen, controles, live). Mockup:
+            https://claude.ai/artifact/U4r7pAgYFNGrPFzqsGBtKD (tab Projecten).
+            Data uit project.json (title, beschrijving, needs/badges toevoegen).
       indelen volgens wat de student doet, niet volgens de techniek.
       - Header op elke pagina: tabs, batterij/wifi/temp/internet, update-icoon
         (licht op bij update), aan/uit-menu (afsluiten/herstarten), altijd
