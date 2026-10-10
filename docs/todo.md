@@ -292,6 +292,9 @@ dat script dekt nu niet alles wat per robot verschilt:
         hover-tekst, aparte snelheid rechtdoor (m/s) en draaien (rad/s), logo +
         naam, versienummer in de header (vX.Y.Z, hover = image/setup/golden).
       - Naam: werktitel **Fenix** (mockup v3, feniks-logo); definitieve naam nog kiezen.
+        Mogelijk later commercieel -> merkcheck nodig (TMview/BOIP, klasse 9 + 42).
+        Fenix/Phoenix is zeer gangbaar. Kandidaten 2026-10-10: Alcedo (ijsvogel),
+        Navora (verzonnen), Zwin, Reynaert, Kompaan; Ardea valt af (DLR-drone).
       - **Robot-onafhankelijk**: Jeremy wil de webpagina later ook op zijn andere
         robots gebruiken -> robottype/capabilities uit config (camera, lidar,
         teleop, Nav2 aan/uit per robot), TurtleBot-specifieke delen (OpenCR,
