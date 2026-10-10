@@ -169,6 +169,12 @@ if ! command -v uhubctl >/dev/null; then
     || echo "⚠️ uhubctl niet geïnstalleerd (geen internet?) - USB-spaarstand werkt niet"
 fi
 
+# Swap enkel als zram (geen /var/swap van 2 GB op de SD-kaart), actief na
+# de volgende herstart
+install_if_changed "$SETUP_DIR/rpi/swap-turtlebot.conf" \
+  /etc/rpi/swap.conf.d/50-turtlebot.conf 644 \
+  && echo "ℹ️ Swap-instelling gewijzigd - actief na een herstart"
+
 # Persistente journal (Raspberry Pi OS staat standaard op volatile), zodat
 # `journalctl -b -1` na een crash/shutdown nog werkt. Begrensd tot 100 MB.
 install_if_changed "$SETUP_DIR/systemd/journald-turtlebot.conf" \
