@@ -272,11 +272,13 @@ dat script dekt nu niet alles wat per robot verschilt:
       **Stap 2 (Rijden + camera in Navigatie) en stap 3 (Info + Beheer met PIN):
       v0.8.0** (turtlebot_docker 4d6f128). PIN via `fenix_admin.py set` op elke
       robot (nog geen PIN ingesteld - Jeremy kiest). Nog open:
-      - [ ] PIN voor de hele vloot in 1 keer zetten (vlootmonitor-opdracht of
-            setup-bestand buiten git), samen met de veiligheidsaanpak.
-      - [ ] Navigatie verder opschonen volgens de mockup (zijpaneel: stappen 1-2
-            dubbel met Rijden; kaartbeheer naar Beheer; icoontjes in de toolbar).
-      - [ ] Projecten: icoontjes.
+      - [x] PIN voor de hele vloot: knop "Docenten-PIN" in de vlootmonitor
+            (enkel de hash naar de robots; robot-image v0.9.0). Getest: hash
+            compatibel met fenix_admin.py, monitor zet set_pin in de wachtrij;
+            nog niet end-to-end met een echte robot (monitor.conf op 09 niet ingesteld).
+      - [x] Navigatie opgeschoond (v0.9.0): icoontjes in de werkbalken, zijpaneel
+            "Navigatie" (kaart maken verwezen naar Rijden, bringup-stap weg).
+      - [x] Projecten: start/stop-icoontjes (v0.9.0).
       indelen volgens wat de student doet, niet volgens de techniek.
       - Header op elke pagina: tabs, batterij/wifi/temp/internet, update-icoon
         (licht op bij update), aan/uit-menu (afsluiten/herstarten), altijd
