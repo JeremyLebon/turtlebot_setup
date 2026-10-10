@@ -254,6 +254,29 @@ dat script dekt nu niet alles wat per robot verschilt:
 
 ## Features
 
+- [ ] **3D-viewer + cameramontage** (idee 2026-10-11, ~1 werksessie voor stap 1+2):
+      1. 3D-viewer (alleen kijken): robot uit `/robot_description` + TB3-meshes
+         (geserveerd door status_page_server.py uit turtlebot3_description),
+         TF-frames als assen met namen, lidar-punten in 3D; draaien/zoomen met
+         muis of vingers. three.js + urdf-loader lokaal gebundeld (offline, geen CDN).
+      2. Camera opmeten en toevoegen: studenten vullen x/y/z + roll/pitch/yaw t.o.v.
+         `base_link` in, viewer toont cameraframe + kijkveld (frustum); "Bewaar" =
+         statische TF `base_link -> camera_link` (state/camera_mount.json,
+         gepubliceerd door launch_control) - ook zichtbaar in rviz; pagina geeft
+         het URDF/xacro-stukje om in hun eigen robotbeschrijving te plakken.
+         URDF zelf niet aanpassen op de robot (veiliger, didactisch: TF-boom groeit).
+      3. Controle: lidar-punten geprojecteerd op het camerabeeld (extrinsiek +
+         intrinsieke kalibratie per resolutie, al aanwezig) - klopt de montage,
+         dan liggen de punten op de muren in het beeld.
+- [ ] **Topic-inspector** (Info): alle topics met type en frequentie, per topic
+      een live "echo" (gedrosseld) - ROS leren zonder terminal.
+- [ ] **TF-boom als schema**: welk frame hangt aan welk, live (past bij de 3D-viewer).
+- [ ] **Rosbag opnemen + downloaden**: 1 knop om een rit op te nemen (scan, odom,
+      tf, camera gecomprimeerd, instelbaar), downloaden als zip, afspelen in
+      turtlebot_vis - voor verslagen en oefenen zonder robot. Let op SD-ruimte.
+- [ ] **Batterijverloop als grafiek**: spanning over de tijd per labo (state/),
+      hoe lang een batterij meegaat, wanneer wisselen.
+
 - [ ] **Desktop-extra's verwijderen op de vloot / golden image** (op turtlebot09
       gedaan 2026-10-11, +1,3 GB): `apt-get remove --purge chromium chromium-l10n
       chromium-common firefox vlc-l10n rpi-userguide rpd-wallpaper-trixie
