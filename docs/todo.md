@@ -254,7 +254,10 @@ dat script dekt nu niet alles wat per robot verschilt:
 
 ## Features
 
-- [ ] **Desktop uit op de hele vloot?** (2026-10-10) RaspiOS op de robots is de
+- [x] **Desktop uit op de hele vloot** (2026-10-10, setup_turtlebot.sh: standaard
+      `multi-user.target`, desktop terug per robot met `echo true >
+      ~/turtlebot_setup/state/desktop` + herstart). Nog open: desktoppakketten
+      verwijderen in een nieuwe golden image? Achtergrond: RaspiOS op de robots is de
       desktopversie: lightdm/labwc draait (~400 MB RAM, 0 % CPU in rust),
       Chromium + Firefox + Vulkan-drivers ~1,5-2 GB op de kaart. turtlebot09 staat
       op `multi-user.target` (geen desktop; terug: `sudo systemctl set-default

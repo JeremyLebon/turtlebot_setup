@@ -175,6 +175,19 @@ install_if_changed "$SETUP_DIR/rpi/swap-turtlebot.conf" \
   /etc/rpi/swap.conf.d/50-turtlebot.conf 644 \
   && echo "ℹ️ Swap-instelling gewijzigd - actief na een herstart"
 
+# Desktop standaard uit (tekstmodus: ~400 MB RAM minder, geen nutteloze
+# processen); actief na de volgende herstart. Desktop terug op een robot:
+#   echo true > ~/turtlebot_setup/state/desktop   (+ herstart)
+if [ "$(cat "$SETUP_DIR/state/desktop" 2>/dev/null)" = true ]; then
+  WANT_TARGET=graphical.target
+else
+  WANT_TARGET=multi-user.target
+fi
+if [ "$(systemctl get-default)" != "$WANT_TARGET" ]; then
+  systemctl set-default "$WANT_TARGET" >/dev/null 2>&1 \
+    && echo "ℹ️ Opstartmodus $WANT_TARGET - actief na een herstart"
+fi
+
 # Persistente journal (Raspberry Pi OS staat standaard op volatile), zodat
 # `journalctl -b -1` na een crash/shutdown nog werkt. Begrensd tot 100 MB.
 install_if_changed "$SETUP_DIR/systemd/journald-turtlebot.conf" \
