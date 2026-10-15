@@ -1,3 +1,7 @@
+---
+hidden: true
+---
+
 # Play a sound
 
 {% hint style="info" %}
