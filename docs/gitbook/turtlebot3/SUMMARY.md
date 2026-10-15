@@ -22,7 +22,6 @@
   * [Read the encoder value](ros2-nodes/read-the-encoder-value.md)
   * [Drive 10cm with a button](ros2-nodes/drive-10cm-with-a-button.md)
 * [Homework](homework.md)
-* [Simulation of sensors](simulation-of-sensors.md)
 * [SLAM](slam.md)
 * [Autonomous driving](autonomous-driving.md)
 * [Autonomous driving with python library](autonomous-driving-with-python-library.md)

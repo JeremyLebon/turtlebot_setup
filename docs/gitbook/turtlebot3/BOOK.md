@@ -1187,11 +1187,8 @@ The same steps as in the simulation book
    Make your scripts there and run them in the VS Code terminal
    (`python3 <script>.py`).
 
-4. **Only for task 2:** copy the script of
-   [Simulation of sensors](simulation-of-sensors.md) to
-   `/home/dockeruser/dev_ws/simulation_sensors.py` and start it in an extra
-   terminal (`python3 simulation_sensors.py`). It publishes fake battery and
-   sensor values on `/sim/...`.
+4. **Only for task 2:** start the fake sensors, see
+   [Simulation of sensors](#simulation-of-sensors) below.
 
 5. Drive the robot (for task 1) in another terminal:
 
@@ -1219,8 +1216,8 @@ and on the real robot (about 220-230 points).
 
 ## Task 2 - Battery warning
 
-Start [Simulation of sensors](simulation-of-sensors.md) (step 4 of the
-startup): it publishes random values on `/sim/battery_state`. Write a node that subscribes to
+Start the [Simulation of sensors](#simulation-of-sensors) script below: it
+publishes random values on `/sim/battery_state`. Write a node that subscribes to
 `/sim/battery_state`, prints the voltage and the percentage, and prints a
 **warning** when the voltage is below **11.2 V** or the percentage below **50 %**.
 
@@ -1246,6 +1243,141 @@ Answer the **Check yourself** questions of the theory pages:
 [IMU](theory/imu.md), [TF](theory/tf.md), [cmd_vel](theory/cmd-vel.md) and
 [QoS](theory/qos.md).
 
+## Simulation of sensors
+
+At home there is no robot battery. The script `simulation_sensors.py` publishes
+**random** values once per second, on topics that start with `/sim/`:
+
+| topic | type |
+|---|---|
+| `/sim/battery_state` | `sensor_msgs/msg/BatteryState` (voltage 10.5-12.6 V, percentage 0-1) |
+| `/sim/temperature` | `sensor_msgs/msg/Temperature` |
+| `/sim/humidity` | `sensor_msgs/msg/RelativeHumidity` |
+| `/sim/gas_value` | `std_msgs/msg/Float32` |
+
+### Download
+
+{% file src=".gitbook/assets/simulation_sensors.py" %}
+simulation_sensors.py
+{% endfile %}
+
+Put it in the `dev_ws` folder of the simulation repository:
+
+| where | path |
+|---|---|
+| WSL | `~/ros2-jazzy-gazebo-turtlebot/dev_ws/simulation_sensors.py` |
+| Windows Explorer | `\\wsl$\Ubuntu-22.04\home\<user>\ros2-jazzy-gazebo-turtlebot\dev_ws` |
+| inside the container | `/home/dockeruser/dev_ws/simulation_sensors.py` |
+
+Or download it directly to the right place, in a **WSL terminal** (not in the container):
+
+```sh
+wget -O ~/ros2-jazzy-gazebo-turtlebot/dev_ws/simulation_sensors.py https://raw.githubusercontent.com/JeremyLebon/turtlebot_setup/master/docs/gitbook/turtlebot3/.gitbook/assets/simulation_sensors.py
+```
+
+{% hint style="info" %}
+Cloned the repository somewhere else than your home folder? Replace
+`~/ros2-jazzy-gazebo-turtlebot` by that folder.
+{% endhint %}
+
+### Run
+
+In a terminal **inside the container** (`docker exec -it gazebo_turtlebot_cont bash`):
+
+```sh
+cd /home/dockeruser/dev_ws
+python3 simulation_sensors.py
+```
+
+Check in another terminal: `ros2 topic echo /sim/battery_state`.
+
+<details>
+
+<summary>The code of simulation_sensors.py</summary>
+
+```python
+#!/usr/bin/env python3
+"""Fake robot sensors for at home (no robot): publishes random values once per
+second on /sim/battery_state, /sim/temperature, /sim/humidity and /sim/gas_value.
+
+Run it in the simulation container (gazebo_turtlebot_cont):
+    python3 simulation_sensors.py
+"""
+import random
+
+import rclpy
+from rclpy.node import Node
+from sensor_msgs.msg import BatteryState, Temperature, RelativeHumidity
+from std_msgs.msg import Float32
+
+
+class RandomSensorNode(Node):
+    def __init__(self):
+        super().__init__("random_sensor_node")
+
+        # Topics start with /sim/: the real robot already publishes /battery_state
+        self.pub_battery = self.create_publisher(BatteryState, "/sim/battery_state", 10)
+        self.pub_temp = self.create_publisher(Temperature, "/sim/temperature", 10)
+        self.pub_humidity = self.create_publisher(RelativeHumidity, "/sim/humidity", 10)
+        self.pub_gas = self.create_publisher(Float32, "/sim/gas_value", 10)
+
+        self.timer = self.create_timer(1.0, self.publish_random_values)  # 1 Hz
+        self.get_logger().info("Random sensors node started: topics /sim/...")
+
+    def publish_random_values(self):
+        now = self.get_clock().now().to_msg()
+
+        batt = BatteryState()
+        batt.header.stamp = now
+        batt.voltage = random.uniform(10.5, 12.6)      # V (3S LiPo)
+        batt.percentage = random.uniform(0.0, 1.0)     # 0-1, not 0-100
+        self.pub_battery.publish(batt)
+
+        temp = Temperature()
+        temp.header.stamp = now
+        temp.temperature = random.uniform(18.0, 35.0)  # degrees C
+        temp.variance = 0.1
+        self.pub_temp.publish(temp)
+
+        hum = RelativeHumidity()
+        hum.header.stamp = now
+        hum.relative_humidity = random.uniform(0.20, 0.80)  # 0-1
+        hum.variance = 0.02
+        self.pub_humidity.publish(hum)
+
+        gas = Float32()
+        gas.data = random.uniform(0.0, 1024.0)         # raw sensor value
+        self.pub_gas.publish(gas)
+
+        self.get_logger().info(
+            f"battery {batt.voltage:.2f} V {batt.percentage * 100:.0f} % | "
+            f"temp {temp.temperature:.1f} C | humidity {hum.relative_humidity * 100:.0f} % | "
+            f"gas {gas.data:.0f}")
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = RandomSensorNode()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.try_shutdown()
+
+
+if __name__ == "__main__":
+    main()
+```
+
+</details>
+
+{% hint style="danger" %}
+Keep the `/sim/` prefix. The real robot already publishes `/battery_state`: a
+second publisher on the same topic would mix fake and real values.
+{% endhint %}
+
 ## Hand in
 
 Upload on Toledo, before the next session:
@@ -1260,111 +1392,7 @@ Next session: SLAM (make a map) and autonomous navigation with the real robot.
 
 ---
 
-## 23. Simulation of sensors  `[gewijzigd]`
-
-<sub>simulation-of-sensors.md</sub>
-
-
-{% hint style="info" %}
-For **at home**, without a robot (see [Homework](homework.md)): run this script
-in the simulation container `gazebo_turtlebot_cont`, in `/home/dockeruser/dev_ws`.
-It gives you battery and sensor values to test your own nodes.
-{% endhint %}
-
-Make a script `simulation_sensors.py` and add the code below. This code will simulate the following parameters. These parameters will be published on ROS 2 topics under `/sim/...`:
-
-* battery state
-* battery percentage
-* temperature
-* humidty
-* gas sensor
-
-{% hint style="danger" %}
-The topics start with `/sim/`. The real robot already publishes `/battery_state`:
-a second publisher on the same topic would mix fake and real values (battery
-icon, labo-check and *Measure while driving* would show nonsense).
-{% endhint %}
-
-```python
-#!/usr/bin/env python3
-import rclpy
-from rclpy.node import Node
-import random
-import time
-
-from sensor_msgs.msg import BatteryState, Temperature, RelativeHumidity, JointState
-from std_msgs.msg import Float32
-
-
-class RandomSensorNode(Node):
-    def __init__(self):
-        super().__init__("random_sensor_node")
-        self.get_logger().info('Random sensors node started!')
-
-        # Publishers
-        self.pub_battery = self.create_publisher(BatteryState, "/sim/battery_state", 10)
-        self.pub_temp = self.create_publisher(Temperature, "/sim/temperature", 10)
-        self.pub_humidity = self.create_publisher(RelativeHumidity, "/sim/humidity", 10)
-        self.pub_gas = self.create_publisher(Float32, "/sim/gas_value", 10)
-
-        # Timer (10 Hz)
-        self.timer = self.create_timer(0.1, self.publish_random_values)
-
-    def publish_random_values(self):
-        now = self.get_clock().now().to_msg()
-
-        # --- Battery (sensor_msgs/BatteryState) ---
-        batt = BatteryState()
-        batt.header.stamp = now
-        batt.voltage = random.uniform(10.5, 12.6)
-        batt.percentage = random.uniform(0.0, 1.0)  # 0–1 (niet 0–100)
-        self.pub_battery.publish(batt)
-
-        # --- Temperature ---
-        temp = Temperature()
-        temp.header.stamp = now
-        temp.temperature = random.uniform(18.0, 35.0)
-        temp.variance = 0.1
-        self.pub_temp.publish(temp)
-
-        # --- Humidity (sensor_msgs/RelativeHumidity) ---
-        hum = RelativeHumidity()
-        hum.header.stamp = now
-        hum.relative_humidity = random.uniform(0.20, 0.80)  # 0–1
-        hum.variance = 0.02
-        self.pub_humidity.publish(hum)
-
-        # --- Gaswaarde ---
-        gas = Float32()
-        gas.data = random.uniform(0.0, 1024.0)
-        self.pub_gas.publish(gas)
-
-        self.get_logger().info(f'Bat Volt: {batt.voltage:.2f} | Bat perctage: {batt.percentage:.2f}  | Temp: {temp.temperature:.2f}  |  Hum: {hum.relative_humidity:.2f}  |  Gas: { gas.data:.2f} ')
-
-def main(args=None):
-    rclpy.init(args=args)
-    node = RandomSensorNode()
-    rclpy.spin(node)
-    node.destroy_node()
-    rclpy.shutdown()
-
-
-if __name__ == "__main__":
-    main()
-
-```
-
-Start the Python script with the following command:
-
-```shellscript
-python3 simulation_sensors.py
-```
-
-Use the ros2 command to echo the published topics, e.g. `ros2 topic echo /sim/battery_state`.
-
----
-
-## 24. SLAM  `[gewijzigd]`
+## 23. SLAM  `[gewijzigd]`
 
 <sub>slam.md</sub>
 
@@ -1419,7 +1447,7 @@ Show the map to the lecturer.
 
 ---
 
-## 25. Autonomous driving  `[gewijzigd]`
+## 24. Autonomous driving  `[gewijzigd]`
 
 <sub>autonomous-driving.md</sub>
 
@@ -1485,7 +1513,7 @@ you are in control; release and Nav2 continues.
 
 ---
 
-## 26. Autonomous driving with python library  `[gewijzigd]`
+## 25. Autonomous driving with python library  `[gewijzigd]`
 
 <sub>autonomous-driving-with-python-library.md</sub>
 
@@ -1614,7 +1642,7 @@ Nav2 on the status page must be stopped for this (only one Nav2 at a time).
 
 ---
 
-## 27. Compare planners and controllers  `[nieuw]`
+## 26. Compare planners and controllers  `[nieuw]`
 
 <sub>compare-planners-and-controllers.md</sub>
 
@@ -1665,7 +1693,7 @@ at the goal.
 
 ---
 
-## 28. Zones  `[nieuw]`
+## 27. Zones  `[nieuw]`
 
 <sub>zones.md</sub>
 
@@ -1708,7 +1736,7 @@ Show your zones and the result to the lecturer.
 
 ---
 
-## 29. Measure while driving  `[gewijzigd]`
+## 28. Measure while driving  `[gewijzigd]`
 
 <sub>measure-while-driving.md</sub>
 
@@ -1823,7 +1851,7 @@ if __name__ == "__main__":
 
 ---
 
-## 30. Solution: Measure while driving  `[gewijzigd]`
+## 29. Solution: Measure while driving  `[gewijzigd]`
 
 <sub>solution-measure-while-driving.md</sub>
 
@@ -1942,7 +1970,7 @@ def main():
 
 ---
 
-## 31. Install python libraries in container  `[gewijzigd]`
+## 30. Install python libraries in container  `[gewijzigd]`
 
 <sub>install-python-libraries-in-container.md</sub>
 
@@ -1990,7 +2018,7 @@ access point has internet.
 
 ---
 
-## 32. Location files on wsl  `[gewijzigd]`
+## 31. Location files on wsl  `[gewijzigd]`
 
 <sub>location-files-on-wsl.md</sub>
 
@@ -2020,7 +2048,7 @@ updates - but it is shared by everyone who uses that robot.
 
 ---
 
-## 33. Theory: what the robot measures  `[nieuw]`
+## 32. Theory: what the robot measures  `[nieuw]`
 
 <sub>theory/README.md</sub>
 
@@ -2089,7 +2117,7 @@ Try it: `ros2 topic list` and `ros2 topic info /odom` (in the `turtlebot-vis` co
 
 ---
 
-### 34. Laser scan (/scan)  `[nieuw]`
+### 33. Laser scan (/scan)  `[nieuw]`
 
 <sub>theory/laser-scan.md</sub>
 
@@ -2211,7 +2239,7 @@ Next: [Read in the scan topic](../ros2-nodes/read-in-the-scan-topic/).
 
 ---
 
-### 35. Odometry (/odom) and encoders  `[nieuw]`
+### 34. Odometry (/odom) and encoders  `[nieuw]`
 
 <sub>theory/odometry.md</sub>
 
@@ -2342,7 +2370,7 @@ Next: [Read the encoder value](../ros2-nodes/read-the-encoder-value.md).
 
 ---
 
-### 36. IMU (/imu)  `[nieuw]`
+### 35. IMU (/imu)  `[nieuw]`
 
 <sub>theory/imu.md</sub>
 
@@ -2453,7 +2481,7 @@ ros2 topic echo /imu --field linear_acceleration
 
 ---
 
-### 37. TF - coordinate frames  `[nieuw]`
+### 36. TF - coordinate frames  `[nieuw]`
 
 <sub>theory/tf.md</sub>
 
@@ -2579,7 +2607,7 @@ Next: [Visualise the robot](../visualise-the-robot.md).
 
 ---
 
-### 38. Driving the robot (/cmd_vel)  `[nieuw]`
+### 37. Driving the robot (/cmd_vel)  `[nieuw]`
 
 <sub>theory/cmd-vel.md</sub>
 
@@ -2680,7 +2708,7 @@ Next: [Drive 10cm with a button](../ros2-nodes/drive-10cm-with-a-button.md).
 
 ---
 
-### 39. QoS - Quality of Service  `[nieuw]`
+### 38. QoS - Quality of Service  `[nieuw]`
 
 <sub>theory/qos.md</sub>
 
