@@ -1,8 +1,9 @@
 # Theory: what the robot measures
 
-Before you visualise the robot and write your own nodes, it helps to know
-**where the data comes from** and **what it means**. This chapter gives a short
-piece of theory for each important topic, applied to our TurtleBot3 Burger.
+Reference chapter: **where the data comes from** and **what it means**, for
+each important topic, applied to our TurtleBot3 Burger. You saw most of it in
+the simulation; here are the values of the real robot. The exercises link to
+the page you need.
 
 * [Laser scan (`/scan`)](theory/laser-scan.md) - what the lidar sees
 * [Odometry (`/odom`) and encoders](theory/odometry.md) - where the robot thinks it is

@@ -34,6 +34,32 @@ BOOKS = {
                     ("turtlebot-in-simulation/theory/cmd-vel.md", "turtlebot-in-simulation/theory/qos.md", "QoS - Quality of Service")]),
 }
 
+# Optional order of the top-level pages (a page moves together with its subpages).
+# Top-level pages not listed keep their place after the listed ones.
+ORDER = {
+    "turtlebot3": [
+        "turtlebot3-in-the-real-world.md", "objectives.md", "turtlebot3-startup.md",
+        "visualise-the-robot.md", "controlling-the-robot.md", "see-turtlebot3-topics.md",
+        "ros2-nodes.md", "play-a-sound.md", "simulation-of-sensors.md",
+        # SLAM / navigation (hidden for now: 'hidden: true' front matter)
+        "slam.md", "autonomous-driving.md", "autonomous-driving-with-python-library.md",
+        "compare-planners-and-controllers.md", "zones.md",
+        "measure-while-driving.md", "solution-measure-while-driving.md",
+        # reference
+        "install-python-libraries-in-container.md", "location-files-on-wsl.md", "theory.md",
+    ],
+}
+
+
+def top(path):
+    return path.split("/")[0].replace(".md", "")
+
+
+def is_hidden(text):
+    m = re.match(r"---\n(.*?)\n---\n", text, re.S)
+    return bool(m and re.search(r"^hidden:\s*true\s*$", m.group(1), re.M))
+
+
 for book, (title, dl, base, new_pages) in BOOKS.items():
     index = open(os.path.join(DL, dl + "_index.txt")).read()
     pages = []   # (path, title)
@@ -42,6 +68,13 @@ for book, (title, dl, base, new_pages) in BOOKS.items():
     for after, path, t in new_pages:
         i = [p for p, _ in pages].index(after)
         pages.insert(i + 1, (path, t))
+
+    if book in ORDER:
+        order = [top(p) for p in ORDER[book]]
+        missing = [p for p in ORDER[book] if p not in [q for q, _ in pages]]
+        assert not missing, missing
+        pos = {k: i for i, k in enumerate(order)}
+        pages.sort(key=lambda pt: pos.get(top(pt[0]), len(order)))   # stable: subpages keep their order
 
     status = {}
     for path, t in pages:
@@ -76,7 +109,8 @@ for book, (title, dl, base, new_pages) in BOOKS.items():
           "Volgorde zoals in GitBook. Klik een pagina aan, of lees alles achter elkaar in [BOOK.md](BOOK.md).", "",
           "| # | Pagina | Status |", "|---|---|---|"]
     for n, (path, t) in enumerate(pages, 1):
-        ov.append("| %d | %s[%s](%s) | %s |" % (n, "&nbsp;&nbsp;&nbsp;&nbsp;" * path.count("/"), t, path, label[status[path]]))
+        hidden = " 🙈 verborgen" if is_hidden(open(os.path.join(GB, book, path)).read()) else ""
+        ov.append("| %d | %s[%s](%s) | %s%s |" % (n, "&nbsp;&nbsp;&nbsp;&nbsp;" * path.count("/"), t, path, label[status[path]], hidden))
     counts = {}
     for v in status.values():
         counts[v] = counts.get(v, 0) + 1
@@ -87,6 +121,7 @@ for book, (title, dl, base, new_pages) in BOOKS.items():
                "_Alle pagina's in leesvolgorde. Statuslabel per pagina tussen haakjes; bron: `docs/gitbook/%s/`._" % book, ""]
     for n, (path, t) in enumerate(pages, 1):
         body = open(os.path.join(GB, book, path)).read().strip()
+        body = re.sub(r"^---\n.*?\n---\n+", "", body, count=1, flags=re.S)   # GitBook front matter (hidden: true)
         body = re.sub(r"^# .*\n", "", body, count=1)            # page title comes from the header below
         h = "#" * min(2 + path.count("/"), 4)
         book_md += ["---", "", "%s %d. %s  `[%s]`" % (h, n, t, status[path]), "", "<sub>%s</sub>" % path, "", body, ""]

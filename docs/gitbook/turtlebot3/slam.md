@@ -1,3 +1,7 @@
+---
+hidden: true
+---
+
 # SLAM
 
 Make a map of the classroom.

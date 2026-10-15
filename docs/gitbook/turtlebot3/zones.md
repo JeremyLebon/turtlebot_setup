@@ -1,3 +1,7 @@
+---
+hidden: true
+---
+
 # Zones: no-go areas, virtual walls, speed zones
 
 **New exercise.** Not everything the robot should avoid is visible for the lidar:
