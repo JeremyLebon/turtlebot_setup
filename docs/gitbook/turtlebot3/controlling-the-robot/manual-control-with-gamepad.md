@@ -7,9 +7,27 @@ and switch the gamepad on.
 Ensure the robot is on the ground or its wheels are in contact with the ground.
 {% endhint %}
 
-Switch the gamepad on via the status page: **Rijden**, top right, gamepad
-button. The button turns blue when the gamepad is active; hover over it to see
-whether the receiver is detected.
+{% hint style="info" %}
+The switch on the back of the gamepad must be on **X** (XInput mode).
+{% endhint %}
+
+Start the gamepad driver **on the robot**: open a terminal inside the robot
+container (see [Connect to the turtlebot3](../turtlebot3-startup/connect-to-the-turtlebot3.md))
+and run:
+
+```sh
+ros2 launch teleop_twist_joy teleop-launch.py joy_vel:=cmd_vel_joy config_filepath:=/root/turtlebot3_ws/joystick_f710.yaml
+```
+
+Keep this terminal open (`CTRL + C` stops the gamepad). The bringup must be
+running as well.
+
+{% hint style="info" %}
+* `joy_vel:=cmd_vel_joy`: the gamepad publishes on `/cmd_vel_joy`, the input
+  with the highest priority in twist_mux.
+* `joystick_f710.yaml`: which buttons and sticks do what, and the speeds.
+* Alternative: status page > **Rijden** > gamepad button (top right).
+{% endhint %}
 
 How to control the TurtleBot:
 

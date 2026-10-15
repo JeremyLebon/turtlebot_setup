@@ -4,9 +4,9 @@ Volgorde zoals in GitBook. Klik een pagina aan, of lees alles achter elkaar in [
 
 | # | Pagina | Status |
 |---|---|---|
-| 1 | [Turtlebot3 in the real world](turtlebot3-in-the-real-world.md) | ⚪ ongewijzigd |
+| 1 | [Turtlebot3 in the real world](turtlebot3-in-the-real-world.md) | 🟠 gewijzigd |
 | 2 | [Objectives](objectives.md) | ⚪ ongewijzigd |
-| 3 | [Turtlebot3 - startup](turtlebot3-startup.md) | ⚪ ongewijzigd |
+| 3 | [Turtlebot3 - startup](turtlebot3-startup.md) | 🟠 gewijzigd |
 | 4 | &nbsp;&nbsp;&nbsp;&nbsp;[Connect to the WIFI](turtlebot3-startup/connect-to-the-wifi.md) | 🟠 gewijzigd |
 | 5 | &nbsp;&nbsp;&nbsp;&nbsp;[Startup of the turtlebot3](turtlebot3-startup/startup-of-the-turtlebot3.md) | 🟠 gewijzigd |
 | 6 | &nbsp;&nbsp;&nbsp;&nbsp;[Connect to the turtlebot3](turtlebot3-startup/connect-to-the-turtlebot3.md) | 🟠 gewijzigd |
@@ -28,7 +28,7 @@ Volgorde zoals in GitBook. Klik een pagina aan, of lees alles achter elkaar in [
 | 22 | [ROS2 nodes](ros2-nodes.md) | 🟠 gewijzigd |
 | 23 | &nbsp;&nbsp;&nbsp;&nbsp;[Read in the scan topic](ros2-nodes/read-in-the-scan-topic.md) | 🟠 gewijzigd |
 | 24 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Exercise](ros2-nodes/read-in-the-scan-topic/exercise.md) | ⚪ ongewijzigd |
-| 25 | &nbsp;&nbsp;&nbsp;&nbsp;[Read the battery level](ros2-nodes/read-the-battery-level.md) | ⚪ ongewijzigd |
+| 25 | &nbsp;&nbsp;&nbsp;&nbsp;[Read the battery level](ros2-nodes/read-the-battery-level.md) | 🟠 gewijzigd |
 | 26 | &nbsp;&nbsp;&nbsp;&nbsp;[Read the encoder value](ros2-nodes/read-the-encoder-value.md) | 🟠 gewijzigd |
 | 27 | &nbsp;&nbsp;&nbsp;&nbsp;[Drive 10cm with a button](ros2-nodes/drive-10cm-with-a-button.md) | 🟠 gewijzigd |
 | 28 | [SLAM](slam.md) | 🟠 gewijzigd |
@@ -43,4 +43,4 @@ Volgorde zoals in GitBook. Klik een pagina aan, of lees alles achter elkaar in [
 | 37 | [Play a sound](play-a-sound.md) | ⚪ ongewijzigd |
 | 38 | [Location files on wsl](location-files-on-wsl.md) | 🟠 gewijzigd |
 
-Samen: 9 ongewijzigd, 20 gewijzigd, 9 nieuw.
+Samen: 23 gewijzigd, 6 ongewijzigd, 9 nieuw.

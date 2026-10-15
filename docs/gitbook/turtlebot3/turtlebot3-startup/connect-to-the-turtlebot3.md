@@ -1,39 +1,8 @@
 # Connect to the turtlebot3
 
-## The status page (Fenix)
+For the exercises you need a terminal **inside the robot container**. Two ways:
 
-Every robot serves its own web page. With your laptop (or phone) on the robot
-wifi `TB-AP-<nr>`, open a browser:
-
-```
-http://10.0.<nr>.10:8080
-```
-
-Check in the header:
-
-* the **robot name** (is this your robot?)
-* the **battery** icon (hover over it: voltage; 0 % = 11.0 V, below that the
-  OpenCR switches the motors off)
-* the **labo-check** icon (tick): green = everything OK. Click it for the full list.
-
-{% hint style="info" %}
-Tabs: **Rijden** (drive, camera, make a map), **Navigatie** (navigate on a map),
-**Projecten** (ready-made demos), **Info** (robot health, topics, logs).
-The red **STOP** button stops everything that drives.
-{% endhint %}
-
-## A terminal on the robot
-
-For the ROS 2 exercises you need a terminal **inside the robot container**.
-Two ways:
-
-### Option 1 - web terminal
-
-Click the `>_` button in the header of the status page (opens
-`http://10.0.<nr>.10:7681`). Login: see lab notes. You are directly inside the
-robot container.
-
-### Option 2 - SSH
+## Option 1 - SSH (recommended)
 
 Open a WSL terminal:
 
@@ -49,6 +18,15 @@ The password stays invisible while typing. Say `yes` when a fingerprint is
 suggested the first time.
 {% endhint %}
 
+{% hint style="info" %}
+`WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!`? The robot was reinstalled
+since your last visit. Remove the old key and try again:
+
+```sh
+ssh-keygen -R 10.0.<nr>.10
+```
+{% endhint %}
+
 You are now on the Raspberry Pi of the robot. Go inside the robot container:
 
 ```sh
@@ -59,3 +37,18 @@ docker exec -it turtlebot_<nr> bash
 `<nr>` is the robot number **without** a leading zero: robot 5 ->
 `docker exec -it turtlebot_5 bash`. Press `TAB` to autocomplete.
 {% endhint %}
+
+You need a robot terminal more than once (bringup, gamepad, ...): open a new WSL
+terminal and repeat both commands.
+
+## Option 2 - web terminal
+
+Open `http://10.0.<nr>.10:7681` in a browser (laptop on `TB-AP-<nr>`).
+Login: see lab notes. You are directly inside the robot container.
+
+## The status page (optional)
+
+Every robot also serves a web page: `http://10.0.<nr>.10:8080`. It is handy
+to check the **battery**, to see what is running, and for the **STOP** button,
+which stops everything that drives. For the exercises you don't need it: you
+work in the terminal.

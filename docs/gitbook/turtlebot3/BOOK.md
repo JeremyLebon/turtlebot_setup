@@ -4,11 +4,34 @@ _Alle pagina's in leesvolgorde. Statuslabel per pagina tussen haakjes; bron: `do
 
 ---
 
-## 1. Turtlebot3 in the real world  `[ongewijzigd]`
+## 1. Turtlebot3 in the real world  `[gewijzigd]`
 
 <sub>turtlebot3-in-the-real-world.md</sub>
 
-# Turtlebot3 in the real world
+
+In the simulation you drove a virtual TurtleBot3 in Gazebo. Now you work with
+the **real robot**. The ROS 2 topics are the same (`/scan`, `/odom`, `/imu`,
+`/cmd_vel`, ...), so most of what you learned still works - but the real world
+has a battery, a wifi connection, wheel slip and sensor noise.
+
+How the lab is set up:
+
+* Every TurtleBot has its **own wifi network** `TB-AP-<nr>`.
+* The robot software runs in a **Docker container** on the Raspberry Pi of the
+  robot (`turtlebot_<nr>`). It starts by itself when the robot boots.
+* On your laptop you use the **`turtlebot-vis`** container (RViz2, teleop and
+  your own nodes). It talks to the robot with ROS 2 over **Zenoh**.
+
+{% hint style="warning" %}
+**Before the lab, with internet** (eduroam, at home): download the laptop
+container, see [Setup laptop (student)](turtlebot3-startup/setup-laptop-student.md).
+It is about 4 GB, and the robot wifi has no (or only slow) internet.
+{% endhint %}
+
+{% hint style="info" %}
+New to the topics, TF, odometry or QoS? Read the
+[Theory: what the robot measures](theory.md) first.
+{% endhint %}
 
 ---
 
@@ -28,17 +51,24 @@ In this exercise, the objectives are the following:
 
 ---
 
-## 3. Turtlebot3 - startup  `[ongewijzigd]`
+## 3. Turtlebot3 - startup  `[gewijzigd]`
 
 <sub>turtlebot3-startup.md</sub>
 
 
-- [Connect to the WIFI](https://vives-4.gitbook.io/turtlebot3/turtlebot3-startup/connect-to-the-wifi.md)
-- [Startup of the turtlebot3](https://vives-4.gitbook.io/turtlebot3/turtlebot3-startup/startup-of-the-turtlebot3.md)
-- [Connect to the turtlebot3](https://vives-4.gitbook.io/turtlebot3/turtlebot3-startup/connect-to-the-turtlebot3.md)
-- [Startup docker](https://vives-4.gitbook.io/turtlebot3/turtlebot3-startup/startup-docker.md): Startup the docker container inside the turtlebot
-- [Startup turtlebot software](https://vives-4.gitbook.io/turtlebot3/turtlebot3-startup/startup-turtlebot-software.md): Startup the turtlebot software inside the docker container onto the turtlebot.
-- [Setup laptop (student)](https://vives-4.gitbook.io/turtlebot3/turtlebot3-startup/setup-laptop-student.md)
+Follow these steps in this order:
+
+1. [Connect to the WIFI](turtlebot3-startup/connect-to-the-wifi.md) - your laptop on `TB-AP-<nr>`
+2. [Startup of the turtlebot3](turtlebot3-startup/startup-of-the-turtlebot3.md) - battery on, wait for the beep
+3. [Connect to the turtlebot3](turtlebot3-startup/connect-to-the-turtlebot3.md) - a terminal inside the robot container
+4. [Startup docker](turtlebot3-startup/startup-docker.md) - check that the robot container runs (nothing to start)
+5. [Startup turtlebot software](turtlebot3-startup/startup-turtlebot-software.md) - start the bringup
+6. [Setup laptop (student)](turtlebot3-startup/setup-laptop-student.md) - the `turtlebot-vis` container on your laptop
+
+{% hint style="info" %}
+Replace `<nr>` everywhere by the number of **your** robot, without a leading
+zero: robot 5 -> `TB-AP-05`, `10.0.5.10`, `turtlebot_5`, `ROS_DOMAIN_ID=5`.
+{% endhint %}
 
 ---
 
@@ -85,23 +115,31 @@ You should get an answer every second. `CTRL + C` stops the ping.
 
 The TurtleBot3 can be powered in 2 ways:
 
-* Via DC adapter
-* Via battery
+* Via DC adapter (on the table, for programming)
+* Via battery (for driving)
 
 Connect the battery to the TurtleBot and switch it on.
 
 * The OpenCR board plays a short melody.
 * After about 1 minute the Raspberry Pi is ready: the robot software starts
-  **automatically** (you don't have to start a Docker container yourself) and
-  you hear a short startup beep.
+  **automatically** in a Docker container (`turtlebot_<nr>`) and you hear a
+  second short melody. You don't have to start anything yourself yet.
 
 {% hint style="info" %}
-Everything runs in a Docker container on the robot (`turtlebot_<nr>`). It starts
-by itself after every boot and keeps running.
+**The lidar does not turn yet?** That is normal. To spare the lidar, the USB
+power of the robot is switched off when nothing uses it. It switches on by
+itself when you start the bringup (see
+[Startup turtlebot software](startup-turtlebot-software.md)).
 {% endhint %}
 
-Continue with [Connect to the turtlebot3](connect-to-the-turtlebot3.md) and check
-the battery voltage and the **labo-check** on the status page.
+{% hint style="danger" %}
+**Battery**: below **11.0 V** the OpenCR switches the motors off and the robot
+beeps. Below about 11.2 V: charge or swap the battery. You can read the voltage
+with `ros2 topic echo /battery_state --field voltage` (after the bringup) or on
+the status page.
+{% endhint %}
+
+Continue with [Connect to the turtlebot3](connect-to-the-turtlebot3.md).
 
 ---
 
@@ -110,40 +148,9 @@ the battery voltage and the **labo-check** on the status page.
 <sub>turtlebot3-startup/connect-to-the-turtlebot3.md</sub>
 
 
-## The status page (Fenix)
+For the exercises you need a terminal **inside the robot container**. Two ways:
 
-Every robot serves its own web page. With your laptop (or phone) on the robot
-wifi `TB-AP-<nr>`, open a browser:
-
-```
-http://10.0.<nr>.10:8080
-```
-
-Check in the header:
-
-* the **robot name** (is this your robot?)
-* the **battery** icon (hover over it: voltage; 0 % = 11.0 V, below that the
-  OpenCR switches the motors off)
-* the **labo-check** icon (tick): green = everything OK. Click it for the full list.
-
-{% hint style="info" %}
-Tabs: **Rijden** (drive, camera, make a map), **Navigatie** (navigate on a map),
-**Projecten** (ready-made demos), **Info** (robot health, topics, logs).
-The red **STOP** button stops everything that drives.
-{% endhint %}
-
-## A terminal on the robot
-
-For the ROS 2 exercises you need a terminal **inside the robot container**.
-Two ways:
-
-### Option 1 - web terminal
-
-Click the `>_` button in the header of the status page (opens
-`http://10.0.<nr>.10:7681`). Login: see lab notes. You are directly inside the
-robot container.
-
-### Option 2 - SSH
+## Option 1 - SSH (recommended)
 
 Open a WSL terminal:
 
@@ -159,6 +166,15 @@ The password stays invisible while typing. Say `yes` when a fingerprint is
 suggested the first time.
 {% endhint %}
 
+{% hint style="info" %}
+`WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!`? The robot was reinstalled
+since your last visit. Remove the old key and try again:
+
+```sh
+ssh-keygen -R 10.0.<nr>.10
+```
+{% endhint %}
+
 You are now on the Raspberry Pi of the robot. Go inside the robot container:
 
 ```sh
@@ -169,6 +185,21 @@ docker exec -it turtlebot_<nr> bash
 `<nr>` is the robot number **without** a leading zero: robot 5 ->
 `docker exec -it turtlebot_5 bash`. Press `TAB` to autocomplete.
 {% endhint %}
+
+You need a robot terminal more than once (bringup, gamepad, ...): open a new WSL
+terminal and repeat both commands.
+
+## Option 2 - web terminal
+
+Open `http://10.0.<nr>.10:7681` in a browser (laptop on `TB-AP-<nr>`).
+Login: see lab notes. You are directly inside the robot container.
+
+## The status page (optional)
+
+Every robot also serves a web page: `http://10.0.<nr>.10:8080`. It is handy
+to check the **battery**, to see what is running, and for the **STOP** button,
+which stops everything that drives. For the exercises you don't need it: you
+work in the terminal.
 
 ---
 
@@ -182,20 +213,17 @@ Nothing to do here anymore: the Docker container on the robot (`turtlebot_<nr>`)
 starts **automatically** when the robot boots, and restarts by itself if needed.
 {% endhint %}
 
-Check that it runs: on the status page `http://10.0.<nr>.10:8080` the
-connection icon (plug) in the header is green, and the robot name is shown.
-
-Or via SSH on the robot:
+Check that it runs. Via SSH on the robot (not inside the container):
 
 ```sh
 docker ps
 ```
 
-You should see a container `turtlebot_<nr>`.
+You should see a container `turtlebot_<nr>` with status `Up`.
 
 {% hint style="danger" %}
-Don't run `docker compose pull` or `docker compose up/down` yourself. Updating
-the robot software is done by the lecturer (status page > Beheer).
+Don't run `docker compose pull`, `docker compose up/down` or `docker rm`
+yourself on the robot. Updating the robot software is done by the lecturer.
 {% endhint %}
 
 ---
@@ -207,34 +235,48 @@ the robot software is done by the lecturer (status page > Beheer).
 
 Start the basic TurtleBot software ("bringup") inside the robot container.
 
-Open a terminal inside the robot container (web terminal or SSH +
-`docker exec -it turtlebot_<nr> bash`, see
-[Connect to the turtlebot3](connect-to-the-turtlebot3.md)) and start:
+Open a terminal inside the robot container (SSH + `docker exec -it turtlebot_<nr> bash`,
+see [Connect to the turtlebot3](connect-to-the-turtlebot3.md)) and start:
 
 ```sh
 ros2 launch turtlebot3_bringup robot.launch.py
 ```
 
-This starts up the following functionalities:
-
-* Reading the lidar sensor
-* Calculation of the odometry
-* Publishing the TF
-* Connection with the OpenCR board (motors, IMU, battery, buttons, buzzer)
-
-Keep this terminal open: `CTRL + C` stops the bringup again.
-
 {% hint style="info" %}
-The first time, start the bringup yourself in the terminal - that's how you
-learn it. Later you can also use the status page: **Rijden > Kaart maken** and
-**Navigatie > Start** start the bringup automatically. Running launches are shown
-under **Actief** in the header, each with its own stop button.
+First the message `[usb_power] USB-stroom was uit (spaarstand) - aanzetten...`
+can appear: the USB power is switched on, the lidar starts turning and the
+bringup continues after a few seconds. That is normal.
 {% endhint %}
 
+This starts up the following functionalities:
+
+* Reading the lidar sensor (`/scan`)
+* Connection with the OpenCR board: motors, encoders, IMU, battery, buttons
+* Calculation of the odometry (`/odom`)
+* Publishing the TF (`/tf`, `/tf_static`)
+
 {% hint style="warning" %}
-Is the bringup already running (started from the status page)? Then a second
-`ros2 launch ... robot.launch.py` gives errors (the serial port of the OpenCR is
-busy). Check **Actief** on the status page first.
+**Keep this terminal open.** `CTRL + C` - or closing the terminal / SSH window -
+stops the bringup, and the robot stops publishing.
+{% endhint %}
+
+## Check
+
+Open a **second** robot terminal (new WSL terminal, `ssh ...`,
+`docker exec -it turtlebot_<nr> bash`) and check:
+
+```sh
+ros2 topic list
+ros2 topic hz /scan
+```
+
+You should see `/scan`, `/odom`, `/imu`, `/battery_state`, ... and about 5 scans
+per second.
+
+{% hint style="warning" %}
+Error `could not open port /dev/ttyACM0` or `device busy`? The bringup is
+probably already running (another terminal, a classmate, or the status page).
+Check with `ros2 node list` - you only need one bringup per robot.
 {% endhint %}
 
 ---
@@ -251,6 +293,12 @@ container on your laptop connects to the Zenoh router on the robot
 {% hint style="success" %}
 With Zenoh the laptop makes the connection itself, so the Windows/Hyper-V
 **firewall rules from previous years are no longer needed**.
+{% endhint %}
+
+{% hint style="danger" %}
+**Do the download part (clone + `docker compose pull`) before the lab, on a
+network with internet** (eduroam, at home). The image is about 4 GB, and the
+robot wifi `TB-AP-<nr>` has no (or only slow) internet.
 {% endhint %}
 
 ## Docker container
@@ -302,6 +350,11 @@ connection works, but you don't see a single topic.
 
 Save with `CTRL + S`, close with `CTRL + X`.
 
+{% hint style="info" %}
+Changed `.env` while the container was already running (other robot)? Run
+`docker compose up` again: the container is recreated with the new values.
+{% endhint %}
+
 ## Start the container
 
 ```sh
@@ -314,7 +367,8 @@ Open a new WSL terminal and connect to the container:
 docker exec -it turtlebot-vis bash
 ```
 
-Check that you see the topics of your robot (the bringup must be running):
+Check that you see the topics of your robot (the bringup must be running, see
+[Startup turtlebot software](startup-turtlebot-software.md)):
 
 ```sh
 ros2 topic list
@@ -1231,6 +1285,9 @@ Start the teleop command.
 Ensure the robot is on the ground or its wheels are in contact with the ground.
 {% endhint %}
 
+The bringup must be running on the robot (see
+[Startup turtlebot software](../turtlebot3-startup/startup-turtlebot-software.md)).
+
 ```sh
 ros2 run turtlebot3_teleop teleop_keyboard
 ```
@@ -1276,9 +1333,27 @@ and switch the gamepad on.
 Ensure the robot is on the ground or its wheels are in contact with the ground.
 {% endhint %}
 
-Switch the gamepad on via the status page: **Rijden**, top right, gamepad
-button. The button turns blue when the gamepad is active; hover over it to see
-whether the receiver is detected.
+{% hint style="info" %}
+The switch on the back of the gamepad must be on **X** (XInput mode).
+{% endhint %}
+
+Start the gamepad driver **on the robot**: open a terminal inside the robot
+container (see [Connect to the turtlebot3](../turtlebot3-startup/connect-to-the-turtlebot3.md))
+and run:
+
+```sh
+ros2 launch teleop_twist_joy teleop-launch.py joy_vel:=cmd_vel_joy config_filepath:=/root/turtlebot3_ws/joystick_f710.yaml
+```
+
+Keep this terminal open (`CTRL + C` stops the gamepad). The bringup must be
+running as well.
+
+{% hint style="info" %}
+* `joy_vel:=cmd_vel_joy`: the gamepad publishes on `/cmd_vel_joy`, the input
+  with the highest priority in twist_mux.
+* `joystick_f710.yaml`: which buttons and sticks do what, and the speeds.
+* Alternative: status page > **Rijden** > gamepad button (top right).
+{% endhint %}
 
 How to control the TurtleBot:
 
@@ -1558,7 +1633,7 @@ Show the result to the lecturer.
 
 ---
 
-### 25. Read the battery level  `[ongewijzigd]`
+### 25. Read the battery level  `[gewijzigd]`
 
 <sub>ros2-nodes/read-the-battery-level.md</sub>
 
@@ -1574,6 +1649,13 @@ Check what data is available in the ros2 topic `/battery_state`.
 Print the voltage value and SoC (state of charge) of the battery to the terminal.
 
 Print a warning when the SoC is below the 50%
+
+{% hint style="info" %}
+* Is `percentage` a value between 0 and 1, or between 0 and 100? Check it with
+  `ros2 topic echo /battery_state --once`.
+* The percentage of the OpenCR is optimistic: the motors already stop at
+  **11.0 V**. Extra: also print a warning when the **voltage** is below 11.2 V.
+{% endhint %}
 
 Show when ready to the lecturer.
 

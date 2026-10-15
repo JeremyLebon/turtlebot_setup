@@ -14,6 +14,9 @@ Start the teleop command.
 Ensure the robot is on the ground or its wheels are in contact with the ground.
 {% endhint %}
 
+The bringup must be running on the robot (see
+[Startup turtlebot software](../turtlebot3-startup/startup-turtlebot-software.md)).
+
 ```sh
 ros2 run turtlebot3_teleop teleop_keyboard
 ```

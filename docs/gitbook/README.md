@@ -58,6 +58,14 @@ docs/gitbook/
 | `turtlebot3/simulation-of-sensors.md` | Simulation of sensors | topics `/sim/...` (publishing `/battery_state` clashed with the real battery) |
 | `turtlebot3/install-python-libraries-in-container.md` | Install python libraries in container | `turtlebot-vis` (Humble, Python 3.10), venv in `ros2_ws` with `--system-site-packages` |
 | `turtlebot3/location-files-on-wsl.md` | Location files on wsl | `turtlebot_vis/ros2_ws`, `\\wsl$\...` path |
+| `turtlebot3/turtlebot3-in-the-real-world.md` | Turtlebot3 in the real world | (2026-10-15) intro: lab setup, **download the laptop image before the lab** (TB-AP has no internet), link to theory. Check in GitBook whether the page has an image you want to keep |
+| `turtlebot3/turtlebot3-startup.md` | Turtlebot3 - startup | (2026-10-15) numbered steps with relative links, `<nr>` explained once |
+| `turtlebot3/turtlebot3-startup/startup-of-the-turtlebot3.md` | Startup of the turtlebot3 | (2026-10-15) lidar not turning = USB power saving (normal); battery 11.0 V |
+| `turtlebot3/turtlebot3-startup/connect-to-the-turtlebot3.md` | Connect to the turtlebot3 | (2026-10-15) **terminal first** (SSH, web terminal), status page only optional; `ssh-keygen -R` after a reinstall |
+| `turtlebot3/turtlebot3-startup/startup-docker.md` | Startup docker | (2026-10-15) check with `docker ps` instead of the status page |
+| `turtlebot3/turtlebot3-startup/startup-turtlebot-software.md` | Startup turtlebot software | (2026-10-15) `[usb_power]` message, keep terminal open, check with a 2nd terminal, one bringup per robot |
+| `turtlebot3/controlling-the-robot/manual-control-with-gamepad.md` | Manual control with gamepad | (2026-10-15) start the gamepad **from the robot terminal** (`teleop_twist_joy ... joy_vel:=cmd_vel_joy`), switch on X; status page as alternative |
+| `turtlebot3/ros2-nodes/read-the-battery-level.md` | Read the battery level | (2026-10-15) hint: percentage 0-1 or 0-100, voltage limit 11.0/11.2 V |
 | `turtlebot3/theory.md` | Theory: what the robot measures | **new**: where the data comes from (OpenCR, LDS-02, RPi5), ROS units and axes |
 | `turtlebot3/theory/laser-scan.md` | Laser scan (/scan) | **new**: lidar, LDS-02 specs, LaserScan fields, index <-> angle, invalid values |
 | `turtlebot3/theory/odometry.md` | Odometry (/odom) and encoders | **new**: ticks, wheel radius/separation, diff-drive formulas, `use_imu`, drift |

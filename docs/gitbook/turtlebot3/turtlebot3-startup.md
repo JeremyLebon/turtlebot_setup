@@ -1,8 +1,15 @@
 # Turtlebot3 - startup
 
-- [Connect to the WIFI](https://vives-4.gitbook.io/turtlebot3/turtlebot3-startup/connect-to-the-wifi.md)
-- [Startup of the turtlebot3](https://vives-4.gitbook.io/turtlebot3/turtlebot3-startup/startup-of-the-turtlebot3.md)
-- [Connect to the turtlebot3](https://vives-4.gitbook.io/turtlebot3/turtlebot3-startup/connect-to-the-turtlebot3.md)
-- [Startup docker](https://vives-4.gitbook.io/turtlebot3/turtlebot3-startup/startup-docker.md): Startup the docker container inside the turtlebot
-- [Startup turtlebot software](https://vives-4.gitbook.io/turtlebot3/turtlebot3-startup/startup-turtlebot-software.md): Startup the turtlebot software inside the docker container onto the turtlebot.
-- [Setup laptop (student)](https://vives-4.gitbook.io/turtlebot3/turtlebot3-startup/setup-laptop-student.md)
+Follow these steps in this order:
+
+1. [Connect to the WIFI](turtlebot3-startup/connect-to-the-wifi.md) - your laptop on `TB-AP-<nr>`
+2. [Startup of the turtlebot3](turtlebot3-startup/startup-of-the-turtlebot3.md) - battery on, wait for the beep
+3. [Connect to the turtlebot3](turtlebot3-startup/connect-to-the-turtlebot3.md) - a terminal inside the robot container
+4. [Startup docker](turtlebot3-startup/startup-docker.md) - check that the robot container runs (nothing to start)
+5. [Startup turtlebot software](turtlebot3-startup/startup-turtlebot-software.md) - start the bringup
+6. [Setup laptop (student)](turtlebot3-startup/setup-laptop-student.md) - the `turtlebot-vis` container on your laptop
+
+{% hint style="info" %}
+Replace `<nr>` everywhere by the number of **your** robot, without a leading
+zero: robot 5 -> `TB-AP-05`, `10.0.5.10`, `turtlebot_5`, `ROS_DOMAIN_ID=5`.
+{% endhint %}

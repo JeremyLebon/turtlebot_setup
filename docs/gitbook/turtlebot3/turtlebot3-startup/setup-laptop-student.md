@@ -9,6 +9,12 @@ With Zenoh the laptop makes the connection itself, so the Windows/Hyper-V
 **firewall rules from previous years are no longer needed**.
 {% endhint %}
 
+{% hint style="danger" %}
+**Do the download part (clone + `docker compose pull`) before the lab, on a
+network with internet** (eduroam, at home). The image is about 4 GB, and the
+robot wifi `TB-AP-<nr>` has no (or only slow) internet.
+{% endhint %}
+
 ## Docker container
 
 Open a WSL terminal and clone the repository:
@@ -58,6 +64,11 @@ connection works, but you don't see a single topic.
 
 Save with `CTRL + S`, close with `CTRL + X`.
 
+{% hint style="info" %}
+Changed `.env` while the container was already running (other robot)? Run
+`docker compose up` again: the container is recreated with the new values.
+{% endhint %}
+
 ## Start the container
 
 ```sh
@@ -70,7 +81,8 @@ Open a new WSL terminal and connect to the container:
 docker exec -it turtlebot-vis bash
 ```
 
-Check that you see the topics of your robot (the bringup must be running):
+Check that you see the topics of your robot (the bringup must be running, see
+[Startup turtlebot software](startup-turtlebot-software.md)):
 
 ```sh
 ros2 topic list
