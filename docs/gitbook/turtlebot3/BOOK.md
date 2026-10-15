@@ -55,8 +55,17 @@ You should see `nobel86/turtlebot-rpi5-vis` with tag `zenoh` (about 4 GB).
 ## Where your files are
 
 Your own code goes in the folder `turtlebot_vis/ros2_ws`: inside the container
-that is `/root/ros2_ws`. Files there survive a restart of the container. See
-[Location files on WSL](location-files-on-wsl.md).
+that is `/root/ros2_ws`. Files there survive a restart of the container; files
+elsewhere in the container can be lost.
+
+| where | path |
+|---|---|
+| inside the container | `/root/ros2_ws` |
+| WSL | `~/turtlebot_vis/ros2_ws` |
+| Windows Explorer | `\\wsl$\Ubuntu-22.04\home\<user>\turtlebot_vis\ros2_ws` |
+
+In Windows Explorer you can also click **Linux** > your distro (e.g.
+`Ubuntu-22.04`) > `home` > your user name > `turtlebot_vis` > `ros2_ws`.
 
 {% hint style="success" %}
 Done? Read [Turtlebot3 in the real world](turtlebot3-in-the-real-world.md)
@@ -428,7 +437,7 @@ Otherwise there is a problem.
 
 Store your scripts in `/root/ros2_ws` inside the container. That directory is
 the folder `turtlebot_vis/ros2_ws` on your laptop, so your files survive a
-restart of the container. See [Location files on WSL](../location-files-on-wsl.md).
+restart of the container. See [Installation - Where your files are](../installation.md#where-your-files-are).
 
 ---
 
@@ -730,7 +739,7 @@ python3 sub_scan.py
 
 {% hint style="warning" %}
 Store your code in `/root/ros2_ws`: that is the folder `turtlebot_vis/ros2_ws`
-on your laptop (see [Location files on WSL](../location-files-on-wsl.md)).
+on your laptop (see [Installation - Where your files are](../installation.md#where-your-files-are)).
 Anything you store elsewhere in the container can be lost.
 {% endhint %}
 
@@ -939,21 +948,16 @@ self.get_logger().info(f"Front ranges ({len(front_full)}): mean={mean_front:.3f}
 
 Finally, this logs how many front readings were used and what their average distance was — formatted to three decimal places.
 
----
-
-#### 18. Exercise  `[gewijzigd]`
-
-<sub>ros2-nodes/read-in-the-scan-topic/exercise.md</sub>
-
+## Exercise
 
 The exercise on the scan topic is part of the homework:
-[Task 1 - Obstacle alarm](../../homework/task-1-obstacle-alarm.md) (with the
-scan sectors as extension). Test your `sub_scan.py` first: hold your hand in
-front of the lidar and check that the front distance changes.
+[Task 1 - Obstacle alarm](../../homework/task-1-obstacle-alarm.md) (with the scan
+sectors as extension). Test your `sub_scan.py` now: hold your hand in front of
+the lidar and check that the front distance changes.
 
 ---
 
-### 19. Read the battery level  `[gewijzigd]`
+### 18. Read the battery level  `[gewijzigd]`
 
 <sub>ros2-nodes/read-the-battery-level.md</sub>
 
@@ -981,7 +985,7 @@ Show when ready to the lecturer.
 
 ---
 
-### 20. Read the encoder value  `[gewijzigd]`
+### 19. Read the encoder value  `[gewijzigd]`
 
 <sub>ros2-nodes/read-the-encoder-value.md</sub>
 
@@ -1006,7 +1010,7 @@ Show when ready to the lecturer.
 
 ---
 
-### 21. Drive 10cm with a button  `[gewijzigd]`
+### 20. Drive 10cm with a button  `[gewijzigd]`
 
 <sub>ros2-nodes/drive-10cm-with-a-button.md</sub>
 
@@ -1144,7 +1148,7 @@ if __name__ == '__main__':
 
 ---
 
-## 22. Homework  `[nieuw]`
+## 21. Homework  `[nieuw]`
 
 <sub>homework/README.md</sub>
 
@@ -1183,7 +1187,7 @@ Next session: SLAM (make a map) and autonomous navigation with the real robot.
 
 ---
 
-### 23. Startup at home  `[nieuw]`
+### 22. Startup at home  `[nieuw]`
 
 <sub>homework/startup-at-home.md</sub>
 
@@ -1227,7 +1231,7 @@ Check: `ros2 topic list` in the container shows `/scan`, `/odom`, `/cmd_vel`,
 
 ---
 
-### 24. Task 1 - Obstacle alarm  `[nieuw]`
+### 23. Task 1 - Obstacle alarm  `[nieuw]`
 
 <sub>homework/task-1-obstacle-alarm.md</sub>
 
@@ -1314,7 +1318,7 @@ Extra: also print the **angle** (in degrees) of the closest obstacle of the whol
 
 ---
 
-### 25. Task 2 - Battery warning  `[nieuw]`
+### 24. Task 2 - Battery warning  `[nieuw]`
 
 <sub>homework/task-2-battery-warning.md</sub>
 
@@ -1466,7 +1470,7 @@ On the real robot you only change the topic to `/battery_state`.
 
 ---
 
-### 26. Task 3 - Turn exactly 90°  `[nieuw]`
+### 25. Task 3 - Turn exactly 90°  `[nieuw]`
 
 <sub>homework/task-3-turn-90-degrees.md</sub>
 
@@ -1509,7 +1513,7 @@ the angle. How far from the start does the robot end? Why?
 
 ---
 
-### 27. Task 4 - Theory  `[nieuw]`
+### 26. Task 4 - Theory  `[nieuw]`
 
 <sub>homework/task-4-theory.md</sub>
 
@@ -1521,37 +1525,7 @@ Answer the **Check yourself** questions of the theory pages:
 
 ---
 
-## 28. Location files on wsl  `[gewijzigd]`
-
-<sub>location-files-on-wsl.md</sub>
-
-
-{% hint style="warning" %}
-Store all files in the `/root/ros2_ws` directory, otherwise you can lose them
-when the container is recreated.
-{% endhint %}
-
-`/root/ros2_ws` in the `turtlebot-vis` container is the folder `ros2_ws` inside
-the cloned `turtlebot_vis` repository on WSL.
-
-In Windows Explorer: **Linux** > your distro (e.g. `Ubuntu-22.04`) > `home` >
-your user name > `turtlebot_vis` > `ros2_ws`.
-
-Or type in the address bar of Windows Explorer:
-
-```
-\\wsl$\Ubuntu-22.04\home\<user>\turtlebot_vis\ros2_ws
-```
-
-{% hint style="info" %}
-On the robot there is a `/root/ros2_ws` as well (in the robot container). It is
-stored on the robot itself (`~/turtlebot_setup/ros2_ws`) and survives robot
-updates - but it is shared by everyone who uses that robot.
-{% endhint %}
-
----
-
-## 29. Theory: what the robot measures  `[nieuw]`
+## 27. Theory: what the robot measures  `[nieuw]`
 
 <sub>theory/README.md</sub>
 
@@ -1620,7 +1594,7 @@ Try it: `ros2 topic list` and `ros2 topic info /odom` (in the `turtlebot-vis` co
 
 ---
 
-### 30. Laser scan (/scan)  `[nieuw]`
+### 28. Laser scan (/scan)  `[nieuw]`
 
 <sub>theory/laser-scan.md</sub>
 
@@ -1742,7 +1716,7 @@ Next: [Read in the scan topic](../ros2-nodes/read-in-the-scan-topic/).
 
 ---
 
-### 31. Odometry (/odom) and encoders  `[nieuw]`
+### 29. Odometry (/odom) and encoders  `[nieuw]`
 
 <sub>theory/odometry.md</sub>
 
@@ -1873,7 +1847,7 @@ Next: [Read the encoder value](../ros2-nodes/read-the-encoder-value.md).
 
 ---
 
-### 32. IMU (/imu)  `[nieuw]`
+### 30. IMU (/imu)  `[nieuw]`
 
 <sub>theory/imu.md</sub>
 
@@ -1984,7 +1958,7 @@ ros2 topic echo /imu --field linear_acceleration
 
 ---
 
-### 33. TF - coordinate frames  `[nieuw]`
+### 31. TF - coordinate frames  `[nieuw]`
 
 <sub>theory/tf.md</sub>
 
@@ -2110,7 +2084,7 @@ Next: [Visualise the robot](../visualise-the-robot.md).
 
 ---
 
-### 34. Driving the robot (/cmd_vel)  `[nieuw]`
+### 32. Driving the robot (/cmd_vel)  `[nieuw]`
 
 <sub>theory/cmd-vel.md</sub>
 
@@ -2211,7 +2185,7 @@ Next: [Drive 10cm with a button](../ros2-nodes/drive-10cm-with-a-button.md).
 
 ---
 
-### 35. QoS - Quality of Service  `[nieuw]`
+### 33. QoS - Quality of Service  `[nieuw]`
 
 <sub>theory/qos.md</sub>
 

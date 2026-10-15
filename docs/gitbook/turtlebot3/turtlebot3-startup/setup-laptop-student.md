@@ -85,4 +85,4 @@ Otherwise there is a problem.
 
 Store your scripts in `/root/ros2_ws` inside the container. That directory is
 the folder `turtlebot_vis/ros2_ws` on your laptop, so your files survive a
-restart of the container. See [Location files on WSL](../location-files-on-wsl.md).
+restart of the container. See [Installation - Where your files are](../installation.md#where-your-files-are).

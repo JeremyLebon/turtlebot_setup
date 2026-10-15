@@ -186,3 +186,10 @@ self.get_logger().info(f"Front ranges ({len(front_full)}): mean={mean_front:.3f}
 ```
 
 Finally, this logs how many front readings were used and what their average distance was — formatted to three decimal places.
+
+## Exercise
+
+The exercise on the scan topic is part of the homework:
+[Task 1 - Obstacle alarm](../../homework/task-1-obstacle-alarm.md) (with the scan
+sectors as extension). Test your `sub_scan.py` now: hold your hand in front of
+the lidar and check that the front distance changes.

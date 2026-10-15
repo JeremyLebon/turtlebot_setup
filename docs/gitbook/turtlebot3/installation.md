@@ -46,8 +46,17 @@ You should see `nobel86/turtlebot-rpi5-vis` with tag `zenoh` (about 4 GB).
 ## Where your files are
 
 Your own code goes in the folder `turtlebot_vis/ros2_ws`: inside the container
-that is `/root/ros2_ws`. Files there survive a restart of the container. See
-[Location files on WSL](location-files-on-wsl.md).
+that is `/root/ros2_ws`. Files there survive a restart of the container; files
+elsewhere in the container can be lost.
+
+| where | path |
+|---|---|
+| inside the container | `/root/ros2_ws` |
+| WSL | `~/turtlebot_vis/ros2_ws` |
+| Windows Explorer | `\\wsl$\Ubuntu-22.04\home\<user>\turtlebot_vis\ros2_ws` |
+
+In Windows Explorer you can also click **Linux** > your distro (e.g.
+`Ubuntu-22.04`) > `home` > your user name > `turtlebot_vis` > `ros2_ws`.
 
 {% hint style="success" %}
 Done? Read [Turtlebot3 in the real world](turtlebot3-in-the-real-world.md)

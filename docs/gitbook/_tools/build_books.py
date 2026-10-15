@@ -47,7 +47,7 @@ ORDER = {
         "visualise-the-robot.md", "controlling-the-robot.md", "see-turtlebot3-topics.md",
         "play-a-sound.md", "ros2-nodes.md", "homework.md",
         # reference
-        "location-files-on-wsl.md", "theory.md",
+        "theory.md",
     ],
 }
 
@@ -58,6 +58,8 @@ MOVED = {}   # old path -> new path inside the same book (none at the moment)
 REMOVED = {
     "turtlebot3": ["objectives.md",             # merged into turtlebot3-in-the-real-world.md (2026-10-15)
                    "simulation-of-sensors.md",   # merged into homework.md (2026-10-15)
+                   "ros2-nodes/read-in-the-scan-topic/exercise.md",   # -> homework task 1 (2026-10-15)
+                   "location-files-on-wsl.md",   # merged into installation.md (2026-10-15)
                    # own books since 2026-10-15 (see ASSEMBLED)
                    "slam.md", "autonomous-driving.md", "autonomous-driving-with-python-library.md",
                    "measure-while-driving.md", "solution-measure-while-driving.md",

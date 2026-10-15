@@ -30,7 +30,7 @@ python3 sub_scan.py
 
 {% hint style="warning" %}
 Store your code in `/root/ros2_ws`: that is the folder `turtlebot_vis/ros2_ws`
-on your laptop (see [Location files on WSL](../location-files-on-wsl.md)).
+on your laptop (see [Installation - Where your files are](../installation.md#where-your-files-are)).
 Anything you store elsewhere in the container can be lost.
 {% endhint %}
 
