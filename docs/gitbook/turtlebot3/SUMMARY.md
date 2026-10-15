@@ -25,7 +25,7 @@
   * [Startup at home](homework/startup-at-home.md)
   * [Task 1 - Obstacle alarm](homework/task-1-obstacle-alarm.md)
   * [Task 2 - Battery warning](homework/task-2-battery-warning.md)
-  * [Task 3 - Drive exactly 1 m with odometry](homework/task-3-drive-1-m-with-odometry.md)
+  * [Task 3 - Turn exactly 90°](homework/task-3-turn-90-degrees.md)
   * [Task 4 - Theory](homework/task-4-theory.md)
 * [SLAM](slam.md)
 * [Autonomous driving](autonomous-driving.md)

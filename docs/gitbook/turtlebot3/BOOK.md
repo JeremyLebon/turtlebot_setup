@@ -1166,7 +1166,7 @@ from the simulation book (Gazebo + ROS 2 Jazzy).
 1. [Startup at home](startup-at-home.md) - start the simulation and VS Code
 2. [Task 1 - Obstacle alarm](task-1-obstacle-alarm.md) - warning when something is close in front (extension: four sectors)
 3. [Task 2 - Battery warning](task-2-battery-warning.md) - with fake sensors (`/sim/battery_state`)
-4. [Task 3 - Drive exactly 1 m with odometry](task-3-drive-1-m-with-odometry.md) - `/odom` instead of time
+4. [Task 3 - Turn exactly 90°](task-3-turn-90-degrees.md) - yaw from `/odom` (extension: drive a square)
 5. [Task 4 - Theory](task-4-theory.md) - the Check yourself questions
 
 ## Hand in
@@ -1214,7 +1214,7 @@ The same steps as in the simulation book
 4. **Only for task 2:** start the fake sensors, see
    [Simulation of sensors](task-2-battery-warning.md#simulation-of-sensors) in task 2.
 
-5. Drive the robot (for task 1 and 3) in another terminal:
+5. Drive the robot (for task 1) in another terminal:
 
    ```sh
    ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -p stamped:=true -p frame_id:="base_link"
@@ -1466,21 +1466,46 @@ On the real robot you only change the topic to `/battery_state`.
 
 ---
 
-### 26. Task 3 - Drive exactly 1 m with odometry  `[nieuw]`
+### 26. Task 3 - Turn exactly 90°  `[nieuw]`
 
-<sub>homework/task-3-drive-1-m-with-odometry.md</sub>
+<sub>homework/task-3-turn-90-degrees.md</sub>
 
 
-In *Drive 10cm with a button* the robot drives on **time**. Now use **`/odom`**:
-drive forward at 0.1 m/s until the robot has driven **1.0 m** from its start
-position, then stop (publish all speeds 0).
+In the lab you drove **straight** (*Drive 10cm with a button*, on time). Now the
+robot **turns**, and you use the **odometry** to know when to stop: turn exactly
+**90° to the left** on the spot, then stop.
 
-* Subscribe to `/odom` and remember the start position.
-* Distance from the start: `math.hypot(x - x0, y - y0)`.
-* Publish `TwistStamped` on `/cmd_vel` (simulation).
+1. Subscribe to `/odom` and calculate the **yaw** (heading) from the quaternion
+   in `pose.pose.orientation` (see [IMU - Quaternions](../theory/imu.md)).
+2. Remember the yaw of the **first** message: that is your start.
+3. Publish on `/cmd_vel` (simulation: `TwistStamped`) with only `angular.z`
+   (positive = left, for example 0.3 rad/s).
+4. Stop (publish all speeds 0) as soon as the robot turned 90° (π/2 rad).
+5. Print the start yaw and how far the robot really turned, in degrees.
 
-Extra: turn exactly **90°** to the left, using the yaw from the quaternion
-(see [IMU](../theory/imu.md)).
+Check it in Gazebo: is the robot turned exactly a quarter turn?
+
+<details>
+
+<summary>Hints</summary>
+
+* Yaw from a quaternion `q`:
+  `math.atan2(2*(q.w*q.z + q.x*q.y), 1 - 2*(q.y*q.y + q.z*q.z))`.
+* The yaw jumps from **+180° to -180°**. Starting at 170° and turning 90° left
+  ends at -100°, so `yaw - start` gives -270°. Bring the difference back between
+  -180° and +180°: `math.atan2(math.sin(d), math.cos(d))`.
+* The robot overshoots when it turns fast until the very end: turn **slower**
+  when you get close (for example speed proportional to the remaining angle,
+  with a minimum).
+* Stop your node when it is done, and always publish speed 0 at the end.
+
+</details>
+
+## Extension - drive a square
+
+Combine driving and turning: drive a **square of 0.5 m × 0.5 m** and come back to
+the start. Use `/odom` for both the distance (`math.hypot(x - x0, y - y0)`) and
+the angle. How far from the start does the robot end? Why?
 
 ---
 

@@ -29,7 +29,7 @@ Volgorde zoals in GitBook. Klik een pagina aan, of lees alles achter elkaar in [
 | 23 | &nbsp;&nbsp;&nbsp;&nbsp;[Startup at home](homework/startup-at-home.md) | 🟢 nieuw |
 | 24 | &nbsp;&nbsp;&nbsp;&nbsp;[Task 1 - Obstacle alarm](homework/task-1-obstacle-alarm.md) | 🟢 nieuw |
 | 25 | &nbsp;&nbsp;&nbsp;&nbsp;[Task 2 - Battery warning](homework/task-2-battery-warning.md) | 🟢 nieuw |
-| 26 | &nbsp;&nbsp;&nbsp;&nbsp;[Task 3 - Drive exactly 1 m with odometry](homework/task-3-drive-1-m-with-odometry.md) | 🟢 nieuw |
+| 26 | &nbsp;&nbsp;&nbsp;&nbsp;[Task 3 - Turn exactly 90°](homework/task-3-turn-90-degrees.md) | 🟢 nieuw |
 | 27 | &nbsp;&nbsp;&nbsp;&nbsp;[Task 4 - Theory](homework/task-4-theory.md) | 🟢 nieuw |
 | 28 | [SLAM](slam.md) | 🟠 gewijzigd 🙈 verborgen |
 | 29 | [Autonomous driving](autonomous-driving.md) | 🟠 gewijzigd 🙈 verborgen |
