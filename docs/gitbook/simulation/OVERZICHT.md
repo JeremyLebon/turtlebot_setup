@@ -6,7 +6,7 @@ Volgorde zoals in GitBook. Klik een pagina aan, of lees alles achter elkaar in [
 |---|---|---|
 | 1 | [Installation](installation.md) | ⚪ ongewijzigd |
 | 2 | [Turtlebot in simulation](turtlebot-in-simulation.md) | ⚪ ongewijzigd |
-| 3 | &nbsp;&nbsp;&nbsp;&nbsp;[Objectives](turtlebot-in-simulation/objectives.md) | ⚪ ongewijzigd |
+| 3 | &nbsp;&nbsp;&nbsp;&nbsp;[Objectives](turtlebot-in-simulation/objectives.md) | 🟠 gewijzigd |
 | 4 | &nbsp;&nbsp;&nbsp;&nbsp;[Tools](turtlebot-in-simulation/tools.md) | ⚪ ongewijzigd |
 | 5 | &nbsp;&nbsp;&nbsp;&nbsp;[Startup](turtlebot-in-simulation/startup.md) | ⚪ ongewijzigd |
 | 6 | &nbsp;&nbsp;&nbsp;&nbsp;[Theory: what the robot measures](turtlebot-in-simulation/theory.md) | 🟢 nieuw |
@@ -28,4 +28,4 @@ Volgorde zoals in GitBook. Klik een pagina aan, of lees alles achter elkaar in [
 | 22 | &nbsp;&nbsp;&nbsp;&nbsp;[Autonomous driving with python library](autonomous-navigation/autonomous-driving-with-python-library.md) | ⚪ ongewijzigd |
 | 23 | [Simulation vs. real robot](simulation-vs-real-robot.md) | 🟢 nieuw |
 
-Samen: 9 ongewijzigd, 8 nieuw, 6 gewijzigd.
+Samen: 8 ongewijzigd, 7 gewijzigd, 8 nieuw.

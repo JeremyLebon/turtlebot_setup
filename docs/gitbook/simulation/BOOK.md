@@ -85,19 +85,32 @@ The `docker exec` lets you make a connection with the docker container via bash.
 
 ---
 
-### 3. Objectives  `[ongewijzigd]`
+### 3. Objectives  `[gewijzigd]`
 
 <sub>turtlebot-in-simulation/objectives.md</sub>
 
 
-In this exercise, the objectives are the following:
+In this session, the objectives are the following:
 
-* Learn to work with Gazebo (simulator)
-* Combine Gazebo with ROS 2
-* Learn to drive the robot in a simulated environment
-* Make your first ROS 2 node
-* Learn to map an environment with slam\_toolbox
-* Learn to navigate autonomously in a mapped environment
+* Install and start the simulation container (Gazebo + ROS 2 Jazzy)
+* Learn to work with Gazebo (simulator) and load the TurtleBot3 in a world
+* Combine Gazebo with ROS 2: nodes, topics and the bridge
+* Drive the robot in a simulated environment with `teleop_twist_keyboard`
+* Visualise the robot in RViz2: robot model, TF, laser scan, odometry and IMU
+* Understand what the robot measures (theory: scan, odometry, IMU, TF, `cmd_vel`, QoS)
+* Make your first ROS 2 nodes: subscribe to `/odom` and publish on `/cmd_vel`
+
+{% hint style="info" %}
+Next session: map an environment with slam\_toolbox (SLAM) and navigate
+autonomously in the mapped environment.
+{% endhint %}
+
+{% hint style="warning" %}
+**This afternoon you work on the real TurtleBot.** While you still have internet
+(eduroam), already download the laptop container for the real robot: see the
+Turtlebot3 book, *Setup laptop (student)* (`git clone` of `turtlebot_vis` and
+`docker compose pull`, about 4 GB).
+{% endhint %}
 
 ---
 
