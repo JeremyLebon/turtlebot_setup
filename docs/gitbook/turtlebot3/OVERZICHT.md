@@ -18,13 +18,13 @@ Volgorde zoals in GitBook. Klik een pagina aan, of lees alles achter elkaar in [
 | 12 | &nbsp;&nbsp;&nbsp;&nbsp;[Manual control by terminal](controlling-the-robot/manual-control-by-terminal.md) | 🟠 gewijzigd |
 | 13 | &nbsp;&nbsp;&nbsp;&nbsp;[Manual control with gamepad](controlling-the-robot/manual-control-with-gamepad.md) | 🟠 gewijzigd |
 | 14 | [See turtlebot3 topics](see-turtlebot3-topics.md) | 🟠 gewijzigd |
-| 15 | [ROS2 nodes](ros2-nodes.md) | 🟠 gewijzigd |
-| 16 | &nbsp;&nbsp;&nbsp;&nbsp;[Read in the scan topic](ros2-nodes/read-in-the-scan-topic.md) | 🟠 gewijzigd |
-| 17 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Exercise](ros2-nodes/read-in-the-scan-topic/exercise.md) | ⚪ ongewijzigd |
-| 18 | &nbsp;&nbsp;&nbsp;&nbsp;[Read the battery level](ros2-nodes/read-the-battery-level.md) | 🟠 gewijzigd |
-| 19 | &nbsp;&nbsp;&nbsp;&nbsp;[Read the encoder value](ros2-nodes/read-the-encoder-value.md) | 🟠 gewijzigd |
-| 20 | &nbsp;&nbsp;&nbsp;&nbsp;[Drive 10cm with a button](ros2-nodes/drive-10cm-with-a-button.md) | 🟠 gewijzigd |
-| 21 | [Play a sound](play-a-sound.md) | ⚪ ongewijzigd |
+| 15 | [Play a sound](play-a-sound.md) | ⚪ ongewijzigd |
+| 16 | [ROS2 nodes](ros2-nodes.md) | 🟠 gewijzigd |
+| 17 | &nbsp;&nbsp;&nbsp;&nbsp;[Read in the scan topic](ros2-nodes/read-in-the-scan-topic.md) | 🟠 gewijzigd |
+| 18 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Exercise](ros2-nodes/read-in-the-scan-topic/exercise.md) | ⚪ ongewijzigd |
+| 19 | &nbsp;&nbsp;&nbsp;&nbsp;[Read the battery level](ros2-nodes/read-the-battery-level.md) | 🟠 gewijzigd |
+| 20 | &nbsp;&nbsp;&nbsp;&nbsp;[Read the encoder value](ros2-nodes/read-the-encoder-value.md) | 🟠 gewijzigd |
+| 21 | &nbsp;&nbsp;&nbsp;&nbsp;[Drive 10cm with a button](ros2-nodes/drive-10cm-with-a-button.md) | 🟠 gewijzigd |
 | 22 | [Simulation of sensors](simulation-of-sensors.md) | 🟠 gewijzigd |
 | 23 | [SLAM](slam.md) | 🟠 gewijzigd 🙈 verborgen |
 | 24 | [Autonomous driving](autonomous-driving.md) | 🟠 gewijzigd 🙈 verborgen |

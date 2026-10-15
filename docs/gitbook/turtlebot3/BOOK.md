@@ -591,7 +591,77 @@ Show it to the lecturer.
 
 ---
 
-## 15. ROS2 nodes  `[gewijzigd]`
+## 15. Play a sound  `[ongewijzigd]`
+
+<sub>play-a-sound.md</sub>
+
+
+## Play a sound by terminal
+
+The turtlebot can play a sound when sending a specific ros2 service.
+
+```
+ros2 service call /sound turtlebot3_msgs/srv/Sound value:\ 2
+```
+
+{% hint style="info" %}
+Only value 0,1, 2 and 3 are implemented.
+{% endhint %}
+
+## Play a sound with rqt
+
+<figure><img src="https://1503299445-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FjFguour9DiTaRsxIJsRZ%2Fuploads%2FcP4tbpiXSomyXAWwtjVJ%2Fimage.png?alt=media&amp;token=30733453-b8af-45da-8b5a-917d9f71af3c" alt=""><figcaption></figcaption></figure>
+
+Play a sound with ros2 node
+
+```python
+#!/usr/bin/env python3
+import rclpy
+from rclpy.node import Node
+from turtlebot3_msgs.srv import Sound  # Service type for TB3 sound
+import sys
+class SoundClientNode(Node):
+    def __init__(self):
+        super().__init__('turtlebot3_sound_client')
+        # create the client
+        self.cli = self.create_client(Sound, '/sound')
+        while not self.cli.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('/sound service not available, waiting...')
+        self.req = Sound.Request()
+
+    def play_sound(self, sound: int):
+        self.req.value = sound
+        self.get_logger().info(f'Calling /sound with value={sound}')
+        self.future = self.cli.call_async(self.req)
+        rclpy.spin_until_future_complete(self, self.future, timeout_sec=5.0)
+
+        if self.future.done() and not self.future.cancelled():
+            resp = self.future.result()
+            if resp is not None:
+                self.get_logger().info(f'Sound service call succeeded: {resp}')
+            else:
+                self.get_logger().error('Service call returned None')
+        else:
+            self.get_logger().error('Service call failed or timed out')
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = SoundClientNode()
+    # Example: play sound #1 (turtlebot3 built-in sound). You can change number.
+    node.play_sound(sound=int(sys.argv[1]))
+    node.destroy_node()
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
+
+```
+
+Try to start the command.
+
+---
+
+## 16. ROS2 nodes  `[gewijzigd]`
 
 <sub>ros2-nodes.md</sub>
 
@@ -618,7 +688,7 @@ The overlay (`install/setup.bash`) is sourced automatically in every new termina
 
 ---
 
-### 16. Read in the scan topic  `[gewijzigd]`
+### 17. Read in the scan topic  `[gewijzigd]`
 
 <sub>ros2-nodes/read-in-the-scan-topic.md</sub>
 
@@ -815,7 +885,7 @@ Finally, this logs how many front readings were used and what their average dist
 
 ---
 
-#### 17. Exercise  `[ongewijzigd]`
+#### 18. Exercise  `[ongewijzigd]`
 
 <sub>ros2-nodes/read-in-the-scan-topic/exercise.md</sub>
 
@@ -828,7 +898,7 @@ Show the result to the lecturer.
 
 ---
 
-### 18. Read the battery level  `[gewijzigd]`
+### 19. Read the battery level  `[gewijzigd]`
 
 <sub>ros2-nodes/read-the-battery-level.md</sub>
 
@@ -856,7 +926,7 @@ Show when ready to the lecturer.
 
 ---
 
-### 19. Read the encoder value  `[gewijzigd]`
+### 20. Read the encoder value  `[gewijzigd]`
 
 <sub>ros2-nodes/read-the-encoder-value.md</sub>
 
@@ -881,7 +951,7 @@ Show when ready to the lecturer.
 
 ---
 
-### 20. Drive 10cm with a button  `[gewijzigd]`
+### 21. Drive 10cm with a button  `[gewijzigd]`
 
 <sub>ros2-nodes/drive-10cm-with-a-button.md</sub>
 
@@ -1016,76 +1086,6 @@ if __name__ == '__main__':
 * `node = MoveOnJoyButton()` creates your node instance.
 * `rclpy.spin(node)` starts the ROS 2 event loop: it listens for messages and calls callbacks (like `joy_callback`). `spin` blocks until the node is shut down.
 * On `KeyboardInterrupt` (Ctrl+C) the code continues to shutdown gracefully: `node.destroy_node()` and `rclpy.shutdown()`.
-
----
-
-## 21. Play a sound  `[ongewijzigd]`
-
-<sub>play-a-sound.md</sub>
-
-
-## Play a sound by terminal
-
-The turtlebot can play a sound when sending a specific ros2 service.
-
-```
-ros2 service call /sound turtlebot3_msgs/srv/Sound value:\ 2
-```
-
-{% hint style="info" %}
-Only value 0,1, 2 and 3 are implemented.
-{% endhint %}
-
-## Play a sound with rqt
-
-<figure><img src="https://1503299445-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FjFguour9DiTaRsxIJsRZ%2Fuploads%2FcP4tbpiXSomyXAWwtjVJ%2Fimage.png?alt=media&amp;token=30733453-b8af-45da-8b5a-917d9f71af3c" alt=""><figcaption></figcaption></figure>
-
-Play a sound with ros2 node
-
-```python
-#!/usr/bin/env python3
-import rclpy
-from rclpy.node import Node
-from turtlebot3_msgs.srv import Sound  # Service type for TB3 sound
-import sys
-class SoundClientNode(Node):
-    def __init__(self):
-        super().__init__('turtlebot3_sound_client')
-        # create the client
-        self.cli = self.create_client(Sound, '/sound')
-        while not self.cli.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('/sound service not available, waiting...')
-        self.req = Sound.Request()
-
-    def play_sound(self, sound: int):
-        self.req.value = sound
-        self.get_logger().info(f'Calling /sound with value={sound}')
-        self.future = self.cli.call_async(self.req)
-        rclpy.spin_until_future_complete(self, self.future, timeout_sec=5.0)
-
-        if self.future.done() and not self.future.cancelled():
-            resp = self.future.result()
-            if resp is not None:
-                self.get_logger().info(f'Sound service call succeeded: {resp}')
-            else:
-                self.get_logger().error('Service call returned None')
-        else:
-            self.get_logger().error('Service call failed or timed out')
-
-def main(args=None):
-    rclpy.init(args=args)
-    node = SoundClientNode()
-    # Example: play sound #1 (turtlebot3 built-in sound). You can change number.
-    node.play_sound(sound=int(sys.argv[1]))
-    node.destroy_node()
-    rclpy.shutdown()
-
-if __name__ == '__main__':
-    main()
-
-```
-
-Try to start the command.
 
 ---
 

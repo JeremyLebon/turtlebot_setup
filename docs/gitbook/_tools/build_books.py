@@ -40,7 +40,7 @@ ORDER = {
     "turtlebot3": [
         "turtlebot3-in-the-real-world.md", "objectives.md", "turtlebot3-startup.md",
         "visualise-the-robot.md", "controlling-the-robot.md", "see-turtlebot3-topics.md",
-        "ros2-nodes.md", "play-a-sound.md", "simulation-of-sensors.md",
+        "play-a-sound.md", "ros2-nodes.md", "simulation-of-sensors.md",
         # SLAM / navigation (hidden for now: 'hidden: true' front matter)
         "slam.md", "autonomous-driving.md", "autonomous-driving-with-python-library.md",
         "compare-planners-and-controllers.md", "zones.md",
