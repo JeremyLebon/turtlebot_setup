@@ -1,6 +1,6 @@
 # Read the battery level
 
-Make a new python script (`sub_battery_level.py`) in the docker container turtlebot-vis.
+Make a new python script (`sub_battery_level.py`) in the `turtlebot-vis` container, in `/root/ros2_ws`.
 
 Check the ros2 msg typ of the `/battery_state` topic. Add this as a python library.
 

@@ -700,25 +700,50 @@ Try to start the command.
 <sub>ros2-nodes/README.md</sub>
 
 
-To make ROS 2 nodes in Python, 2 ways can be used:
+You write your ROS 2 nodes **on your laptop**, in your own `turtlebot-vis`
+container. The node talks to the robot over Zenoh, exactly like RViz2 and
+teleop. The bringup must be running on the robot.
 
-1. **On your laptop** - in the `turtlebot-vis` container: VS Code > Remote
-   Explorer > WSL > Dev Containers > `turtlebot-vis`. Store your code in
-   `/root/ros2_ws`.
-2. **On the robot** - in the robot container `turtlebot_<nr>`: VS Code > Remote
-   Explorer > SSH (`turtlebot@10.0.<nr>.10`) > attach to the container. Store
-   your code in `/root/ros2_ws` there as well (on the robot this is
-   `~/turtlebot_setup/ros2_ws`).
+## Open the container in VS Code
+
+VS Code > **Remote Explorer** > **WSL** (Ubuntu-22.04) > **Dev Containers** >
+`turtlebot-vis` > attach. When asked to open a folder, choose `/root/ros2_ws`.
 
 {% hint style="info" %}
-Both `ros2_ws` folders survive restarts and robot updates. Anything you store
-elsewhere in a container can be lost.
+Same steps as in the simulation ([The first ros2 node](https://vives-4.gitbook.io/ros2-simulation-turtlebo-gazebo/the-first-ros2-node)),
+but now the container is `turtlebot-vis`. VS Code may ask to install the Python
+extension in the container: say yes.
 {% endhint %}
 
+## Make and run a script
+
+1. Make the script in `/root/ros2_ws`, for example `sub_scan.py`.
+2. Open a terminal in VS Code (**Terminal > New Terminal**): it runs inside the container.
+3. Run it:
+
+```sh
+cd /root/ros2_ws
+python3 sub_scan.py
+```
+
+`CTRL + C` stops the node.
+
 {% hint style="warning" %}
-On the robot: build your own packages with `colcon build` in `/root/ros2_ws`.
-The overlay (`install/setup.bash`) is sourced automatically in every new terminal.
+Store your code in `/root/ros2_ws`: that is the folder `turtlebot_vis/ros2_ws`
+on your laptop (see [Location files on WSL](../location-files-on-wsl.md)).
+Anything you store elsewhere in the container can be lost.
 {% endhint %}
+
+<details>
+
+<summary>Advanced: run a node on the robot itself</summary>
+
+The robot container `turtlebot_<nr>` also has a `/root/ros2_ws`
+(`~/turtlebot_setup/ros2_ws` on the robot). It is **shared by everyone who uses
+that robot**, and VS Code over SSH needs internet on the robot to install its
+server. Only use it when your lecturer asks for it.
+
+</details>
 
 ---
 
@@ -733,9 +758,7 @@ Theory: [Laser scan (/scan)](../../theory/laser-scan.md) - angles, indices, inva
 
 Make a Python script (`sub_scan.py`) that is subscribed to the `/scan` topic. Make the script inside the `turtlebot-vis` container in the directory `/root/ros2_ws`.
 
-Use the Remote explorer extension in VScode to make connection with the WSL and the running docker container. See the previous [session](https://vives-4.gitbook.io/ros2-simulation-turtlebo-gazebo/the-first-ros2-node) (there the container is `ros2-jazzy-gazebo-turtlebot`, here it is `turtlebot-vis`)
-
-Sometimes the extension python has be installed in the docker container via VScode
+How to open the container in VS Code and run your script: see [ROS2 nodes](../).
 
 ## Add the needed libraries
 
@@ -936,7 +959,7 @@ Show the result to the lecturer.
 <sub>ros2-nodes/read-the-battery-level.md</sub>
 
 
-Make a new python script (`sub_battery_level.py`) in the docker container turtlebot-vis.
+Make a new python script (`sub_battery_level.py`) in the `turtlebot-vis` container, in `/root/ros2_ws`.
 
 Check the ros2 msg typ of the `/battery_state` topic. Add this as a python library.
 
@@ -968,7 +991,7 @@ Show when ready to the lecturer.
 Theory: [Odometry (/odom) and encoders](../theory/odometry.md) - ticks, wheel radius and the formulas.
 {% endhint %}
 
-Make a new python script (`sub_encoders.py`) in the docker container turtlebot-vis.
+Make a new python script (`sub_encoders.py`) in the `turtlebot-vis` container, in `/root/ros2_ws`.
 
 Check if there is a ros2 topic that contains the encoder values
 

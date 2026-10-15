@@ -6,9 +6,7 @@ Theory: [Laser scan (/scan)](../../theory/laser-scan.md) - angles, indices, inva
 
 Make a Python script (`sub_scan.py`) that is subscribed to the `/scan` topic. Make the script inside the `turtlebot-vis` container in the directory `/root/ros2_ws`.
 
-Use the Remote explorer extension in VScode to make connection with the WSL and the running docker container. See the previous [session](https://vives-4.gitbook.io/ros2-simulation-turtlebo-gazebo/the-first-ros2-node) (there the container is `ros2-jazzy-gazebo-turtlebot`, here it is `turtlebot-vis`)
-
-Sometimes the extension python has be installed in the docker container via VScode
+How to open the container in VS Code and run your script: see [ROS2 nodes](../).
 
 ## Add the needed libraries
 

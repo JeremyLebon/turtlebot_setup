@@ -1,3 +1,7 @@
+---
+hidden: true
+---
+
 # Simulation of sensors
 
 Make a script `simulation_sensors.py` and add the code below. This code will simulate the following parameters. These parameters will be published on ROS 2 topics under `/sim/...`:

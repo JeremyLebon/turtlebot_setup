@@ -25,7 +25,7 @@ Volgorde zoals in GitBook. Klik een pagina aan, of lees alles achter elkaar in [
 | 19 | &nbsp;&nbsp;&nbsp;&nbsp;[Read the battery level](ros2-nodes/read-the-battery-level.md) | 🟠 gewijzigd |
 | 20 | &nbsp;&nbsp;&nbsp;&nbsp;[Read the encoder value](ros2-nodes/read-the-encoder-value.md) | 🟠 gewijzigd |
 | 21 | &nbsp;&nbsp;&nbsp;&nbsp;[Drive 10cm with a button](ros2-nodes/drive-10cm-with-a-button.md) | 🟠 gewijzigd |
-| 22 | [Simulation of sensors](simulation-of-sensors.md) | 🟠 gewijzigd |
+| 22 | [Simulation of sensors](simulation-of-sensors.md) | 🟠 gewijzigd 🙈 verborgen |
 | 23 | [SLAM](slam.md) | 🟠 gewijzigd 🙈 verborgen |
 | 24 | [Autonomous driving](autonomous-driving.md) | 🟠 gewijzigd 🙈 verborgen |
 | 25 | [Autonomous driving with python library](autonomous-driving-with-python-library.md) | 🟠 gewijzigd 🙈 verborgen |
