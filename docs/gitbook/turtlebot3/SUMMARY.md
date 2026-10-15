@@ -1,7 +1,7 @@
 # Table of contents
 
 * [Turtlebot3 in the real world](turtlebot3-in-the-real-world.md)
-* [Objectives](objectives.md)
+* [Installation](installation.md)
 * [Turtlebot3 - startup](turtlebot3-startup/README.md)
   * [Connect to the WIFI](turtlebot3-startup/connect-to-the-wifi.md)
   * [Startup of the turtlebot3](turtlebot3-startup/startup-of-the-turtlebot3.md)

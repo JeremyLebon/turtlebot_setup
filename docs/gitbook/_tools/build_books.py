@@ -17,6 +17,7 @@ BOOKS = {
                    [("autonomous-driving-with-python-library.md", "compare-planners-and-controllers.md", "Compare planners and controllers"),
                     ("compare-planners-and-controllers.md", "zones.md", "Zones"),
                     ("turtlebot3-startup/setup-laptop-student.md", "theory.md", "Theory: what the robot measures"),
+                    ("turtlebot3-in-the-real-world.md", "installation.md", "Installation"),
                     ("theory.md", "theory/laser-scan.md", "Laser scan (/scan)"),
                     ("theory/laser-scan.md", "theory/odometry.md", "Odometry (/odom) and encoders"),
                     ("theory/odometry.md", "theory/imu.md", "IMU (/imu)"),
@@ -38,7 +39,7 @@ BOOKS = {
 # Top-level pages not listed keep their place after the listed ones.
 ORDER = {
     "turtlebot3": [
-        "turtlebot3-in-the-real-world.md", "objectives.md", "turtlebot3-startup.md",
+        "turtlebot3-in-the-real-world.md", "installation.md", "turtlebot3-startup.md",
         "visualise-the-robot.md", "controlling-the-robot.md", "see-turtlebot3-topics.md",
         "play-a-sound.md", "ros2-nodes.md", "simulation-of-sensors.md",
         # SLAM / navigation (hidden for now: 'hidden: true' front matter)
@@ -48,6 +49,12 @@ ORDER = {
         # reference
         "install-python-libraries-in-container.md", "location-files-on-wsl.md", "theory.md",
     ],
+}
+
+
+# Pages of the original book that are dropped on purpose (content moved elsewhere).
+REMOVED = {
+    "turtlebot3": ["objectives.md"],   # merged into turtlebot3-in-the-real-world.md (2026-10-15)
 }
 
 
@@ -77,6 +84,8 @@ for book, (title, dl, base, new_pages) in BOOKS.items():
     for after, path, t in new_pages:
         i = [p for p, _ in pages].index(after)
         pages.insert(i + 1, (path, t))
+
+    pages = [(p, t) for p, t in pages if p not in REMOVED.get(book, [])]
 
     if book in ORDER:
         order = [top(p) for p in ORDER[book]]

@@ -1,6 +1,6 @@
 # Turtlebot3 - startup
 
-Follow these steps in this order:
+First make sure the [Installation](../installation.md) is done (with internet). Then follow these steps in this order:
 
 1. [Connect to the WIFI](connect-to-the-wifi.md) - your laptop on `TB-AP-<nr>`
 2. [Startup of the turtlebot3](startup-of-the-turtlebot3.md) - battery on, wait for the beep

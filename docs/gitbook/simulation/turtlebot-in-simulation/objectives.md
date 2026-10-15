@@ -18,6 +18,6 @@ autonomously in the mapped environment.
 {% hint style="warning" %}
 **This afternoon you work on the real TurtleBot.** While you still have internet
 (eduroam), already download the laptop container for the real robot: see the
-Turtlebot3 book, *Setup laptop (student)* (`git clone` of `turtlebot_vis` and
+Turtlebot3 book, *Installation* (`git clone` of `turtlebot_vis` and
 `docker compose pull`, about 4 GB).
 {% endhint %}

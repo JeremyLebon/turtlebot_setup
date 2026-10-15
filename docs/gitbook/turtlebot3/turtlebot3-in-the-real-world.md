@@ -8,8 +8,26 @@ How the lab is set up:
 * The robot software runs in a **Docker container** on the Raspberry Pi of the robot (`turtlebot_<nr>`). It starts by itself when the robot boots.
 * On your laptop you use the **`turtlebot-vis`** container (RViz2, teleop and your own nodes). It talks to the robot with ROS 2 over **Zenoh**.
 
+## Objectives
+
+In this session, the objectives are the following:
+
+* Start up the real TurtleBot3 and connect to it (own wifi, SSH, robot container)
+* Start the robot software (bringup) and connect your laptop over Zenoh
+* Visualise the real robot in RViz2: robot model, TF, odometry and laser scan
+* Drive the robot in a real environment with the keyboard and the gamepad
+* Find and read the topics of the robot (battery, encoders, lidar, odometry)
+* Make your own ROS 2 nodes on the real robot (subscribe and publish)
+
+{% hint style="info" %}
+Next session: map an environment with Cartographer (SLAM) and navigate
+autonomously in the mapped environment.
+{% endhint %}
+
 {% hint style="warning" %}
-**Before the lab, with internet** (eduroam, at home): download the laptop container, see [Setup laptop (student)](turtlebot3-startup/setup-laptop-student.md). It is about 4 GB, and the robot wifi has no (or only slow) internet.
+**Before the lab, with internet** (eduroam, at home): do the
+[Installation](installation.md) of the laptop container. It is about 4 GB, and
+the robot wifi has no (or only slow) internet.
 {% endhint %}
 
 {% hint style="info" %}

@@ -17,20 +17,7 @@ How the lab is set up:
 * The robot software runs in a **Docker container** on the Raspberry Pi of the robot (`turtlebot_<nr>`). It starts by itself when the robot boots.
 * On your laptop you use the **`turtlebot-vis`** container (RViz2, teleop and your own nodes). It talks to the robot with ROS 2 over **Zenoh**.
 
-{% hint style="warning" %}
-**Before the lab, with internet** (eduroam, at home): download the laptop container, see [Setup laptop (student)](turtlebot3-startup/setup-laptop-student.md). It is about 4 GB, and the robot wifi has no (or only slow) internet.
-{% endhint %}
-
-{% hint style="info" %}
-New to the topics, TF, odometry or QoS? Read the [Theory: what the robot measures](theory/) first.
-{% endhint %}
-
----
-
-## 2. Objectives  `[gewijzigd]`
-
-<sub>objectives.md</sub>
-
+## Objectives
 
 In this session, the objectives are the following:
 
@@ -46,6 +33,78 @@ Next session: map an environment with Cartographer (SLAM) and navigate
 autonomously in the mapped environment.
 {% endhint %}
 
+{% hint style="warning" %}
+**Before the lab, with internet** (eduroam, at home): do the
+[Installation](installation.md) of the laptop container. It is about 4 GB, and
+the robot wifi has no (or only slow) internet.
+{% endhint %}
+
+{% hint style="info" %}
+New to the topics, TF, odometry or QoS? Read the [Theory: what the robot measures](theory/) first.
+{% endhint %}
+
+---
+
+## 2. Installation  `[nieuw]`
+
+<sub>installation.md</sub>
+
+
+On your laptop you work in the **`turtlebot-vis`** container: RViz2, teleop and
+your own ROS 2 nodes, connected to the robot over Zenoh. Install it **before the
+lab, on a network with internet** (eduroam, at home).
+
+{% hint style="danger" %}
+The robot wifi `TB-AP-<nr>` has no (or only slow) internet. The container image
+is about **4 GB**: download it before you connect to the robot.
+{% endhint %}
+
+You need the same as for the simulation: **WSL** (Ubuntu 22.04) with **Docker**.
+
+## Clone the repository
+
+Open a WSL terminal:
+
+```sh
+git clone https://github.com/JeremyLebon/turtlebot_vis.git
+```
+
+{% hint style="info" %}
+Already cloned in a previous year? Update it: `cd turtlebot_vis`,
+`git checkout .env` (throws away your old robot number, otherwise `git pull`
+refuses), `git pull`, `git submodule update --init`. The old version (DDS) can't
+talk to the robots anymore.
+{% endhint %}
+
+## Download the container image
+
+```sh
+cd turtlebot_vis
+docker compose pull
+```
+
+This downloads the ready-made image (much faster than building it yourself).
+
+Check that it is there:
+
+```sh
+docker images | grep turtlebot-rpi5-vis
+```
+
+You should see `nobel86/turtlebot-rpi5-vis` with tag `zenoh` (about 4 GB).
+
+## Where your files are
+
+Your own code goes in the folder `turtlebot_vis/ros2_ws`: inside the container
+that is `/root/ros2_ws`. Files there survive a restart of the container. See
+[Location files on WSL](location-files-on-wsl.md).
+
+{% hint style="success" %}
+Done? In the lab you continue with [Turtlebot3 - startup](turtlebot3-startup/).
+Setting your robot number and starting the container happens there, in
+[Setup laptop (student)](turtlebot3-startup/setup-laptop-student.md).
+{% endhint %}
+
 ---
 
 ## 3. Turtlebot3 - startup  `[gewijzigd]`
@@ -53,7 +112,7 @@ autonomously in the mapped environment.
 <sub>turtlebot3-startup/README.md</sub>
 
 
-Follow these steps in this order:
+First make sure the [Installation](../installation.md) is done (with internet). Then follow these steps in this order:
 
 1. [Connect to the WIFI](connect-to-the-wifi.md) - your laptop on `TB-AP-<nr>`
 2. [Startup of the turtlebot3](startup-of-the-turtlebot3.md) - battery on, wait for the beep
@@ -291,37 +350,15 @@ With Zenoh the laptop makes the connection itself, so the Windows/Hyper-V
 **firewall rules from previous years are no longer needed**.
 {% endhint %}
 
-{% hint style="danger" %}
-**Do the download part (clone + `docker compose pull`) before the lab, on a
-network with internet** (eduroam, at home). The image is about 4 GB, and the
-robot wifi `TB-AP-<nr>` has no (or only slow) internet.
+{% hint style="warning" %}
+First do the [Installation](../installation.md) (clone + `docker compose pull`),
+**with internet**. On the robot wifi you can't download the 4 GB image.
 {% endhint %}
 
-## Docker container
-
-Open a WSL terminal and clone the repository:
-
-```sh
-git clone https://github.com/JeremyLebon/turtlebot_vis.git
-```
-
-{% hint style="info" %}
-Already cloned in a previous year? Update it: `cd turtlebot_vis`,
-`git checkout .env` (throws away your old robot number, otherwise `git pull`
-refuses), `git pull`, `git submodule update --init`. The old version (DDS) can't
-talk to the robots anymore.
-{% endhint %}
-
-Go inside the directory:
+Open a WSL terminal and go to the cloned repository:
 
 ```sh
 cd turtlebot_vis
-```
-
-Download the ready-made image (much faster than building it yourself):
-
-```sh
-docker compose pull
 ```
 
 ## Set your robot number

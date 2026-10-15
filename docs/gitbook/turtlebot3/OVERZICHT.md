@@ -5,7 +5,7 @@ Volgorde zoals in GitBook. Klik een pagina aan, of lees alles achter elkaar in [
 | # | Pagina | Status |
 |---|---|---|
 | 1 | [Turtlebot3 in the real world](turtlebot3-in-the-real-world.md) | 🟠 gewijzigd |
-| 2 | [Objectives](objectives.md) | 🟠 gewijzigd |
+| 2 | [Installation](installation.md) | 🟢 nieuw |
 | 3 | [Turtlebot3 - startup](turtlebot3-startup/README.md) | 🟠 gewijzigd |
 | 4 | &nbsp;&nbsp;&nbsp;&nbsp;[Connect to the WIFI](turtlebot3-startup/connect-to-the-wifi.md) | 🟠 gewijzigd |
 | 5 | &nbsp;&nbsp;&nbsp;&nbsp;[Startup of the turtlebot3](turtlebot3-startup/startup-of-the-turtlebot3.md) | 🟠 gewijzigd |
@@ -43,4 +43,4 @@ Volgorde zoals in GitBook. Klik een pagina aan, of lees alles achter elkaar in [
 | 37 | &nbsp;&nbsp;&nbsp;&nbsp;[Driving the robot (/cmd_vel)](theory/cmd-vel.md) | 🟢 nieuw |
 | 38 | &nbsp;&nbsp;&nbsp;&nbsp;[QoS - Quality of Service](theory/qos.md) | 🟢 nieuw |
 
-Samen: 28 gewijzigd, 1 ongewijzigd, 9 nieuw.
+Samen: 27 gewijzigd, 10 nieuw, 1 ongewijzigd.

@@ -9,37 +9,15 @@ With Zenoh the laptop makes the connection itself, so the Windows/Hyper-V
 **firewall rules from previous years are no longer needed**.
 {% endhint %}
 
-{% hint style="danger" %}
-**Do the download part (clone + `docker compose pull`) before the lab, on a
-network with internet** (eduroam, at home). The image is about 4 GB, and the
-robot wifi `TB-AP-<nr>` has no (or only slow) internet.
+{% hint style="warning" %}
+First do the [Installation](../installation.md) (clone + `docker compose pull`),
+**with internet**. On the robot wifi you can't download the 4 GB image.
 {% endhint %}
 
-## Docker container
-
-Open a WSL terminal and clone the repository:
-
-```sh
-git clone https://github.com/JeremyLebon/turtlebot_vis.git
-```
-
-{% hint style="info" %}
-Already cloned in a previous year? Update it: `cd turtlebot_vis`,
-`git checkout .env` (throws away your old robot number, otherwise `git pull`
-refuses), `git pull`, `git submodule update --init`. The old version (DDS) can't
-talk to the robots anymore.
-{% endhint %}
-
-Go inside the directory:
+Open a WSL terminal and go to the cloned repository:
 
 ```sh
 cd turtlebot_vis
-```
-
-Download the ready-made image (much faster than building it yourself):
-
-```sh
-docker compose pull
 ```
 
 ## Set your robot number

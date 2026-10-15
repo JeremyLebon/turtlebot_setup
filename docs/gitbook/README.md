@@ -80,6 +80,8 @@ docs/gitbook/
 | `turtlebot3/turtlebot3-startup/startup-turtlebot-software.md` | Startup turtlebot software | (2026-10-15) `[usb_power]` message, keep terminal open, check with a 2nd terminal, one bringup per robot |
 | `turtlebot3/controlling-the-robot/manual-control-with-gamepad.md` | Manual control with gamepad | (2026-10-15) start the gamepad **from the robot terminal** (`teleop_twist_joy ... joy_vel:=cmd_vel_joy`), switch on X; status page as alternative |
 | `turtlebot3/ros2-nodes/read-the-battery-level.md` | Read the battery level | (2026-10-15) hint: percentage 0-1 or 0-100, voltage limit 11.0/11.2 V |
+| `turtlebot3/installation.md` | **new** Installation (after the intro) | clone + `docker compose pull` of turtlebot_vis **with internet, before the lab**; Setup laptop (student) keeps only `.env`, start, check |
+| `turtlebot3/turtlebot3-in-the-real-world.md` | Turtlebot3 in the real world | objectives of the session merged in; page **Objectives removed** |
 | `turtlebot3/theory.md` | Theory: what the robot measures | **new**: where the data comes from (OpenCR, LDS-02, RPi5), ROS units and axes |
 | `turtlebot3/theory/laser-scan.md` | Laser scan (/scan) | **new**: lidar, LDS-02 specs, LaserScan fields, index <-> angle, invalid values |
 | `turtlebot3/theory/odometry.md` | Odometry (/odom) and encoders | **new**: ticks, wheel radius/separation, diff-drive formulas, `use_imu`, drift |
