@@ -1,7 +1,3 @@
----
-hidden: true
----
-
 # Autonomous driving
 
 {% hint style="danger" %}

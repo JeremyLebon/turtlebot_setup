@@ -1,0 +1,14 @@
+# GitBook site configuration (Git Sync project directory: docs/gitbook/session-4-project).
+# Keep the key unchanged once the site is live: GitBook matches spaces by key.
+$schema: https://api.gitbook.com/gitbook-docs.yaml
+site:
+  title: Session 4 - Project
+  structure:
+    - type: space
+      key: session-4-project
+      title: Session 4 - Project
+      path: session-4
+      default: true
+      content:
+        directory: ./
+        language: en

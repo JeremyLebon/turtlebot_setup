@@ -1,7 +1,3 @@
----
-hidden: true
----
-
 # SLAM
 
 Make a map of the classroom.
@@ -10,7 +6,7 @@ There are two ways. Do **way 1 first** - that's where you learn what happens.
 
 ## Way 1 - yourself, with ROS 2 commands
 
-Make sure the bringup runs on the robot and the `turtlebot-vis` container on your laptop is started (see [Turtlebot3 - startup](../turtlebot3-startup/)).
+Make sure the bringup runs on the robot and the `turtlebot-vis` container on your laptop is started (see the Turtlebot3 book, *Turtlebot3 - startup*).
 
 In the **robot** container (web terminal or SSH):
 

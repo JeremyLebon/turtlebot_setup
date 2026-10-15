@@ -1,7 +1,3 @@
----
-hidden: true
----
-
 # Measure while driving
 
 Make a nav2\_simple\_battery.py script via VScode > WSL > docker container (Remote Explorer)

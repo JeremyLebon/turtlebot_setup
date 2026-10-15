@@ -1,7 +1,3 @@
----
-hidden: true
----
-
 # Startup
 
 Go the terminal where docker compose up is used. And stop it with CRTL + C

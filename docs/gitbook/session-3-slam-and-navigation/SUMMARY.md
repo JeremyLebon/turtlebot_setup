@@ -1,0 +1,16 @@
+# Table of contents
+
+* [Session 3 - SLAM and navigation](README.md)
+* [Part 1 - In simulation](simulation/README.md)
+  * [SLAM / Mapping](simulation/slam-mapping/README.md)
+    * [Startup](simulation/slam-mapping/startup.md)
+    * [Start mapping](simulation/slam-mapping/start-mapping.md)
+    * [Save map](simulation/slam-mapping/save-map.md)
+  * [Autonomous Navigation](simulation/autonomous-navigation/README.md)
+    * [Autonomous driving with python library](simulation/autonomous-navigation/autonomous-driving-with-python-library.md)
+* [Part 2 - On the real robot](real-robot/README.md)
+  * [SLAM](real-robot/slam.md)
+  * [Autonomous driving](real-robot/autonomous-driving.md)
+  * [Autonomous driving with python library](real-robot/autonomous-driving-with-python-library.md)
+  * [Compare planners and controllers](real-robot/compare-planners-and-controllers.md)
+  * [Zones](real-robot/zones.md)

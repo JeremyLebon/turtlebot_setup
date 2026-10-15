@@ -1,7 +1,3 @@
----
-hidden: true
----
-
 # Autonomous driving with python library
 
 Make a nav2\_simple.py script via VScode  > WSL > docker container (See The first ros2 node)

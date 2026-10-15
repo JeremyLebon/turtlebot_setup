@@ -1,0 +1,14 @@
+# GitBook site configuration (Git Sync project directory: docs/gitbook/session-3-slam-and-navigation).
+# Keep the key unchanged once the site is live: GitBook matches spaces by key.
+$schema: https://api.gitbook.com/gitbook-docs.yaml
+site:
+  title: Session 3 - SLAM and navigation
+  structure:
+    - type: space
+      key: session-3-slam-and-navigation
+      title: Session 3 - SLAM and navigation
+      path: session-3
+      default: true
+      content:
+        directory: ./
+        language: en

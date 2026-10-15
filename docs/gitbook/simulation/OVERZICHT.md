@@ -20,12 +20,6 @@ Volgorde zoals in GitBook. Klik een pagina aan, of lees alles achter elkaar in [
 | 14 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Driving the robot (/cmd_vel)](turtlebot-in-simulation/theory/cmd-vel.md) | 🟢 nieuw |
 | 15 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[QoS - Quality of Service](turtlebot-in-simulation/theory/qos.md) | 🟢 nieuw |
 | 16 | [The first ros2 node](the-first-ros2-node.md) | 🟠 gewijzigd |
-| 17 | [SLAM / Mapping](slam-mapping.md) | 🟠 gewijzigd 🙈 verborgen |
-| 18 | &nbsp;&nbsp;&nbsp;&nbsp;[Startup](slam-mapping/startup.md) | 🟠 gewijzigd 🙈 verborgen |
-| 19 | &nbsp;&nbsp;&nbsp;&nbsp;[Start mapping](slam-mapping/start-mapping.md) | 🟠 gewijzigd 🙈 verborgen |
-| 20 | &nbsp;&nbsp;&nbsp;&nbsp;[Save map](slam-mapping/save-map.md) | 🟠 gewijzigd 🙈 verborgen |
-| 21 | [Autonomous Navigation](autonomous-navigation.md) | 🟠 gewijzigd 🙈 verborgen |
-| 22 | &nbsp;&nbsp;&nbsp;&nbsp;[Autonomous driving with python library](autonomous-navigation/autonomous-driving-with-python-library.md) | 🟠 gewijzigd 🙈 verborgen |
-| 23 | [Simulation vs. real robot](simulation-vs-real-robot.md) | 🟢 nieuw |
+| 17 | [Simulation vs. real robot](simulation-vs-real-robot.md) | 🟢 nieuw |
 
-Samen: 1 ongewijzigd, 14 gewijzigd, 8 nieuw.
+Samen: 1 ongewijzigd, 8 gewijzigd, 8 nieuw.

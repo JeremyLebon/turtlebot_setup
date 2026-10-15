@@ -1,7 +1,3 @@
----
-hidden: true
----
-
 # Save map
 
 With the following command in a new terminal the map can be saved.

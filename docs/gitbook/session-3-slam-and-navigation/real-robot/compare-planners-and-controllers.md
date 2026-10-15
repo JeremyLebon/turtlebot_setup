@@ -1,7 +1,3 @@
----
-hidden: true
----
-
 # Compare planners and controllers
 
 **New exercise.** Nav2 has two "brains":

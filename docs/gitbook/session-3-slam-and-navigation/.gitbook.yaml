@@ -1,0 +1,6 @@
+# GitBook Git Sync: project directory docs/gitbook/session-3-slam-and-navigation
+root: ./
+
+structure:
+  readme: README.md
+  summary: SUMMARY.md
