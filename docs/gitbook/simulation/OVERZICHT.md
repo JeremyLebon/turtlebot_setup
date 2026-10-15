@@ -7,8 +7,8 @@ Volgorde zoals in GitBook. Klik een pagina aan, of lees alles achter elkaar in [
 | 1 | [Installation](installation.md) | ⚪ ongewijzigd |
 | 2 | [Turtlebot in simulation](turtlebot-in-simulation.md) | 🟠 gewijzigd |
 | 3 | &nbsp;&nbsp;&nbsp;&nbsp;[Objectives](turtlebot-in-simulation/objectives.md) | 🟠 gewijzigd |
-| 4 | &nbsp;&nbsp;&nbsp;&nbsp;[Tools](turtlebot-in-simulation/tools.md) | ⚪ ongewijzigd |
-| 5 | &nbsp;&nbsp;&nbsp;&nbsp;[Startup](turtlebot-in-simulation/startup.md) | ⚪ ongewijzigd |
+| 4 | &nbsp;&nbsp;&nbsp;&nbsp;[Tools](turtlebot-in-simulation/tools.md) | 🟠 gewijzigd |
+| 5 | &nbsp;&nbsp;&nbsp;&nbsp;[Startup](turtlebot-in-simulation/startup.md) | 🟠 gewijzigd |
 | 6 | &nbsp;&nbsp;&nbsp;&nbsp;[Theory: what the robot measures](turtlebot-in-simulation/theory.md) | 🟢 nieuw |
 | 7 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Laser scan (/scan)](turtlebot-in-simulation/theory/laser-scan.md) | 🟢 nieuw |
 | 8 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Odometry (/odom) and wheels](turtlebot-in-simulation/theory/odometry.md) | 🟢 nieuw |
@@ -28,4 +28,4 @@ Volgorde zoals in GitBook. Klik een pagina aan, of lees alles achter elkaar in [
 | 22 | &nbsp;&nbsp;&nbsp;&nbsp;[Autonomous driving with python library](autonomous-navigation/autonomous-driving-with-python-library.md) | 🟠 gewijzigd 🙈 verborgen |
 | 23 | [Simulation vs. real robot](simulation-vs-real-robot.md) | 🟢 nieuw |
 
-Samen: 3 ongewijzigd, 12 gewijzigd, 8 nieuw.
+Samen: 1 ongewijzigd, 14 gewijzigd, 8 nieuw.

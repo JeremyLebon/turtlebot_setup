@@ -1,7 +1,5 @@
 # Tools
 
-###
-
 ### Gazebo
 
 Gazebo is an open-source 3D robot simulator that allows users to accurately and efficiently simulate populations of robots in complex indoor and outdoor environments. It provides a robust physics engine and models for sensors and actuators. In the ROS 2 ecosystem, the newer version (Gazebo Sim) is the standard for testing robot autonomy, relying on the `ros_gz_bridge` for real-time communication with the ROS control stack.

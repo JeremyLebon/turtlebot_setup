@@ -26,7 +26,7 @@ In the current configuration, the map frame doesn't exist, which is why the Glob
 
 ### Change fixed frame
 
-Select as fixed frame as the odom frame
+Select `odom` as Fixed Frame.
 
 <div><figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2FKXOe51sV1ksvoZJN7nLr%2Fimage.png?alt=media&amp;token=87ae629c-6ccb-4e36-ba60-0f7b67f5cabf" alt=""><figcaption></figcaption></figure> <figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2FO0rwUJ8wsFlfi24sITSz%2Fimage.png?alt=media&amp;token=e8ec05dc-f554-478c-add2-97a2c2a45ee6" alt=""><figcaption></figcaption></figure></div>
 
@@ -92,7 +92,11 @@ The tf2 ros2 library calculates all the frames and joints at very high rate.
 
 ### Echo the /tf topic
 
-Use the following command to see a list op the ros2 topics. Use a new terminal if needed.
+Use the following command to see a list of the ros2 topics. Use a new terminal if needed.
+
+```
+ros2 topic list
+```
 
 Output
 
@@ -133,9 +137,9 @@ ros2 topic hz /tf
 
 <figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2Fx0MpAOaM8tbpBmtP8bqC%2Fimage.png?alt=media&amp;token=48a2b37c-4a71-4935-816a-2129fdfe68d3" alt=""><figcaption></figcaption></figure>
 
-### Look at the /joint\_state topic
+### Look at the /joint\_states topic
 
-If you echo the `/joint_states` And you let the robot turn. You should see the joint state position and velocity change.&#x20;
+Echo the `/joint_states` topic and let the robot turn. You should see the joint state position and velocity change.&#x20;
 
 <div><figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2FIf9Qd2kLikFoRpBieMgl%2Fimage.png?alt=media&amp;token=1c73090f-2dd6-49bf-af5b-439e6599b5cc" alt=""><figcaption></figcaption></figure> <figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2Fc7iuLHaMdenJRVFX2ogG%2Fimage.png?alt=media&amp;token=d87f8603-ba1e-4e0e-8fdd-d0c49bc318f2" alt=""><figcaption></figcaption></figure></div>
 

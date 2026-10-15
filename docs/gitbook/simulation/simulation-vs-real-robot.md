@@ -1,8 +1,7 @@
 # Simulation vs. real robot
 
-**New page** (suggested at the end of this book, before going to the real
-TurtleBot3). What you learned here works on the real robot, but a few things
-differ:
+What you learned here works on the real TurtleBot3, but a few things differ.
+Read this page before you start with the real robot:
 
 | | Simulation (this book) | Real TurtleBot3 (lab) |
 |---|---|---|

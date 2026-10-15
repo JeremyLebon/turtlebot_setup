@@ -145,12 +145,10 @@ Turtlebot3 book, *Setup laptop (student)* (`git clone` of `turtlebot_vis` and
 
 ---
 
-### 4. Tools  `[ongewijzigd]`
+### 4. Tools  `[gewijzigd]`
 
 <sub>turtlebot-in-simulation/tools.md</sub>
 
-
-###
 
 ### Gazebo
 
@@ -166,7 +164,7 @@ RViz (ROS Visualization) isn't a simulator but a 3D visualization tool within th
 
 ---
 
-### 5. Startup  `[ongewijzigd]`
+### 5. Startup  `[gewijzigd]`
 
 <sub>turtlebot-in-simulation/startup.md</sub>
 
@@ -182,6 +180,7 @@ docker exec -it gazebo_turtlebot_cont bash
 ```
 
 Select the `burger` turtlebot3 as loaded model in Gazebo with the following command
+(in this container it is already the default, but on other systems you need it)
 
 ```sh
 export TURTLEBOT3_MODEL=burger
@@ -198,11 +197,11 @@ The  `ros2 launch` command lets you start several ros2 nodes with one command.&#
 <pre class="language-sh"><code class="lang-sh"><strong>ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py
 </strong></code></pre>
 
-Normally, the world below should be loaded. Try the find the turtlebot3 with the mouse and scrolling.
+Normally, the world below should be loaded. Try to find the turtlebot3 with the mouse and scrolling.
 
 <div><figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2FAqtGNSo6CAyvDoyLjVAR%2Fimage.png?alt=media&amp;token=9e38f2e4-8593-4c06-8139-dd1ecaa342b1" alt=""><figcaption></figcaption></figure> <figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2FZ45E9208uQDSv4e1ceNe%2Fimage.png?alt=media&amp;token=2833a4bb-a0e9-4f06-97a7-0efef922290c" alt=""><figcaption></figcaption></figure></div>
 
-By clicking `CRTL+C` in the terminal gazebo and ros2 launch can be stopped.
+With `CTRL+C` in the terminal, Gazebo and the ros2 launch are stopped.
 
 ## Load the turtlebot in the house world
 
@@ -213,7 +212,7 @@ Try the following command to drop the turtle in the house environment.
 
 <figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2FITbPVgiVyF6yDsQRFA21%2Fimage.png?alt=media&amp;token=986a0d24-241a-42b1-b2c8-73de09b6c412" alt=""><figcaption></figcaption></figure>
 
-By clicking `CRTL+C` in the terminal gazebo and ros2 launch can be stopped.
+With `CTRL+C` in the terminal, Gazebo and the ros2 launch are stopped.
 
 ---
 
@@ -1135,13 +1134,14 @@ rqt
 
 Select the topic with Plugins > Topics > Topic monitor.
 
-Select the graph with Plugins > Visualisation> Plot
+Select the graph with Plugins > Visualization > Plot. Type the field you want to
+plot, for example `/odom/pose/pose/position/x`, and click **+** (do the same for `y`).
 
 <figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2FFDOM01gw9GcX0mVKRweZ%2Fimage.png?alt=media&amp;token=8ac28a21-6e1d-4b3a-870a-9acca6687e53" alt=""><figcaption></figcaption></figure>
 
 </details>
 
-Close rqt with CRTL + C in the terminal
+Close rqt with `CTRL+C` in the terminal.
 
 ---
 
@@ -1176,7 +1176,7 @@ In the current configuration, the map frame doesn't exist, which is why the Glob
 
 ### Change fixed frame
 
-Select as fixed frame as the odom frame
+Select `odom` as Fixed Frame.
 
 <div><figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2FKXOe51sV1ksvoZJN7nLr%2Fimage.png?alt=media&amp;token=87ae629c-6ccb-4e36-ba60-0f7b67f5cabf" alt=""><figcaption></figcaption></figure> <figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2FO0rwUJ8wsFlfi24sITSz%2Fimage.png?alt=media&amp;token=e8ec05dc-f554-478c-add2-97a2c2a45ee6" alt=""><figcaption></figcaption></figure></div>
 
@@ -1242,7 +1242,11 @@ The tf2 ros2 library calculates all the frames and joints at very high rate.
 
 ### Echo the /tf topic
 
-Use the following command to see a list op the ros2 topics. Use a new terminal if needed.
+Use the following command to see a list of the ros2 topics. Use a new terminal if needed.
+
+```
+ros2 topic list
+```
 
 Output
 
@@ -1283,9 +1287,9 @@ ros2 topic hz /tf
 
 <figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2Fx0MpAOaM8tbpBmtP8bqC%2Fimage.png?alt=media&amp;token=48a2b37c-4a71-4935-816a-2129fdfe68d3" alt=""><figcaption></figcaption></figure>
 
-### Look at the /joint\_state topic
+### Look at the /joint\_states topic
 
-If you echo the `/joint_states` And you let the robot turn. You should see the joint state position and velocity change.&#x20;
+Echo the `/joint_states` topic and let the robot turn. You should see the joint state position and velocity change.&#x20;
 
 <div><figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2FIf9Qd2kLikFoRpBieMgl%2Fimage.png?alt=media&amp;token=1c73090f-2dd6-49bf-af5b-439e6599b5cc" alt=""><figcaption></figcaption></figure> <figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2Fc7iuLHaMdenJRVFX2ogG%2Fimage.png?alt=media&amp;token=d87f8603-ba1e-4e0e-8fdd-d0c49bc318f2" alt=""><figcaption></figcaption></figure></div>
 
@@ -1342,7 +1346,7 @@ Click Add and select the tab *By topic,* and select the topic */odom.*
 
 <figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2F9LMmGp6LFrOXsNilUrMK%2Fimage.png?alt=media&amp;token=039c800b-c760-47af-b926-2650cd3df440" alt=""><figcaption></figcaption></figure>
 
-Collapse the item Odometry on the left. And change the parameter to keep to 500. This means the last 500 locations will be visualised in Rviz2. Then try driving around.
+Collapse the item Odometry on the left. And change the parameter to keep to 500. This means the last 500 locations will be visualised in RViz2.
 
 <figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2FZkYe8O1NTIsSyi5CcPxG%2Fimage.png?alt=media&amp;token=31694e11-6e09-4af2-bc71-fcccdb0ebc53" alt=""><figcaption></figcaption></figure>
 
@@ -1352,7 +1356,7 @@ Collapse the item Odometry on the left. And change the parameter to keep to 500.
 
 ## IMU
 
-The Turtlebot3 has a build in imu sensor. This can't be directly shown in RViz2.&#x20;
+The Turtlebot3 has a built-in IMU sensor. This can't be directly shown in RViz2.&#x20;
 
 With `ros2 topic echo`, the real-time value can be shown. Open a new terminal if needed. You can see the linear z acceleration is roughly the known 9.81 m/s².&#x20;
 
@@ -1375,7 +1379,7 @@ Theory: [Odometry](turtlebot-in-simulation/theory/odometry.md) (quaternion to ya
 
 ## Connect to the container via VScode
 
-Make sure the `turtlebot3_gazebo` node and t`eleop_twist_keyboard` is running.
+Make sure Gazebo (`turtlebot3_world.launch.py`) and `teleop_twist_keyboard` are running.
 
 Open VScode and use the Remote Explorer in VScode.
 
@@ -1397,7 +1401,15 @@ Select the ros2-jazzy-gazebo-turtlebot. Click on the arrow to connect.
 
 <figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2F5IyrVViWo3rFjiKEcBAO%2Fimage.png?alt=media&amp;token=2d99fee1-609f-4cb6-afb1-8a3b14c35ae7" alt=""><figcaption></figcaption></figure>
 
-You should now be inside the Docker container. You may be asked to select a directory in the Docker container.
+You should now be inside the Docker container. When asked to open a folder,
+choose `/home/dockeruser/dev_ws`.
+
+{% hint style="warning" %}
+Store your scripts in `/home/dockeruser/dev_ws`: that folder is the `dev_ws`
+folder of the cloned `ros2-jazzy-gazebo-turtlebot` repository on WSL, so your
+files survive when the container is recreated. Files elsewhere in the
+container can be lost.
+{% endhint %}
 
 ## Make your first ROS 2 node
 
@@ -1405,7 +1417,7 @@ You should now be inside the Docker container. You may be asked to select a dire
 
 The objective is to read out the location of the turtlebot with our own written Python script.
 
-Make a new directory, `turtlebot` and make a `turtlebot_subscribe.py` script.
+Make a new directory `turtlebot` in `/home/dockeruser/dev_ws` and make a `turtlebot_subscribe.py` script in it.
 
 <figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2F9VzjsmJr7wkCoOzcnJVM%2Fimage.png?alt=media&amp;token=5159afc2-8983-4a66-8615-616ca03a4ea0" alt=""><figcaption></figcaption></figure>
 
@@ -1494,6 +1506,11 @@ The objective is to control the turtlebot with our own written Python script. To
 
 Make a `turtlebot_publish.py` script.
 
+{% hint style="info" %}
+Stop `teleop_twist_keyboard` first (`CTRL+C`): two nodes publishing on
+`/cmd_vel` at the same time fight for the robot.
+{% endhint %}
+
 Paste the code below in the `turtlebot_publish.py`
 
 Analyse the Python code. And try to understand what is happening.
@@ -1523,7 +1540,7 @@ class CmdVelStampedPublisher(Node):
         self.linear_speed = 0.0   # m/s forward
         self.angular_speed = 0.2  # rad/s rotation
         
-        self.get_logger().info("Publishing TwistStamped messages on /cmd_vel_stamped")
+        self.get_logger().info("Publishing TwistStamped messages on /cmd_vel")
 
     def publish_velocity(self):
         msg = TwistStamped()
@@ -1851,9 +1868,8 @@ if __name__ == '__main__':
 <sub>simulation-vs-real-robot.md</sub>
 
 
-**New page** (suggested at the end of this book, before going to the real
-TurtleBot3). What you learned here works on the real robot, but a few things
-differ:
+What you learned here works on the real TurtleBot3, but a few things differ.
+Read this page before you start with the real robot:
 
 | | Simulation (this book) | Real TurtleBot3 (lab) |
 |---|---|---|

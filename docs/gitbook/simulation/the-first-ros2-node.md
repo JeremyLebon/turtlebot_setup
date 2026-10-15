@@ -6,7 +6,7 @@ Theory: [Odometry](turtlebot-in-simulation/theory/odometry.md) (quaternion to ya
 
 ## Connect to the container via VScode
 
-Make sure the `turtlebot3_gazebo` node and t`eleop_twist_keyboard` is running.
+Make sure Gazebo (`turtlebot3_world.launch.py`) and `teleop_twist_keyboard` are running.
 
 Open VScode and use the Remote Explorer in VScode.
 
@@ -28,7 +28,15 @@ Select the ros2-jazzy-gazebo-turtlebot. Click on the arrow to connect.
 
 <figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2F5IyrVViWo3rFjiKEcBAO%2Fimage.png?alt=media&amp;token=2d99fee1-609f-4cb6-afb1-8a3b14c35ae7" alt=""><figcaption></figcaption></figure>
 
-You should now be inside the Docker container. You may be asked to select a directory in the Docker container.
+You should now be inside the Docker container. When asked to open a folder,
+choose `/home/dockeruser/dev_ws`.
+
+{% hint style="warning" %}
+Store your scripts in `/home/dockeruser/dev_ws`: that folder is the `dev_ws`
+folder of the cloned `ros2-jazzy-gazebo-turtlebot` repository on WSL, so your
+files survive when the container is recreated. Files elsewhere in the
+container can be lost.
+{% endhint %}
 
 ## Make your first ROS 2 node
 
@@ -36,7 +44,7 @@ You should now be inside the Docker container. You may be asked to select a dire
 
 The objective is to read out the location of the turtlebot with our own written Python script.
 
-Make a new directory, `turtlebot` and make a `turtlebot_subscribe.py` script.
+Make a new directory `turtlebot` in `/home/dockeruser/dev_ws` and make a `turtlebot_subscribe.py` script in it.
 
 <figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2F9VzjsmJr7wkCoOzcnJVM%2Fimage.png?alt=media&amp;token=5159afc2-8983-4a66-8615-616ca03a4ea0" alt=""><figcaption></figcaption></figure>
 
@@ -125,6 +133,11 @@ The objective is to control the turtlebot with our own written Python script. To
 
 Make a `turtlebot_publish.py` script.
 
+{% hint style="info" %}
+Stop `teleop_twist_keyboard` first (`CTRL+C`): two nodes publishing on
+`/cmd_vel` at the same time fight for the robot.
+{% endhint %}
+
 Paste the code below in the `turtlebot_publish.py`
 
 Analyse the Python code. And try to understand what is happening.
@@ -154,7 +167,7 @@ class CmdVelStampedPublisher(Node):
         self.linear_speed = 0.0   # m/s forward
         self.angular_speed = 0.2  # rad/s rotation
         
-        self.get_logger().info("Publishing TwistStamped messages on /cmd_vel_stamped")
+        self.get_logger().info("Publishing TwistStamped messages on /cmd_vel")
 
     def publish_velocity(self):
         msg = TwistStamped()

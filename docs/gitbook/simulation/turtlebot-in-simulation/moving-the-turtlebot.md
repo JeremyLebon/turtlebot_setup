@@ -85,10 +85,11 @@ rqt
 
 Select the topic with Plugins > Topics > Topic monitor.
 
-Select the graph with Plugins > Visualisation> Plot
+Select the graph with Plugins > Visualization > Plot. Type the field you want to
+plot, for example `/odom/pose/pose/position/x`, and click **+** (do the same for `y`).
 
 <figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2FFDOM01gw9GcX0mVKRweZ%2Fimage.png?alt=media&amp;token=8ac28a21-6e1d-4b3a-870a-9acca6687e53" alt=""><figcaption></figcaption></figure>
 
 </details>
 
-Close rqt with CRTL + C in the terminal
+Close rqt with `CTRL+C` in the terminal.

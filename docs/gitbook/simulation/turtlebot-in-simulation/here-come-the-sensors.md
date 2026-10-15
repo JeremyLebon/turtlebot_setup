@@ -44,7 +44,7 @@ Click Add and select the tab *By topic,* and select the topic */odom.*
 
 <figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2F9LMmGp6LFrOXsNilUrMK%2Fimage.png?alt=media&amp;token=039c800b-c760-47af-b926-2650cd3df440" alt=""><figcaption></figcaption></figure>
 
-Collapse the item Odometry on the left. And change the parameter to keep to 500. This means the last 500 locations will be visualised in Rviz2. Then try driving around.
+Collapse the item Odometry on the left. And change the parameter to keep to 500. This means the last 500 locations will be visualised in RViz2.
 
 <figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2FZkYe8O1NTIsSyi5CcPxG%2Fimage.png?alt=media&amp;token=31694e11-6e09-4af2-bc71-fcccdb0ebc53" alt=""><figcaption></figcaption></figure>
 
@@ -54,7 +54,7 @@ Collapse the item Odometry on the left. And change the parameter to keep to 500.
 
 ## IMU
 
-The Turtlebot3 has a build in imu sensor. This can't be directly shown in RViz2.&#x20;
+The Turtlebot3 has a built-in IMU sensor. This can't be directly shown in RViz2.&#x20;
 
 With `ros2 topic echo`, the real-time value can be shown. Open a new terminal if needed. You can see the linear z acceleration is roughly the known 9.81 m/s².&#x20;
 
