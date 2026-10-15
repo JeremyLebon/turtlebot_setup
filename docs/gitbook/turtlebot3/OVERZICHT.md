@@ -27,7 +27,7 @@ Volgorde zoals in GitBook. Klik een pagina aan, of lees alles achter elkaar in [
 | 21 | &nbsp;&nbsp;&nbsp;&nbsp;[Drive 10cm with a button](ros2-nodes/drive-10cm-with-a-button.md) | 🟠 gewijzigd |
 | 22 | [Homework](homework/README.md) | 🟢 nieuw |
 | 23 | &nbsp;&nbsp;&nbsp;&nbsp;[Startup at home](homework/startup-at-home.md) | 🟢 nieuw |
-| 24 | &nbsp;&nbsp;&nbsp;&nbsp;[Task 1 - Scan sectors](homework/task-1-scan-sectors.md) | 🟢 nieuw |
+| 24 | &nbsp;&nbsp;&nbsp;&nbsp;[Task 1 - Obstacle alarm](homework/task-1-obstacle-alarm.md) | 🟢 nieuw |
 | 25 | &nbsp;&nbsp;&nbsp;&nbsp;[Task 2 - Battery warning](homework/task-2-battery-warning.md) | 🟢 nieuw |
 | 26 | &nbsp;&nbsp;&nbsp;&nbsp;[Task 3 - Drive exactly 1 m with odometry](homework/task-3-drive-1-m-with-odometry.md) | 🟢 nieuw |
 | 27 | &nbsp;&nbsp;&nbsp;&nbsp;[Task 4 - Theory](homework/task-4-theory.md) | 🟢 nieuw |

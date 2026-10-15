@@ -32,6 +32,7 @@ docs/gitbook/
   simulation/            idem voor het simulatieboek
   _original/             de pagina's zoals ze op 2026-10-11 in GitBook stonden
   _tools/build_books.py  maakt SUMMARY/OVERZICHT/BOOK opnieuw
+  _solutions/            oplossingen van het huiswerk (voor de docent, niet in GitBook)
 ```
 
 ## Werkwijze

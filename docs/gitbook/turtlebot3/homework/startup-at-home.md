@@ -26,7 +26,7 @@ The same steps as in the simulation book
 4. **Only for task 2:** start the fake sensors, see
    [Simulation of sensors](task-2-battery-warning.md#simulation-of-sensors) in task 2.
 
-5. Drive the robot (for task 1) in another terminal:
+5. Drive the robot (for task 1 and 3) in another terminal:
 
    ```sh
    ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -p stamped:=true -p frame_id:="base_link"

@@ -15,7 +15,7 @@ from the simulation book (Gazebo + ROS 2 Jazzy).
 ## Overview
 
 1. [Startup at home](startup-at-home.md) - start the simulation and VS Code
-2. [Task 1 - Scan sectors](task-1-scan-sectors.md) - closest distance front, left, behind, right
+2. [Task 1 - Obstacle alarm](task-1-obstacle-alarm.md) - warning when something is close in front (extension: four sectors)
 3. [Task 2 - Battery warning](task-2-battery-warning.md) - with fake sensors (`/sim/battery_state`)
 4. [Task 3 - Drive exactly 1 m with odometry](task-3-drive-1-m-with-odometry.md) - `/odom` instead of time
 5. [Task 4 - Theory](task-4-theory.md) - the Check yourself questions

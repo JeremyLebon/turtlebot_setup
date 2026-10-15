@@ -23,7 +23,7 @@
   * [Drive 10cm with a button](ros2-nodes/drive-10cm-with-a-button.md)
 * [Homework](homework/README.md)
   * [Startup at home](homework/startup-at-home.md)
-  * [Task 1 - Scan sectors](homework/task-1-scan-sectors.md)
+  * [Task 1 - Obstacle alarm](homework/task-1-obstacle-alarm.md)
   * [Task 2 - Battery warning](homework/task-2-battery-warning.md)
   * [Task 3 - Drive exactly 1 m with odometry](homework/task-3-drive-1-m-with-odometry.md)
   * [Task 4 - Theory](homework/task-4-theory.md)
