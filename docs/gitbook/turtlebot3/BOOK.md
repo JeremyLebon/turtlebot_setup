@@ -1188,7 +1188,7 @@ The same steps as in the simulation book
    (`python3 <script>.py`).
 
 4. **Only for task 2:** start the fake sensors, see
-   [Simulation of sensors](#simulation-of-sensors) below.
+   [Simulation of sensors](#simulation-of-sensors) in task 2.
 
 5. Drive the robot (for task 1) in another terminal:
 
@@ -1216,34 +1216,9 @@ and on the real robot (about 220-230 points).
 
 ## Task 2 - Battery warning
 
-Start the [Simulation of sensors](#simulation-of-sensors) script below: it
-publishes random values on `/sim/battery_state`. Write a node that subscribes to
-`/sim/battery_state`, prints the voltage and the percentage, and prints a
-**warning** when the voltage is below **11.2 V** or the percentage below **50 %**.
+At home there is no robot battery: first start fake sensors, then write your node.
 
-On the real robot you only change the topic to `/battery_state`.
-
-## Task 3 - Drive exactly 1 m with odometry
-
-In *Drive 10cm with a button* the robot drives on **time**. Now use **`/odom`**:
-drive forward at 0.1 m/s until the robot has driven **1.0 m** from its start
-position, then stop (publish all speeds 0).
-
-* Subscribe to `/odom` and remember the start position.
-* Distance from the start: `math.hypot(x - x0, y - y0)`.
-* Publish `TwistStamped` on `/cmd_vel` (simulation).
-
-Extra: turn exactly **90°** to the left, using the yaw from the quaternion
-(see [IMU](theory/imu.md)).
-
-## Task 4 - Theory
-
-Answer the **Check yourself** questions of the theory pages:
-[Laser scan](theory/laser-scan.md), [Odometry](theory/odometry.md),
-[IMU](theory/imu.md), [TF](theory/tf.md), [cmd_vel](theory/cmd-vel.md) and
-[QoS](theory/qos.md).
-
-## Simulation of sensors
+### Simulation of sensors
 
 At home there is no robot battery. The script `simulation_sensors.py` publishes
 **random** values once per second, on topics that start with `/sim/`:
@@ -1255,7 +1230,7 @@ At home there is no robot battery. The script `simulation_sensors.py` publishes
 | `/sim/humidity` | `sensor_msgs/msg/RelativeHumidity` |
 | `/sim/gas_value` | `std_msgs/msg/Float32` |
 
-### Download
+#### Download
 
 {% file src=".gitbook/assets/simulation_sensors.py" %}
 simulation_sensors.py
@@ -1280,7 +1255,7 @@ Cloned the repository somewhere else than your home folder? Replace
 `~/ros2-jazzy-gazebo-turtlebot` by that folder.
 {% endhint %}
 
-### Run
+#### Run
 
 In a terminal **inside the container** (`docker exec -it gazebo_turtlebot_cont bash`):
 
@@ -1377,6 +1352,34 @@ if __name__ == "__main__":
 Keep the `/sim/` prefix. The real robot already publishes `/battery_state`: a
 second publisher on the same topic would mix fake and real values.
 {% endhint %}
+
+### Your node
+
+With `simulation_sensors.py` running, write a node that subscribes to
+`/sim/battery_state`, prints the voltage and the percentage, and prints a
+**warning** when the voltage is below **11.2 V** or the percentage below **50 %**.
+
+On the real robot you only change the topic to `/battery_state`.
+
+## Task 3 - Drive exactly 1 m with odometry
+
+In *Drive 10cm with a button* the robot drives on **time**. Now use **`/odom`**:
+drive forward at 0.1 m/s until the robot has driven **1.0 m** from its start
+position, then stop (publish all speeds 0).
+
+* Subscribe to `/odom` and remember the start position.
+* Distance from the start: `math.hypot(x - x0, y - y0)`.
+* Publish `TwistStamped` on `/cmd_vel` (simulation).
+
+Extra: turn exactly **90°** to the left, using the yaw from the quaternion
+(see [IMU](theory/imu.md)).
+
+## Task 4 - Theory
+
+Answer the **Check yourself** questions of the theory pages:
+[Laser scan](theory/laser-scan.md), [Odometry](theory/odometry.md),
+[IMU](theory/imu.md), [TF](theory/tf.md), [cmd_vel](theory/cmd-vel.md) and
+[QoS](theory/qos.md).
 
 ## Hand in
 
