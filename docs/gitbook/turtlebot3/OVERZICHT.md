@@ -31,21 +31,23 @@ Volgorde zoals in GitBook. Klik een pagina aan, of lees alles achter elkaar in [
 | 25 | &nbsp;&nbsp;&nbsp;&nbsp;[Task 2 - Battery warning](homework/task-2-battery-warning.md) | 🟢 nieuw |
 | 26 | &nbsp;&nbsp;&nbsp;&nbsp;[Task 3 - Turn exactly 90°](homework/task-3-turn-90-degrees.md) | 🟢 nieuw |
 | 27 | &nbsp;&nbsp;&nbsp;&nbsp;[Task 4 - Theory](homework/task-4-theory.md) | 🟢 nieuw |
-| 28 | [SLAM](slam.md) | 🟠 gewijzigd 🙈 verborgen |
-| 29 | [Autonomous driving](autonomous-driving.md) | 🟠 gewijzigd 🙈 verborgen |
-| 30 | [Autonomous driving with python library](autonomous-driving-with-python-library.md) | 🟠 gewijzigd 🙈 verborgen |
-| 31 | [Compare planners and controllers](compare-planners-and-controllers.md) | 🟢 nieuw 🙈 verborgen |
-| 32 | [Zones](zones.md) | 🟢 nieuw 🙈 verborgen |
-| 33 | [Measure while driving](measure-while-driving.md) | 🟠 gewijzigd 🙈 verborgen |
-| 34 | [Solution: Measure while driving](solution-measure-while-driving.md) | 🟠 gewijzigd 🙈 verborgen |
-| 35 | [Install python libraries in container](install-python-libraries-in-container.md) | 🟠 gewijzigd |
-| 36 | [Location files on wsl](location-files-on-wsl.md) | 🟠 gewijzigd |
-| 37 | [Theory: what the robot measures](theory/README.md) | 🟢 nieuw |
-| 38 | &nbsp;&nbsp;&nbsp;&nbsp;[Laser scan (/scan)](theory/laser-scan.md) | 🟢 nieuw |
-| 39 | &nbsp;&nbsp;&nbsp;&nbsp;[Odometry (/odom) and encoders](theory/odometry.md) | 🟢 nieuw |
-| 40 | &nbsp;&nbsp;&nbsp;&nbsp;[IMU (/imu)](theory/imu.md) | 🟢 nieuw |
-| 41 | &nbsp;&nbsp;&nbsp;&nbsp;[TF - coordinate frames](theory/tf.md) | 🟢 nieuw |
-| 42 | &nbsp;&nbsp;&nbsp;&nbsp;[Driving the robot (/cmd_vel)](theory/cmd-vel.md) | 🟢 nieuw |
-| 43 | &nbsp;&nbsp;&nbsp;&nbsp;[QoS - Quality of Service](theory/qos.md) | 🟢 nieuw |
+| 28 | [Session 3 - SLAM and navigation](session-3-slam-and-navigation/README.md) | 🟢 nieuw 🙈 verborgen |
+| 29 | &nbsp;&nbsp;&nbsp;&nbsp;[SLAM](session-3-slam-and-navigation/slam.md) | 🟠 gewijzigd 🙈 verborgen |
+| 30 | &nbsp;&nbsp;&nbsp;&nbsp;[Autonomous driving](session-3-slam-and-navigation/autonomous-driving.md) | 🟠 gewijzigd 🙈 verborgen |
+| 31 | &nbsp;&nbsp;&nbsp;&nbsp;[Autonomous driving with python library](session-3-slam-and-navigation/autonomous-driving-with-python-library.md) | 🟠 gewijzigd 🙈 verborgen |
+| 32 | &nbsp;&nbsp;&nbsp;&nbsp;[Compare planners and controllers](session-3-slam-and-navigation/compare-planners-and-controllers.md) | 🟢 nieuw 🙈 verborgen |
+| 33 | &nbsp;&nbsp;&nbsp;&nbsp;[Zones](session-3-slam-and-navigation/zones.md) | 🟢 nieuw 🙈 verborgen |
+| 34 | [Session 4 - Project](session-4-project/README.md) | 🟢 nieuw 🙈 verborgen |
+| 35 | &nbsp;&nbsp;&nbsp;&nbsp;[Measure while driving](session-4-project/measure-while-driving.md) | 🟠 gewijzigd 🙈 verborgen |
+| 36 | &nbsp;&nbsp;&nbsp;&nbsp;[Install python libraries in container](session-4-project/install-python-libraries-in-container.md) | 🟠 gewijzigd 🙈 verborgen |
+| 37 | &nbsp;&nbsp;&nbsp;&nbsp;[Solution: Measure while driving](session-4-project/solution-measure-while-driving.md) | 🟠 gewijzigd 🙈 verborgen |
+| 38 | [Location files on wsl](location-files-on-wsl.md) | 🟠 gewijzigd |
+| 39 | [Theory: what the robot measures](theory/README.md) | 🟢 nieuw |
+| 40 | &nbsp;&nbsp;&nbsp;&nbsp;[Laser scan (/scan)](theory/laser-scan.md) | 🟢 nieuw |
+| 41 | &nbsp;&nbsp;&nbsp;&nbsp;[Odometry (/odom) and encoders](theory/odometry.md) | 🟢 nieuw |
+| 42 | &nbsp;&nbsp;&nbsp;&nbsp;[IMU (/imu)](theory/imu.md) | 🟢 nieuw |
+| 43 | &nbsp;&nbsp;&nbsp;&nbsp;[TF - coordinate frames](theory/tf.md) | 🟢 nieuw |
+| 44 | &nbsp;&nbsp;&nbsp;&nbsp;[Driving the robot (/cmd_vel)](theory/cmd-vel.md) | 🟢 nieuw |
+| 45 | &nbsp;&nbsp;&nbsp;&nbsp;[QoS - Quality of Service](theory/qos.md) | 🟢 nieuw |
 
-Samen: 16 nieuw, 26 gewijzigd, 1 ongewijzigd.
+Samen: 18 nieuw, 26 gewijzigd, 1 ongewijzigd.

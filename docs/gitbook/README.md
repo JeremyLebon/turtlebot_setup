@@ -21,6 +21,18 @@ commits ("GitBook: ..."): doe eerst `git pull` voor je hier iets aanpast.
 GitBook bewaart een pagina met subpagina's als `<map>/README.md` (bv.
 `theory/README.md` i.p.v. `theory.md`); `build_books.py` volgt die conventie.
 
+## Sessies in het Turtlebot3-boek
+
+* nu: Installation t.e.m. ROS2 nodes + Homework
+* `session-3-slam-and-navigation/` (verborgen): SLAM, Nav2, planners, zones
+* `session-4-project/` (verborgen): project met SLAM + Nav2 Simple Commander + rapport
+  (Measure while driving, Install python libraries)
+* naslag: Location files on WSL, Theory
+
+Een sessie zichtbaar maken: `hidden: true` weghalen in de README.md van die map
+**en** in de pagina's eronder (of in GitBook zelf). `build_books.py` kent de
+verplaatsing via `MOVED`.
+
 ## Structuur
 
 ```

@@ -1,3 +1,7 @@
+---
+hidden: true
+---
+
 # Install python libraries in container
 
 Needed to install libraries (Matplotlib, reportlab, ...).

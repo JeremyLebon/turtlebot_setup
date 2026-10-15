@@ -1521,9 +1521,29 @@ Answer the **Check yourself** questions of the theory pages:
 
 ---
 
-## 28. SLAM  `[gewijzigd]`
+## 28. Session 3 - SLAM and navigation  `[nieuw]`
 
-<sub>slam.md</sub>
+<sub>session-3-slam-and-navigation/README.md</sub>
+
+
+In this session the robot learns its environment and drives on its own:
+
+1. [SLAM](slam.md) - make a map of the room with Cartographer and save it
+2. [Autonomous driving](autonomous-driving.md) - navigate on the map with Nav2
+3. [Autonomous driving with python library](autonomous-driving-with-python-library.md) - send goals from Python (Nav2 Simple Commander)
+4. [Compare planners and controllers](compare-planners-and-controllers.md) - how does the robot choose its path?
+5. [Zones](zones.md) - keep-out zones and speed zones on the map
+
+{% hint style="info" %}
+Before you start: the bringup runs on the robot and your laptop is connected,
+see [Turtlebot3 - startup](../turtlebot3-startup/). Theory: [TF - map and odom](../theory/tf.md).
+{% endhint %}
+
+---
+
+### 29. SLAM  `[gewijzigd]`
+
+<sub>session-3-slam-and-navigation/slam.md</sub>
 
 
 Make a map of the classroom.
@@ -1532,7 +1552,7 @@ There are two ways. Do **way 1 first** - that's where you learn what happens.
 
 ## Way 1 - yourself, with ROS 2 commands
 
-Make sure the bringup runs on the robot and the `turtlebot-vis` container on your laptop is started (see [Turtlebot3 - startup](turtlebot3-startup/)).
+Make sure the bringup runs on the robot and the `turtlebot-vis` container on your laptop is started (see [Turtlebot3 - startup](../turtlebot3-startup/)).
 
 In the **robot** container (web terminal or SSH):
 
@@ -1576,9 +1596,9 @@ Show the map to the lecturer.
 
 ---
 
-## 29. Autonomous driving  `[gewijzigd]`
+### 30. Autonomous driving  `[gewijzigd]`
 
-<sub>autonomous-driving.md</sub>
+<sub>session-3-slam-and-navigation/autonomous-driving.md</sub>
 
 
 {% hint style="danger" %}
@@ -1642,9 +1662,9 @@ you are in control; release and Nav2 continues.
 
 ---
 
-## 30. Autonomous driving with python library  `[gewijzigd]`
+### 31. Autonomous driving with python library  `[gewijzigd]`
 
-<sub>autonomous-driving-with-python-library.md</sub>
+<sub>session-3-slam-and-navigation/autonomous-driving-with-python-library.md</sub>
 
 
 Make a nav2\_simple.py script via VScode > WSL > docker container (Remote Explorer)
@@ -1771,9 +1791,9 @@ Nav2 on the status page must be stopped for this (only one Nav2 at a time).
 
 ---
 
-## 31. Compare planners and controllers  `[nieuw]`
+### 32. Compare planners and controllers  `[nieuw]`
 
-<sub>compare-planners-and-controllers.md</sub>
+<sub>session-3-slam-and-navigation/compare-planners-and-controllers.md</sub>
 
 
 **New exercise.** Nav2 has two "brains":
@@ -1822,9 +1842,9 @@ at the goal.
 
 ---
 
-## 32. Zones  `[nieuw]`
+### 33. Zones  `[nieuw]`
 
-<sub>zones.md</sub>
+<sub>session-3-slam-and-navigation/zones.md</sub>
 
 
 **New exercise.** Not everything the robot should avoid is visible for the lidar:
@@ -1865,9 +1885,28 @@ Show your zones and the result to the lecturer.
 
 ---
 
-## 33. Measure while driving  `[gewijzigd]`
+## 34. Session 4 - Project  `[nieuw]`
 
-<sub>measure-while-driving.md</sub>
+<sub>session-4-project/README.md</sub>
+
+
+In this session you make your **own project** with the real robot: the robot
+navigates on a map with **SLAM** and the **Nav2 Simple Commander**, measures
+something on the way, and you generate a **report** of the results.
+
+1. [Measure while driving](measure-while-driving.md) - example: measure the battery at every waypoint
+2. [Install python libraries in container](install-python-libraries-in-container.md) - matplotlib, reportlab, ... for your report
+
+{% hint style="info" %}
+You need the map and the navigation of
+[Session 3 - SLAM and navigation](../session-3-slam-and-navigation/).
+{% endhint %}
+
+---
+
+### 35. Measure while driving  `[gewijzigd]`
+
+<sub>session-4-project/measure-while-driving.md</sub>
 
 
 Make a nav2\_simple\_battery.py script via VScode > WSL > docker container (Remote Explorer)
@@ -1980,9 +2019,57 @@ if __name__ == "__main__":
 
 ---
 
-## 34. Solution: Measure while driving  `[gewijzigd]`
+### 36. Install python libraries in container  `[gewijzigd]`
 
-<sub>solution-measure-while-driving.md</sub>
+<sub>session-4-project/install-python-libraries-in-container.md</sub>
+
+
+Needed to install libraries (Matplotlib, reportlab, ...).
+
+Go inside the `turtlebot-vis` container (ROS 2 Humble, Ubuntu 22.04, Python 3.10):
+
+```sh
+docker exec -it turtlebot-vis bash
+apt update
+apt install -y python3-venv
+```
+
+Make a virtual environment **in your workspace** (so it survives a restart of
+the container) **with** the system packages (otherwise `rclpy` and the ROS
+message types are not found):
+
+```sh
+python3 -m venv --system-site-packages /root/ros2_ws/.venv
+```
+
+Activate the venv:
+
+```sh
+source /root/ros2_ws/.venv/bin/activate
+```
+
+Install the specific libraries with:
+
+```sh
+python -m pip install matplotlib reportlab PyYAML pandas seaborn
+```
+
+{% hint style="info" %}
+`apt install` is lost when the container is recreated (e.g. after
+`docker compose pull`); the venv in `/root/ros2_ws` stays. After a recreate,
+only `apt install -y python3-venv` is needed again before using pip.
+{% endhint %}
+
+{% hint style="warning" %}
+The robot wifi may have no internet: install libraries at home or when the
+access point has internet.
+{% endhint %}
+
+---
+
+### 37. Solution: Measure while driving  `[gewijzigd]`
+
+<sub>session-4-project/solution-measure-while-driving.md</sub>
 
 
 Make a nav2\_simple\_battery.py script via VScode > WSL > docker container (Remote Explorer)
@@ -2099,55 +2186,7 @@ def main():
 
 ---
 
-## 35. Install python libraries in container  `[gewijzigd]`
-
-<sub>install-python-libraries-in-container.md</sub>
-
-
-Needed to install libraries (Matplotlib, reportlab, ...).
-
-Go inside the `turtlebot-vis` container (ROS 2 Humble, Ubuntu 22.04, Python 3.10):
-
-```sh
-docker exec -it turtlebot-vis bash
-apt update
-apt install -y python3-venv
-```
-
-Make a virtual environment **in your workspace** (so it survives a restart of
-the container) **with** the system packages (otherwise `rclpy` and the ROS
-message types are not found):
-
-```sh
-python3 -m venv --system-site-packages /root/ros2_ws/.venv
-```
-
-Activate the venv:
-
-```sh
-source /root/ros2_ws/.venv/bin/activate
-```
-
-Install the specific libraries with:
-
-```sh
-python -m pip install matplotlib reportlab PyYAML pandas seaborn
-```
-
-{% hint style="info" %}
-`apt install` is lost when the container is recreated (e.g. after
-`docker compose pull`); the venv in `/root/ros2_ws` stays. After a recreate,
-only `apt install -y python3-venv` is needed again before using pip.
-{% endhint %}
-
-{% hint style="warning" %}
-The robot wifi may have no internet: install libraries at home or when the
-access point has internet.
-{% endhint %}
-
----
-
-## 36. Location files on wsl  `[gewijzigd]`
+## 38. Location files on wsl  `[gewijzigd]`
 
 <sub>location-files-on-wsl.md</sub>
 
@@ -2177,7 +2216,7 @@ updates - but it is shared by everyone who uses that robot.
 
 ---
 
-## 37. Theory: what the robot measures  `[nieuw]`
+## 39. Theory: what the robot measures  `[nieuw]`
 
 <sub>theory/README.md</sub>
 
@@ -2246,7 +2285,7 @@ Try it: `ros2 topic list` and `ros2 topic info /odom` (in the `turtlebot-vis` co
 
 ---
 
-### 38. Laser scan (/scan)  `[nieuw]`
+### 40. Laser scan (/scan)  `[nieuw]`
 
 <sub>theory/laser-scan.md</sub>
 
@@ -2368,7 +2407,7 @@ Next: [Read in the scan topic](../ros2-nodes/read-in-the-scan-topic/).
 
 ---
 
-### 39. Odometry (/odom) and encoders  `[nieuw]`
+### 41. Odometry (/odom) and encoders  `[nieuw]`
 
 <sub>theory/odometry.md</sub>
 
@@ -2499,7 +2538,7 @@ Next: [Read the encoder value](../ros2-nodes/read-the-encoder-value.md).
 
 ---
 
-### 40. IMU (/imu)  `[nieuw]`
+### 42. IMU (/imu)  `[nieuw]`
 
 <sub>theory/imu.md</sub>
 
@@ -2610,7 +2649,7 @@ ros2 topic echo /imu --field linear_acceleration
 
 ---
 
-### 41. TF - coordinate frames  `[nieuw]`
+### 43. TF - coordinate frames  `[nieuw]`
 
 <sub>theory/tf.md</sub>
 
@@ -2736,7 +2775,7 @@ Next: [Visualise the robot](../visualise-the-robot.md).
 
 ---
 
-### 42. Driving the robot (/cmd_vel)  `[nieuw]`
+### 44. Driving the robot (/cmd_vel)  `[nieuw]`
 
 <sub>theory/cmd-vel.md</sub>
 
@@ -2837,7 +2876,7 @@ Next: [Drive 10cm with a button](../ros2-nodes/drive-10cm-with-a-button.md).
 
 ---
 
-### 43. QoS - Quality of Service  `[nieuw]`
+### 45. QoS - Quality of Service  `[nieuw]`
 
 <sub>theory/qos.md</sub>
 

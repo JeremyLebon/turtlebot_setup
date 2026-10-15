@@ -24,6 +24,8 @@ BOOKS = {
                     ("homework/task-1-obstacle-alarm.md", "homework/task-2-battery-warning.md", "Task 2 - Battery warning"),
                     ("homework/task-2-battery-warning.md", "homework/task-3-turn-90-degrees.md", "Task 3 - Turn exactly 90°"),
                     ("homework/task-3-turn-90-degrees.md", "homework/task-4-theory.md", "Task 4 - Theory"),
+                    ("homework/task-4-theory.md", "session-3-slam-and-navigation.md", "Session 3 - SLAM and navigation"),
+                    ("session-3-slam-and-navigation.md", "session-4-project.md", "Session 4 - Project"),
                     ("theory.md", "theory/laser-scan.md", "Laser scan (/scan)"),
                     ("theory/laser-scan.md", "theory/odometry.md", "Odometry (/odom) and encoders"),
                     ("theory/odometry.md", "theory/imu.md", "IMU (/imu)"),
@@ -48,15 +50,27 @@ ORDER = {
         "installation.md", "turtlebot3-in-the-real-world.md", "turtlebot3-startup.md",
         "visualise-the-robot.md", "controlling-the-robot.md", "see-turtlebot3-topics.md",
         "play-a-sound.md", "ros2-nodes.md", "homework.md",
-        # SLAM / navigation (hidden for now: 'hidden: true' front matter)
-        "slam.md", "autonomous-driving.md", "autonomous-driving-with-python-library.md",
-        "compare-planners-and-controllers.md", "zones.md",
-        "measure-while-driving.md", "solution-measure-while-driving.md",
+        # next sessions (hidden for now: 'hidden: true' front matter)
+        "session-3-slam-and-navigation.md", "session-4-project.md",
         # reference
-        "install-python-libraries-in-container.md", "location-files-on-wsl.md", "theory.md",
+        "location-files-on-wsl.md", "theory.md",
     ],
 }
 
+
+# Pages of the original book that moved to a folder (old path -> new path).
+MOVED = {
+    "turtlebot3": {
+        "slam.md": "session-3-slam-and-navigation/slam.md",
+        "autonomous-driving.md": "session-3-slam-and-navigation/autonomous-driving.md",
+        "autonomous-driving-with-python-library.md": "session-3-slam-and-navigation/autonomous-driving-with-python-library.md",
+        "compare-planners-and-controllers.md": "session-3-slam-and-navigation/compare-planners-and-controllers.md",
+        "zones.md": "session-3-slam-and-navigation/zones.md",
+        "measure-while-driving.md": "session-4-project/measure-while-driving.md",
+        "solution-measure-while-driving.md": "session-4-project/solution-measure-while-driving.md",
+        "install-python-libraries-in-container.md": "session-4-project/install-python-libraries-in-container.md",
+    },
+}
 
 # Pages of the original book that are dropped on purpose (content moved elsewhere).
 REMOVED = {
@@ -93,6 +107,9 @@ for book, (title, dl, base, new_pages) in BOOKS.items():
         pages.insert(i + 1, (path, t))
 
     pages = [(p, t) for p, t in pages if p not in REMOVED.get(book, [])]
+    moved = MOVED.get(book, {})
+    orig_of = {new: old for old, new in moved.items()}
+    pages = [(moved.get(p, p), t) for p, t in pages]
 
     if book in ORDER:
         order = [top(p) for p in ORDER[book]]
@@ -104,7 +121,7 @@ for book, (title, dl, base, new_pages) in BOOKS.items():
     status = {}
     for path, t in pages:
         dst = os.path.join(GB, book, fpath(book, path))
-        src = os.path.join(DL, dl, path.replace("/", "__"))
+        src = os.path.join(DL, dl, orig_of.get(path, path).replace("/", "__"))
         orig = None
         if os.path.exists(src):
             orig = re.sub(r"^> For the complete documentation index.*\n\n?", "", open(src).read(), flags=re.M)
