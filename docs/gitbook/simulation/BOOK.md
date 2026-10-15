@@ -1546,7 +1546,7 @@ Change the Python code so that the Turtlebot:&#x20;
 
 ---
 
-## 17. SLAM / Mapping  `[ongewijzigd]`
+## 17. SLAM / Mapping  `[gewijzigd]`
 
 <sub>slam-mapping.md</sub>
 
@@ -1557,7 +1557,7 @@ Change the Python code so that the Turtlebot:&#x20;
 
 ---
 
-### 18. Startup  `[ongewijzigd]`
+### 18. Startup  `[gewijzigd]`
 
 <sub>slam-mapping/startup.md</sub>
 
@@ -1595,7 +1595,7 @@ Make sure the `turtlebot3_gazebo` node and t`eleop_twist_keyboard` are running.
 
 ---
 
-### 19. Start mapping  `[ongewijzigd]`
+### 19. Start mapping  `[gewijzigd]`
 
 <sub>slam-mapping/start-mapping.md</sub>
 
@@ -1694,7 +1694,7 @@ calculated path will change when the obstacle is detected.
 
 ---
 
-### 22. Autonomous driving with python library  `[ongewijzigd]`
+### 22. Autonomous driving with python library  `[gewijzigd]`
 
 <sub>autonomous-navigation/autonomous-driving-with-python-library.md</sub>
 

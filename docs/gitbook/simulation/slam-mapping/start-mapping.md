@@ -1,3 +1,7 @@
+---
+hidden: true
+---
+
 # Start mapping
 
 Open a new terminal and connect to the docker container.

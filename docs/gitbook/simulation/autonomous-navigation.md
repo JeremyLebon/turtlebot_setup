@@ -1,3 +1,7 @@
+---
+hidden: true
+---
+
 # Autonomous Navigation
 
 {% hint style="danger" %}

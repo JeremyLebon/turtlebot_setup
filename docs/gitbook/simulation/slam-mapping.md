@@ -1,3 +1,7 @@
+---
+hidden: true
+---
+
 # SLAM / Mapping
 
 - [Startup](https://vives-4.gitbook.io/ros2-simulation-turtlebo-gazebo/slam-mapping/startup.md)

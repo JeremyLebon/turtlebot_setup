@@ -20,12 +20,12 @@ Volgorde zoals in GitBook. Klik een pagina aan, of lees alles achter elkaar in [
 | 14 | &nbsp;&nbsp;&nbsp;&nbsp;[Show me the robot](turtlebot-in-simulation/show-me-the-robot.md) | 🟠 gewijzigd |
 | 15 | &nbsp;&nbsp;&nbsp;&nbsp;[Here come the sensors](turtlebot-in-simulation/here-come-the-sensors.md) | 🟠 gewijzigd |
 | 16 | [The first ros2 node](the-first-ros2-node.md) | 🟠 gewijzigd |
-| 17 | [SLAM / Mapping](slam-mapping.md) | ⚪ ongewijzigd |
-| 18 | &nbsp;&nbsp;&nbsp;&nbsp;[Startup](slam-mapping/startup.md) | ⚪ ongewijzigd |
-| 19 | &nbsp;&nbsp;&nbsp;&nbsp;[Start mapping](slam-mapping/start-mapping.md) | ⚪ ongewijzigd |
-| 20 | &nbsp;&nbsp;&nbsp;&nbsp;[Save map](slam-mapping/save-map.md) | 🟠 gewijzigd |
-| 21 | [Autonomous Navigation](autonomous-navigation.md) | 🟠 gewijzigd |
-| 22 | &nbsp;&nbsp;&nbsp;&nbsp;[Autonomous driving with python library](autonomous-navigation/autonomous-driving-with-python-library.md) | ⚪ ongewijzigd |
+| 17 | [SLAM / Mapping](slam-mapping.md) | 🟠 gewijzigd 🙈 verborgen |
+| 18 | &nbsp;&nbsp;&nbsp;&nbsp;[Startup](slam-mapping/startup.md) | 🟠 gewijzigd 🙈 verborgen |
+| 19 | &nbsp;&nbsp;&nbsp;&nbsp;[Start mapping](slam-mapping/start-mapping.md) | 🟠 gewijzigd 🙈 verborgen |
+| 20 | &nbsp;&nbsp;&nbsp;&nbsp;[Save map](slam-mapping/save-map.md) | 🟠 gewijzigd 🙈 verborgen |
+| 21 | [Autonomous Navigation](autonomous-navigation.md) | 🟠 gewijzigd 🙈 verborgen |
+| 22 | &nbsp;&nbsp;&nbsp;&nbsp;[Autonomous driving with python library](autonomous-navigation/autonomous-driving-with-python-library.md) | 🟠 gewijzigd 🙈 verborgen |
 | 23 | [Simulation vs. real robot](simulation-vs-real-robot.md) | 🟢 nieuw |
 
-Samen: 8 ongewijzigd, 7 gewijzigd, 8 nieuw.
+Samen: 4 ongewijzigd, 11 gewijzigd, 8 nieuw.
