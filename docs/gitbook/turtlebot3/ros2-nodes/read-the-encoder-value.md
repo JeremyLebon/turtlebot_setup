@@ -1,5 +1,9 @@
 # Read the encoder value
 
+{% hint style="info" %}
+Theory: [Odometry (/odom) and encoders](../theory/odometry.md) - ticks, wheel radius and the formulas.
+{% endhint %}
+
 Make a new python script (`sub_encoders.py`) in the docker container turtlebot-vis.
 
 Check if there is a ros2 topic that contains the encoder values

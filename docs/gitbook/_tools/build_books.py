@@ -15,7 +15,14 @@ BOOKS = {
     "turtlebot3": ("Turtlebot3", "turtlebot3", "https://vives-4.gitbook.io/turtlebot3/",
                    # new pages: (insert after this path, new path, title)
                    [("autonomous-driving-with-python-library.md", "compare-planners-and-controllers.md", "Compare planners and controllers"),
-                    ("compare-planners-and-controllers.md", "zones.md", "Zones")]),
+                    ("compare-planners-and-controllers.md", "zones.md", "Zones"),
+                    ("turtlebot3-startup/setup-laptop-student.md", "theory.md", "Theory: what the robot measures"),
+                    ("theory.md", "theory/laser-scan.md", "Laser scan (/scan)"),
+                    ("theory/laser-scan.md", "theory/odometry.md", "Odometry (/odom) and encoders"),
+                    ("theory/odometry.md", "theory/imu.md", "IMU (/imu)"),
+                    ("theory/imu.md", "theory/tf.md", "TF - coordinate frames"),
+                    ("theory/tf.md", "theory/cmd-vel.md", "Driving the robot (/cmd_vel)"),
+                    ("theory/cmd-vel.md", "theory/qos.md", "QoS - Quality of Service")]),
     "simulation": ("ROS2 - Simulation - Turtlebot - Gazebo", "simulation", "https://vives-4.gitbook.io/ros2-simulation-turtlebo-gazebo/",
                    [("autonomous-navigation/autonomous-driving-with-python-library.md", "simulation-vs-real-robot.md", "Simulation vs. real robot")]),
 }

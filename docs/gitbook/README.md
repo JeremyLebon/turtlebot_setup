@@ -58,6 +58,14 @@ docs/gitbook/
 | `turtlebot3/simulation-of-sensors.md` | Simulation of sensors | topics `/sim/...` (publishing `/battery_state` clashed with the real battery) |
 | `turtlebot3/install-python-libraries-in-container.md` | Install python libraries in container | `turtlebot-vis` (Humble, Python 3.10), venv in `ros2_ws` with `--system-site-packages` |
 | `turtlebot3/location-files-on-wsl.md` | Location files on wsl | `turtlebot_vis/ros2_ws`, `\\wsl$\...` path |
+| `turtlebot3/theory.md` | Theory: what the robot measures | **new**: where the data comes from (OpenCR, LDS-02, RPi5), ROS units and axes |
+| `turtlebot3/theory/laser-scan.md` | Laser scan (/scan) | **new**: lidar, LDS-02 specs, LaserScan fields, index <-> angle, invalid values |
+| `turtlebot3/theory/odometry.md` | Odometry (/odom) and encoders | **new**: ticks, wheel radius/separation, diff-drive formulas, `use_imu`, drift |
+| `turtlebot3/theory/imu.md` | IMU (/imu) | **new**: gyro/accelerometer, quaternion -> yaw, IMU + encoders |
+| `turtlebot3/theory/tf.md` | TF - coordinate frames | **new**: TF tree of the Burger, static/dynamic, map vs odom, fixed frame, tf2 in Python |
+| `turtlebot3/theory/cmd-vel.md` | Driving the robot (/cmd_vel) | **new**: Twist, limits, curve radius, path via twist_mux, good habits |
+| `turtlebot3/theory/qos.md` | QoS - Quality of Service | **new**: reliability/durability/depth, compatibility (DDS) vs Zenoh, QoS of the TB3 topics |
+| `turtlebot3/visualise-the-robot.md`, `see-turtlebot3-topics.md`, `ros2-nodes/read-in-the-scan-topic.md`, `ros2-nodes/read-the-encoder-value.md`, `ros2-nodes/drive-10cm-with-a-button.md` | (several) | + hint with a link to the theory page; Best Effort hint: DDS vs Zenoh |
 | `turtlebot3/compare-planners-and-controllers.md` | **new** (after Autonomous driving) | exercise: NavFn/A\*/Smac/Theta\* and DWB/RPP/MPPI compared |
 | `turtlebot3/zones.md` | **new** (after Autonomous driving) | exercise: no-go zone, virtual wall, preferred lane, speed zone (costmap filters) |
 

@@ -1,5 +1,9 @@
 # Drive 10cm with a button
 
+{% hint style="info" %}
+Theory: [Driving the robot (/cmd_vel)](../theory/cmd-vel.md) - Twist, units and twist_mux.
+{% endhint %}
+
 Make a Python script (`pub_controlling_the_robot.py`). Make the script inside the `turtlebot-vis` container in the directory `/root/ros2_ws`.
 
 ## Imports and top-level setup

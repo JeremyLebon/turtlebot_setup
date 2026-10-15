@@ -343,10 +343,818 @@ restart of the container. See [Location files on WSL](../location-files-on-wsl.m
 
 ---
 
-## 10. Visualise the robot  `[ongewijzigd]`
+## 10. Theory: what the robot measures  `[nieuw]`
+
+<sub>theory.md</sub>
+
+
+Before you visualise the robot and write your own nodes, it helps to know
+**where the data comes from** and **what it means**. This chapter gives a short
+piece of theory for each important topic, applied to our TurtleBot3 Burger.
+
+* [Laser scan (`/scan`)](theory/laser-scan.md) - what the lidar sees
+* [Odometry (`/odom`) and encoders](theory/odometry.md) - where the robot thinks it is
+* [IMU (`/imu`)](theory/imu.md) - rotation and acceleration
+* [TF - coordinate frames](theory/tf.md) - how everything fits together
+* [Driving the robot (`/cmd_vel`)](theory/cmd-vel.md) - speed commands and twist_mux
+* [QoS - Quality of Service](theory/qos.md) - why you sometimes receive nothing
+
+## Where does the data come from?
+
+```
+                 TurtleBot3 Burger (robot)                         Laptop (student)
+ ┌─────────────────────────────────────────────────────┐
+ │  LDS-02 lidar ──USB──┐                              │
+ │                      │   Raspberry Pi 5             │
+ │                      ▼   (container turtlebot_<nr>) │
+ │                 ld08_driver ──────────► /scan       │
+ │                                                     │     Zenoh      ┌──────────────┐
+ │  OpenCR board ──USB──► turtlebot3_node ─► /odom     │ ◄────wifi────► │ turtlebot-vis│
+ │   • 2 motors with       (ROS 2 driver)  ─► /imu     │   TB-AP-<nr>   │  RViz2, rqt, │
+ │     encoders                            ─► /tf      │                │  your nodes  │
+ │   • IMU chip                            ─► /joint_states            └──────────────┘
+ │   • battery, buttons                    ─► /sensor_state, /battery_state
+ │                                                     │
+ │                 /cmd_vel ──► twist_mux ──► turtlebot3_node ──► motors
+ └─────────────────────────────────────────────────────┘
+```
+
+* The **OpenCR** board is a microcontroller board. It reads the motor encoders,
+  the IMU, the battery and the buttons and drives the two motors.
+* `turtlebot3_node` on the Raspberry Pi talks to the OpenCR over USB and turns
+  everything into ROS 2 topics. It also **calculates the odometry** and
+  publishes the transform `odom -> base_footprint`.
+* The **LDS-02** lidar has its own driver (`ld08_driver`) that publishes `/scan`.
+
+## Conventions used by all ROS robots
+
+ROS uses fixed conventions (REP-103), so every robot and every tool agrees:
+
+| Quantity | Unit | |
+|---|---|---|
+| distance | metre (m) | not cm or mm! |
+| angle | radian (rad) | 1 rad ≈ 57.3°, 90° = π/2 ≈ 1.571 rad |
+| linear speed | m/s | |
+| angular speed | rad/s | |
+| time | seconds (ROS time stamp in the `header`) | |
+
+Axes of the robot (right-hand rule):
+
+```
+            x (forward)
+            ▲
+            │
+   y ◄──────●        z points up, out of the screen
+  (left)   robot
+```
+
+* **x** = forward, **y** = left, **z** = up.
+* A **positive rotation** around z is **counterclockwise** (to the left).
+  So `angular.z = +0.5` in `/cmd_vel` turns the robot to the left.
+
+{% hint style="info" %}
+Try it: `ros2 topic list` and `ros2 topic info /odom` (in the `turtlebot-vis`
+container). Which node publishes `/odom`? Which nodes publish `/scan` and `/imu`?
+{% endhint %}
+
+---
+
+### 11. Laser scan (/scan)  `[nieuw]`
+
+<sub>theory/laser-scan.md</sub>
+
+
+## How a lidar works
+
+On top of the TurtleBot is a **LDS-02** lidar (Laser Distance Sensor). Inside,
+a laser and a receiver turn around (about 5 rotations per second). For every
+small angle step the sensor measures the distance to the first object the laser
+hits. The result of one rotation is a **2D slice** of the world at the height of
+the lidar (about 18 cm above the floor).
+
+```
+                    0 rad (front, x)
+                         ▲
+                 ·  ·  · │ ·  ·  ·
+             ·           │           ·
+   +π/2   ·              │              ·    -π/2
+  (left) ·───────────────●───────────────·  (right)
+          ·            robot            ·
+             ·                       ·
+                 ·  ·  ·   ·  ·  ·
+                       ±π (back)
+```
+
+{% hint style="warning" %}
+The lidar only sees what is **at its own height**. A low object (a cable, a
+foot of a chair) or a table top above the robot is invisible to it. Glass and
+black, shiny surfaces can also give no (or a wrong) reflection.
+{% endhint %}
+
+## LDS-02 on our robot
+
+| | LDS-02 |
+|---|---|
+| rotations per second | ~5 Hz → `/scan` arrives about 5 times per second |
+| points per rotation | ~220-230 (not always exactly the same!) |
+| angular resolution | ~1.6° per point |
+| range | ~0.16 m to 8 m |
+| frame | `base_scan` (see [TF](tf.md)) |
+
+## The LaserScan message
+
+`/scan` is of type `sensor_msgs/msg/LaserScan`:
+
+| field | meaning |
+|---|---|
+| `header.stamp` | time of the measurement |
+| `header.frame_id` | `base_scan`: the distances are measured from the centre of the lidar |
+| `angle_min`, `angle_max` | angle of the first and the last point (rad) |
+| `angle_increment` | angle between two points (rad) |
+| `range_min`, `range_max` | limits of the sensor (m) |
+| `ranges[]` | the distances (m), one per angle step |
+| `intensities[]` | strength of the reflection (here: the confidence of the point) |
+
+The **index** `i` in `ranges[]` belongs to the angle:
+
+```
+angle(i) = angle_min + i * angle_increment
+```
+
+and the other way around, the index for a given angle:
+
+```
+i = round((angle - angle_min) / angle_increment)
+```
+
+Index `0` is the **front** of the robot, the angle grows **counterclockwise**:
+a quarter of the array further is the **left** side, half way is the **back**,
+three quarters is the **right**.
+
+{% hint style="info" %}
+Because the number of points is not always the same (220, 221, ...), never use
+fixed indices like `ranges[55]` for "left". Calculate the index from
+`angle_increment`, or use `len(msg.ranges) // 4`.
+{% endhint %}
+
+## Invalid values
+
+Not every angle gives a good measurement. In `ranges[]` you can find:
+
+* `nan` - no measurement for that angle
+* `inf` - nothing within range
+* `0.0` or a value smaller than ~0.12 m - no valid echo
+
+Always filter these before you calculate a mean or a minimum, for example:
+
+```python
+valid = [r for r in msg.ranges if math.isfinite(r) and r > 0.12]
+```
+
+## From distance and angle to a point (x, y)
+
+A lidar point is given in **polar coordinates** (distance `r`, angle `θ`). To
+get the point in the frame of the lidar (`base_scan`):
+
+```
+x = r * cos(θ)        (forward)
+y = r * sin(θ)        (left)
+```
+
+This is exactly what RViz2 does to draw the red dots. To place the points on the
+map, RViz2 also needs the position of the lidar on the robot and the position of
+the robot in the world: that is [TF](tf.md).
+
+## QoS: Best Effort
+
+The lidar publishes with **Best Effort** reliability: if a message is lost on the
+wifi, it is not sent again (the next scan arrives 0.2 s later anyway). With
+standard ROS 2 (DDS, as in the simulation) a subscriber that asks for
+**Reliable** does not match and receives nothing. That is why you set Best Effort
+in RViz2 and in your own node. More in [QoS](qos.md).
+
+## Try it
+
+```bash
+ros2 topic hz /scan                     # how many scans per second?
+ros2 topic echo /scan --once --field angle_increment
+ros2 topic echo /scan --once --field ranges
+```
+
+<details>
+
+<summary>Check yourself</summary>
+
+1. `angle_increment` is 0.0283 rad. How many degrees is that, and how many points do you expect per rotation?
+   * 0.0283 × 57.3 ≈ 1.6°; 2π / 0.0283 ≈ 222 points.
+2. Which index (approximately) points to the left if `len(ranges)` is 224?
+   * 224 / 4 = 56 (angle +π/2).
+3. A chair leg is 0.10 m in front of the lidar. What do you see in `ranges`?
+   * Nothing useful: it is below the minimum range, you get `0.0`/`nan`.
+
+</details>
+
+Next: [Read in the scan topic](../ros2-nodes/read-in-the-scan-topic.md).
+
+---
+
+### 12. Odometry (/odom) and encoders  `[nieuw]`
+
+<sub>theory/odometry.md</sub>
+
+
+## What is odometry?
+
+**Odometry** is estimating the position of the robot by **counting how far the
+wheels have turned**. It is like walking with your eyes closed and counting your
+steps: it works well for a short time, but small errors add up.
+
+The robot starts at `(x, y, θ) = (0, 0, 0)` when `turtlebot3_node` starts. From
+then on it adds every small movement to that position.
+
+## Encoders on the TurtleBot3
+
+Each wheel is driven by a Dynamixel **XL430** motor with a built-in encoder:
+
+| | Burger |
+|---|---|
+| encoder ticks per wheel rotation | 4096 |
+| wheel radius `r` | 0.033 m |
+| distance between the wheels `L` | 0.160 m |
+| wheel circumference `2πr` | 0.207 m |
+| distance per tick | 0.207 / 4096 ≈ 0.05 mm |
+
+You can see the raw values in two topics:
+
+* `/sensor_state` (`turtlebot3_msgs/msg/SensorState`): `left_encoder`,
+  `right_encoder` - the number of ticks (integer).
+* `/joint_states` (`sensor_msgs/msg/JointState`): `position[]` of
+  `wheel_left_joint` and `wheel_right_joint` in **radians** and `velocity[]` in rad/s.
+
+From ticks to distance travelled by a wheel:
+
+```
+angle_wheel  = ticks * 2π / 4096        [rad]
+distance     = angle_wheel * r          [m]
+speed_wheel  = velocity * r             [m/s]   (velocity from /joint_states)
+```
+
+## From two wheels to the position of the robot
+
+The TurtleBot3 is a **differential drive** robot: two driven wheels and a
+caster at the back. It cannot drive sideways. Every small time step:
+
+```
+d_left, d_right = distance of each wheel since the last step
+
+d     = (d_right + d_left) / 2          distance of the robot centre
+dθ    = (d_right - d_left) / L          rotation of the robot
+
+x    += d * cos(θ + dθ/2)
+y    += d * sin(θ + dθ/2)
+θ    += dθ
+```
+
+* Both wheels the same distance → driving straight (`dθ = 0`).
+* Wheels in opposite directions → turning on the spot (`d = 0`).
+
+The same formulas the other way around turn a command on `/cmd_vel`
+(`linear.x = v`, `angular.z = ω`) into wheel speeds:
+
+```
+v_left  = v - ω * L / 2
+v_right = v + ω * L / 2
+```
+
+{% hint style="info" %}
+**On our robot** the IMU helps: `turtlebot3_node` is configured with
+`use_imu: true`. The **distance** comes from the wheel encoders, but the
+**rotation θ** comes from the [IMU](imu.md). The IMU measures rotation better
+than the wheels, which slip when the robot turns.
+{% endhint %}
+
+## The Odometry message
+
+`/odom` is of type `nav_msgs/msg/Odometry`:
+
+| field | meaning |
+|---|---|
+| `header.frame_id` | `odom` - the position is relative to the start point |
+| `child_frame_id` | `base_footprint` - the robot |
+| `pose.pose.position` | `x`, `y` (m), `z` is always 0 |
+| `pose.pose.orientation` | rotation as a **quaternion** (`x, y, z, w`) - see [IMU](imu.md) |
+| `twist.twist.linear.x` | forward speed (m/s) |
+| `twist.twist.angular.z` | rotation speed (rad/s) |
+| `pose.covariance`, `twist.covariance` | how uncertain the estimate is |
+
+The same position is also published as the transform `odom -> base_footprint` on
+`/tf` (see [TF](tf.md)).
+
+## Why does odometry drift?
+
+* the wheels **slip** (smooth floor, accelerating, turning)
+* the wheel radius is not exactly 0.033 m (wear, tyre pressure, dust)
+* bumps, thresholds, cables
+* small errors in θ become large errors in x, y after a few metres
+
+So `/odom` is **smooth and fast, but not correct over long distances**. To know
+where the robot really is, SLAM or AMCL compares the [laser scan](laser-scan.md)
+with a map and publishes a correction (`map -> odom`, see [TF](tf.md)).
+
+## Try it
+
+```bash
+ros2 topic echo /odom --field pose.pose.position
+ros2 topic echo /sensor_state --field left_encoder
+ros2 topic echo /joint_states
+```
+
+Drive 1 m forward (mark it on the floor) and compare with `x` in `/odom`.
+Then turn 4 times on the spot and look at `x`, `y`: are they still 0?
+
+<details>
+
+<summary>Check yourself</summary>
+
+1. The left encoder went from 10 000 to 22 288 ticks. How far did the left wheel drive?
+   * 12 288 ticks = 3 rotations → 3 × 0.207 m ≈ 0.62 m.
+2. `/cmd_vel` has `linear.x = 0`, `angular.z = 1.0` rad/s. What are the wheel speeds?
+   * v_left = -0.08 m/s, v_right = +0.08 m/s: turning left on the spot.
+3. After driving through the lab for 5 minutes, the robot in RViz2 (fixed frame `odom`) is 30 cm next to where it really is. Is something broken?
+   * No, that is normal odometry drift.
+
+</details>
+
+Next: [Read the encoder value](../ros2-nodes/read-the-encoder-value.md).
+
+---
+
+### 13. IMU (/imu)  `[nieuw]`
+
+<sub>theory/imu.md</sub>
+
+
+## What is an IMU?
+
+An **IMU** (Inertial Measurement Unit) is a small chip that measures how the
+robot **moves and rotates**. On the TurtleBot3 the IMU is on the **OpenCR**
+board. It contains:
+
+* a **gyroscope**: rotation speed around x, y and z (rad/s)
+* an **accelerometer**: acceleration along x, y and z (m/s²)
+
+(You know these sensors from your phone and from the flight controller of a drone.)
+
+The OpenCR combines both in a filter and calculates the **orientation** of the
+robot: how it is turned in space.
+
+```
+          z (yaw)
+          ▲
+          │
+          │
+          ●─────► x (roll)      roll  = rotation around x (tilt left/right)
+         ╱                      pitch = rotation around y (nose up/down)
+        ╱                       yaw   = rotation around z (heading)
+       ▼
+      y (pitch)
+```
+
+For a ground robot, **yaw** (the heading) is by far the most important one.
+Roll and pitch stay almost 0 on a flat floor.
+
+## The Imu message
+
+`/imu` is of type `sensor_msgs/msg/Imu`, frame `imu_link`:
+
+| field | meaning | robot standing still on the floor |
+|---|---|---|
+| `orientation` | rotation as a quaternion (`x, y, z, w`) | depends on the heading |
+| `angular_velocity` | rad/s around x, y, z | ≈ 0, 0, 0 |
+| `linear_acceleration` | m/s² along x, y, z | ≈ 0, 0, **9.81** |
+
+{% hint style="info" %}
+Standing still, the accelerometer measures **9.81 m/s² upwards**: it measures
+gravity. That is how the IMU knows which way is down (roll and pitch). For yaw
+there is no such reference, so yaw slowly **drifts**.
+{% endhint %}
+
+## Quaternions
+
+ROS does not store orientation as three angles, but as a **quaternion**: four
+numbers `(x, y, z, w)`. Quaternions have no problems with angles that jump from
++180° to -180° and are easy to combine. You don't have to understand the
+maths, just remember:
+
+* no rotation: `(0, 0, 0, 1)`
+* for a ground robot only `z` and `w` change
+* convert to **yaw** (in rad) like this:
+
+```python
+import math
+
+q = msg.orientation          # also works for msg.pose.pose.orientation of /odom
+yaw = math.atan2(2.0 * (q.w * q.z + q.x * q.y),
+                 1.0 - 2.0 * (q.y * q.y + q.z * q.z))
+print(math.degrees(yaw))
+```
+
+## IMU and odometry on our robot
+
+The wheels are good at measuring **distance**, but bad at measuring **rotation**:
+during a turn the wheels slip. The gyroscope measures rotation directly. That is
+why `turtlebot3_node` uses the yaw of the IMU for the heading in `/odom`
+(`use_imu: true`, see [Odometry](odometry.md)).
+
+| | wheel encoders | IMU (gyroscope) |
+|---|---|---|
+| distance | ✅ good | ❌ (double integration of acceleration → very large drift) |
+| rotation | ⚠️ errors from slip | ✅ good, slow drift over time |
+
+Combining sensors to get a better result than each sensor alone is called
+**sensor fusion**.
+
+## Try it
+
+```bash
+ros2 topic hz /imu
+ros2 topic echo /imu --field angular_velocity
+ros2 topic echo /imu --field linear_acceleration
+```
+
+* Turn the robot by hand around its vertical axis: which value of `angular_velocity` changes? Positive or negative to the left?
+* Tilt the robot (carefully!): what happens with `linear_acceleration`?
+
+<details>
+
+<summary>Check yourself</summary>
+
+1. The robot turns left at 0.5 rad/s. What does `angular_velocity.z` show?
+   * About +0.5 (counterclockwise is positive).
+2. The quaternion is `(0, 0, 0.707, 0.707)`. What is the yaw?
+   * atan2(2·0.707·0.707, 1 − 2·0.707²) = atan2(1, 0) = π/2 → 90°, turned to the left.
+3. Why can't we calculate the position of the robot from the accelerometer?
+   * Acceleration has to be integrated twice; every small error grows very fast (quadratically in time).
+
+</details>
+
+---
+
+### 14. TF - coordinate frames  `[nieuw]`
+
+<sub>theory/tf.md</sub>
+
+
+## The problem
+
+Every sensor measures in **its own coordinate frame**:
+
+* the lidar says "there is a wall 1.0 m in front of **me**" (frame `base_scan`)
+* the IMU measures in **its** frame (`imu_link`)
+* odometry says where the **robot** is relative to the **start point** (`odom`)
+
+To draw the wall on the map, or to drive to it, we have to know how these
+frames are positioned relative to each other. That is the job of **TF** (the
+`tf2` library).
+
+## Frames and transforms
+
+A **frame** is a coordinate system with a name. A **transform** between two
+frames is a translation (x, y, z) + a rotation (quaternion). All transforms
+together form a **tree**: every frame has exactly one parent.
+
+The TF tree of our TurtleBot3:
+
+```
+map                     ← only with SLAM or Nav2 (Cartographer / AMCL)
+ └── odom               ← start point of the odometry
+      └── base_footprint     ← the robot, on the floor (dynamic: turtlebot3_node)
+           └── base_link          ← centre of the robot, 1 cm higher (static)
+                ├── base_scan          ← the lidar        (static)
+                ├── imu_link           ← the IMU          (static)
+                ├── caster_back_link   ← caster           (static)
+                ├── wheel_left_link    ← left wheel  (turns: robot_state_publisher)
+                └── wheel_right_link   ← right wheel (turns: robot_state_publisher)
+```
+
+| transform | published by | kind |
+|---|---|---|
+| `map -> odom` | Cartographer (SLAM) or AMCL (Nav2) | dynamic, correction of the drift |
+| `odom -> base_footprint` | `turtlebot3_node` (odometry) | dynamic, changes when driving |
+| `base_footprint -> base_link -> base_scan, imu_link, ...` | `robot_state_publisher` (from the URDF) | **static**, fixed on the robot |
+| `base_link -> wheel_*_link` | `robot_state_publisher` (from `/joint_states`) | dynamic, the wheels turn |
+
+* **Dynamic** transforms are published on `/tf` many times per second.
+* **Static** transforms are published once on `/tf_static` (they never change).
+
+## Positions on the Burger (from the URDF)
+
+| from `base_link` to | x | y | z |
+|---|---|---|---|
+| `base_scan` (lidar) | -0.032 m | 0 | 0.172 m |
+| `imu_link` | -0.032 m | 0 | 0.068 m |
+| `wheel_left_link` | 0 | +0.080 m | 0.023 m |
+| `wheel_right_link` | 0 | -0.080 m | 0.023 m |
+
+`base_link` is 0.010 m above `base_footprint` (the floor).
+
+So the lidar is **3.2 cm behind** the centre between the wheels. A wall at
+1.000 m in the scan is at 1.000 - 0.032 = 0.968 m in front of `base_link`. TF
+does this calculation for you.
+
+## Why both `map` and `odom`?
+
+* `odom` is **smooth** (no jumps) but **drifts** - good for the controller that drives.
+* `map` is **correct** (SLAM/AMCL compares the scan with the map) but **can jump** - good for "where am I in the lab".
+* SLAM/AMCL publishes `map -> odom` so that `map -> odom -> base_footprint`
+  gives the corrected position, without changing the odometry itself.
+
+## Fixed frame in RViz2
+
+In RViz2 the **Fixed Frame** is the frame in which everything is drawn:
+
+* `base_link` - the robot stands still, the world moves around it
+* `odom` - the world stands still, the robot drives (with drift)
+* `map` - the robot drives on the map (only with SLAM / Nav2)
+
+If RViz2 says *"No transform from [base_scan] to [map]"*, a link in the tree is
+missing: for example SLAM is not running, so there is no `map -> odom`.
+
+## Try it
+
+```bash
+# Show the TF tree as a PDF (frames_<date>.pdf in the current folder)
+ros2 run tf2_tools view_frames
+
+# Position of the robot relative to odom, live
+ros2 run tf2_ros tf2_echo odom base_footprint
+
+# Fixed offset of the lidar
+ros2 run tf2_ros tf2_echo base_link base_scan
+```
+
+In RViz2: add the **TF** display and enable *Show Names*.
+
+In Python you can ask TF for a transform with a `tf2_ros.Buffer` and a
+`tf2_ros.TransformListener`:
+
+```python
+from tf2_ros import Buffer, TransformListener
+
+self.tf_buffer = Buffer()
+self.tf_listener = TransformListener(self.tf_buffer, self)
+...
+t = self.tf_buffer.lookup_transform('odom', 'base_footprint', rclpy.time.Time())
+self.get_logger().info(f"x={t.transform.translation.x:.2f} y={t.transform.translation.y:.2f}")
+```
+
+<details>
+
+<summary>Check yourself</summary>
+
+1. Which node publishes `odom -> base_footprint`, and what happens with it when you restart that node?
+   * `turtlebot3_node`; the odometry starts again at (0, 0, 0).
+2. You start RViz2 with Fixed Frame `map` but without SLAM. What do you see?
+   * An error: there is no transform `map -> odom`, nothing is drawn.
+3. You mount a camera 5 cm in front of the lidar. What do you need to add to the TF tree?
+   * A static transform, e.g. `base_link -> camera_link` with x = -0.032 + 0.05 = 0.018 m (and the height):
+     `ros2 run tf2_ros static_transform_publisher --x 0.018 --z 0.17 --frame-id base_link --child-frame-id camera_link`
+
+</details>
+
+Next: [Visualise the robot](../visualise-the-robot.md).
+
+---
+
+### 15. Driving the robot (/cmd_vel)  `[nieuw]`
+
+<sub>theory/cmd-vel.md</sub>
+
+
+## A speed, not a position
+
+You don't tell the robot **where** to go, you tell it **how fast** to move
+*right now*. That is the job of the topic `/cmd_vel` ("command velocity").
+The robot keeps that speed until it gets a new command.
+
+So "drive 10 cm" always becomes: drive at speed `v` during a time `t`, then
+send speed 0 (or: drive until [odometry](odometry.md) says you did 10 cm).
+
+## The Twist message
+
+On our robot (ROS 2 Humble) `/cmd_vel` is a `geometry_msgs/msg/Twist`:
+
+```
+linear:            angular:
+  x: 0.1   ← forward (m/s)    x: 0.0
+  y: 0.0                      y: 0.0
+  z: 0.0                      z: 0.5   ← turn (rad/s), positive = left
+```
+
+A **differential drive** robot can only use two of the six numbers:
+
+| field | meaning | Burger max |
+|---|---|---|
+| `linear.x` | forward (+) / backward (-) | 0.22 m/s |
+| `angular.z` | turn left (+) / right (-) | 2.84 rad/s |
+| `linear.y`, `linear.z`, `angular.x`, `angular.y` | ignored: the robot cannot drive sideways, fly or roll | - |
+
+Combining both gives a **curve** with radius `R = v / ω`. For example
+`linear.x = 0.1`, `angular.z = 0.5` → a circle with a radius of 0.2 m.
+
+How the robot turns this into two wheel speeds is explained in
+[Odometry](odometry.md): `v_left = v - ω·L/2`, `v_right = v + ω·L/2`.
+
+{% hint style="info" %}
+In the simulation (ROS 2 Jazzy) `/cmd_vel` is a `TwistStamped`: the same
+`Twist` inside `msg.twist`, plus a `header` with a time stamp.
+{% endhint %}
+
+## The path of a command on our robot
+
+```
+ teleop_keyboard ─┐
+ Nav2            ─┼─► /cmd_vel      (prio 10) ─┐
+ your node       ─┘                            │
+ status page ───────► /cmd_vel_web  (prio 50) ─┼─► twist_mux ─► /cmd_vel_out ─► turtlebot3_node ─► OpenCR ─► motors
+ gamepad F710 ──────► /cmd_vel_joy  (prio 100)─┘
+```
+
+* **twist_mux** passes only the source with the highest priority that sent
+  something in the last 0.5 s (see
+  [Manual control by terminal](../controlling-the-robot/manual-control-by-terminal.md)).
+* `turtlebot3_node` limits the speed to what the robot can do and sends it to
+  the OpenCR, which controls the two motors.
+
+## Good habits
+
+* **Publish regularly** (e.g. 10-20 times per second), not just once: twist_mux
+  forgets a source after 0.5 s, and a regular stream is safer.
+* **Always stop explicitly**: publish a `Twist()` with everything 0 when you are
+  done, and also when your node stops (Ctrl+C). Don't count on the robot
+  stopping by itself.
+* **Start slow**: test with 0.05 m/s and 0.3 rad/s, with the robot on the floor
+  and room around it.
+* Keep the gamepad nearby: with **LB** you always take over (highest priority).
+
+## Try it
+
+```bash
+# Turn slowly to the left, 10 times per second (Ctrl+C to stop)
+ros2 topic pub -r 10 /cmd_vel geometry_msgs/msg/Twist "{angular: {z: 0.3}}"
+
+# Stop
+ros2 topic pub --once /cmd_vel geometry_msgs/msg/Twist "{}"
+
+# What arrives at the robot (after twist_mux)?
+ros2 topic echo /cmd_vel_out
+```
+
+<details>
+
+<summary>Check yourself</summary>
+
+1. You publish `linear.y = 0.1`. What does the robot do?
+   * Nothing: a differential drive robot cannot drive sideways.
+2. Which command drives a circle with a radius of 0.5 m at 0.1 m/s, to the right?
+   * `linear.x = 0.1`, `angular.z = -0.2` (ω = v / R = 0.1 / 0.5).
+3. Your node publishes on `/cmd_vel`, but the robot does not react. A classmate is holding LB on the gamepad. Why?
+   * `/cmd_vel_joy` has a higher priority in twist_mux; your commands are ignored.
+
+</details>
+
+Next: [Drive 10cm with a button](../ros2-nodes/drive-10cm-with-a-button.md).
+
+---
+
+### 16. QoS - Quality of Service  `[nieuw]`
+
+<sub>theory/qos.md</sub>
+
+
+## Why QoS?
+
+Not every topic needs the same kind of delivery:
+
+* A **laser scan** arrives 5 times per second. If one is lost on the wifi, it is
+  no use sending it again: the next one is newer anyway.
+* A **map** is published once. A node that starts later must still get it.
+* A **command** that has to arrive should be sent again when it gets lost.
+
+With **QoS** (Quality of Service) every publisher and subscriber says how it
+wants to send or receive messages.
+
+## The three settings you need
+
+| setting | options | meaning |
+|---|---|---|
+| **Reliability** | `RELIABLE` | a lost message is sent again (like TCP) |
+| | `BEST_EFFORT` | a lost message is lost, no waiting (like UDP) - good for sensors |
+| **Durability** | `VOLATILE` | you only get messages sent **after** you subscribed |
+| | `TRANSIENT_LOCAL` | the publisher keeps the last message(s); a **late** subscriber still gets them ("latched") |
+| **History + depth** | `KEEP_LAST` + `depth` | how many messages are kept in the queue (e.g. 10) |
+
+There are more settings (deadline, lifespan, liveliness), but you won't need
+them in this lab.
+
+When you write `self.create_subscription(Imu, '/imu', self.cb, 10)`, the `10`
+is the depth, and you get the **default** QoS: `RELIABLE`, `VOLATILE`, `KEEP_LAST 10`.
+
+## Publisher and subscriber must match
+
+In standard ROS 2 (DDS middleware, as in the **simulation**) a subscriber only
+receives messages if it asks for **the same or less** than the publisher offers:
+
+| publisher offers | subscriber asks | works? |
+|---|---|---|
+| RELIABLE | RELIABLE | ✅ |
+| RELIABLE | BEST_EFFORT | ✅ |
+| BEST_EFFORT | BEST_EFFORT | ✅ |
+| BEST_EFFORT | **RELIABLE** | ❌ no messages |
+| TRANSIENT_LOCAL | VOLATILE or TRANSIENT_LOCAL | ✅ |
+| VOLATILE | **TRANSIENT_LOCAL** | ❌ no messages |
+
+The nasty part: there is **no error**, you simply get nothing (at most a warning
+*"incompatible QoS"*). That is the classic "RViz2 does not show my laser scan".
+
+{% hint style="info" %}
+**Our real robot uses Zenoh** (`rmw_zenoh_cpp`) instead of DDS. Zenoh is less
+strict: a `RELIABLE` subscriber still receives a `BEST_EFFORT` topic. But code
+and RViz2 settings must also work in the simulation and on other robots, so
+**always match the QoS of the publisher**. For sensor data: use Best Effort.
+{% endhint %}
+
+## QoS of the TurtleBot3 topics
+
+| topic | reliability | durability | why |
+|---|---|---|---|
+| `/scan` | **BEST_EFFORT** | VOLATILE | sensor data (`SensorDataQoS`), newest is most important |
+| `/odom`, `/imu`, `/joint_states`, `/battery_state`, `/sensor_state` | RELIABLE | VOLATILE | default QoS of `turtlebot3_node` |
+| `/cmd_vel` | RELIABLE | VOLATILE | default QoS |
+| `/tf` | RELIABLE | VOLATILE | changes all the time |
+| `/tf_static` | RELIABLE | **TRANSIENT_LOCAL** | sent once; nodes that start later must still get it |
+| `/map` (map server, Nav2) | RELIABLE | **TRANSIENT_LOCAL** | sent once; RViz2 started later must still see the map |
+
+Check it yourself: `ros2 topic info -v /scan` shows the QoS of every publisher
+and subscriber.
+
+## QoS in Python
+
+For sensor data there is a ready-made profile:
+
+```python
+from rclpy.qos import qos_profile_sensor_data
+
+self.create_subscription(LaserScan, '/scan', self.scan_callback, qos_profile_sensor_data)
+```
+
+Or set it yourself, as in [Read in the scan topic](../ros2-nodes/read-in-the-scan-topic.md):
+
+```python
+from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
+
+qos = QoSProfile(depth=10,
+                 reliability=ReliabilityPolicy.BEST_EFFORT)
+
+map_qos = QoSProfile(depth=1,
+                     reliability=ReliabilityPolicy.RELIABLE,
+                     durability=DurabilityPolicy.TRANSIENT_LOCAL)
+```
+
+In RViz2 you find the same settings per display under **Topic**: *Reliability
+Policy*, *Durability Policy*, *Depth*.
+
+## Try it
+
+```bash
+ros2 topic info -v /scan
+ros2 topic info -v /odom
+ros2 topic echo --qos-reliability best_effort /scan --field ranges
+```
+
+<details>
+
+<summary>Check yourself</summary>
+
+1. Why is `/scan` Best Effort and not Reliable?
+   * Resending an old scan over the wifi is useless (the next one arrives 0.2 s later) and causes extra traffic and delay.
+2. In the simulation, your subscriber on `/scan` uses `10` as QoS. What happens?
+   * Default = RELIABLE, publisher offers BEST_EFFORT → incompatible, no messages.
+3. You start RViz2 after the map server. Which durability do you need to see `/map`?
+   * TRANSIENT_LOCAL.
+
+</details>
+
+---
+
+## 17. Visualise the robot  `[gewijzigd]`
 
 <sub>visualise-the-robot.md</sub>
 
+
+{% hint style="info" %}
+Theory first? See [TF - coordinate frames](theory/tf.md), [Odometry](theory/odometry.md) and [Laser scan](theory/laser-scan.md).
+{% endhint %}
 
 Select as Fixed frame the odom frame.
 
@@ -357,7 +1165,7 @@ Try to show the RobotModel, odometry, TF and laserscan in RViz2
 <figure><img src="https://1503299445-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FjFguour9DiTaRsxIJsRZ%2Fuploads%2F6mYEBmeKnLrh8C6W5M8Y%2Fimage.png?alt=media&amp;token=f700b34e-308d-4445-b580-d844b375abd2" alt=""><figcaption></figcaption></figure>
 
 {% hint style="warning" %}
-To see the laserscan in RViz2, the **reliability policy** should be changed to Best Effort. Otherwise, the scan isn't shown.
+To see the laserscan in RViz2, set the **reliability policy** to Best Effort: the lidar publishes Best Effort. In the simulation (DDS) the scan isn't shown otherwise; on the real robot (Zenoh) it works anyway, but match it all the same. See [QoS](theory/qos.md).
 
 ![](https://1503299445-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FjFguour9DiTaRsxIJsRZ%2Fuploads%2FbmNIRml1AdtYoQZ0KFmX%2Fimage.png?alt=media\&token=279c9ddd-a69e-490d-af55-15ef51e869c6)
 {% endhint %}
@@ -386,7 +1194,7 @@ Scan (lidar)
 
 ---
 
-## 11. Controlling the robot  `[ongewijzigd]`
+## 18. Controlling the robot  `[ongewijzigd]`
 
 <sub>controlling-the-robot.md</sub>
 
@@ -398,7 +1206,7 @@ Manual controlling of the robot can be done in several ways:
 
 ---
 
-### 12. Manual control by terminal  `[gewijzigd]`
+### 19. Manual control by terminal  `[gewijzigd]`
 
 <sub>controlling-the-robot/manual-control-by-terminal.md</sub>
 
@@ -450,7 +1258,7 @@ pressed), or the keyboard (arrows / WASD, space = stop).
 
 ---
 
-### 13. Manual control with gamepad  `[gewijzigd]`
+### 20. Manual control with gamepad  `[gewijzigd]`
 
 <sub>controlling-the-robot/manual-control-with-gamepad.md</sub>
 
@@ -483,10 +1291,14 @@ Show the progress to the lecturer.
 
 ---
 
-## 14. See turtlebot3 topics  `[ongewijzigd]`
+## 21. See turtlebot3 topics  `[gewijzigd]`
 
 <sub>see-turtlebot3-topics.md</sub>
 
+
+{% hint style="info" %}
+What do these topics mean? See [Theory: what the robot measures](theory.md).
+{% endhint %}
 
 Get an overview of all available ROS 2 topics on the TurtleBot via terminal command.
 
@@ -503,7 +1315,7 @@ Show it to the lecturer.
 
 ---
 
-## 15. ROS2 nodes  `[gewijzigd]`
+## 22. ROS2 nodes  `[gewijzigd]`
 
 <sub>ros2-nodes.md</sub>
 
@@ -530,10 +1342,14 @@ The overlay (`install/setup.bash`) is sourced automatically in every new termina
 
 ---
 
-### 16. Read in the scan topic  `[gewijzigd]`
+### 23. Read in the scan topic  `[gewijzigd]`
 
 <sub>ros2-nodes/read-in-the-scan-topic.md</sub>
 
+
+{% hint style="info" %}
+Theory: [Laser scan (/scan)](../theory/laser-scan.md) - angles, indices, invalid values and QoS.
+{% endhint %}
 
 Make a Python script (`sub_scan.py`) that is subscribed to the `/scan` topic. Make the script inside the `turtlebot-vis` container in the directory `/root/ros2_ws`.
 
@@ -723,7 +1539,7 @@ Finally, this logs how many front readings were used and what their average dist
 
 ---
 
-#### 17. Exercise  `[ongewijzigd]`
+#### 24. Exercise  `[ongewijzigd]`
 
 <sub>ros2-nodes/read-in-the-scan-topic/exercise.md</sub>
 
@@ -736,7 +1552,7 @@ Show the result to the lecturer.
 
 ---
 
-### 18. Read the battery level  `[ongewijzigd]`
+### 25. Read the battery level  `[ongewijzigd]`
 
 <sub>ros2-nodes/read-the-battery-level.md</sub>
 
@@ -757,10 +1573,14 @@ Show when ready to the lecturer.
 
 ---
 
-### 19. Read the encoder value  `[ongewijzigd]`
+### 26. Read the encoder value  `[gewijzigd]`
 
 <sub>ros2-nodes/read-the-encoder-value.md</sub>
 
+
+{% hint style="info" %}
+Theory: [Odometry (/odom) and encoders](../theory/odometry.md) - ticks, wheel radius and the formulas.
+{% endhint %}
 
 Make a new python script (`sub_encoders.py`) in the docker container turtlebot-vis.
 
@@ -778,10 +1598,14 @@ Show when ready to the lecturer.
 
 ---
 
-### 20. Drive 10cm with a button  `[gewijzigd]`
+### 27. Drive 10cm with a button  `[gewijzigd]`
 
 <sub>ros2-nodes/drive-10cm-with-a-button.md</sub>
 
+
+{% hint style="info" %}
+Theory: [Driving the robot (/cmd_vel)](../theory/cmd-vel.md) - Twist, units and twist_mux.
+{% endhint %}
 
 Make a Python script (`pub_controlling_the_robot.py`). Make the script inside the `turtlebot-vis` container in the directory `/root/ros2_ws`.
 
@@ -912,7 +1736,7 @@ if __name__ == '__main__':
 
 ---
 
-## 21. SLAM  `[gewijzigd]`
+## 28. SLAM  `[gewijzigd]`
 
 <sub>slam.md</sub>
 
@@ -976,7 +1800,7 @@ Show the map to the lecturer.
 
 ---
 
-## 22. Autonomous driving  `[gewijzigd]`
+## 29. Autonomous driving  `[gewijzigd]`
 
 <sub>autonomous-driving.md</sub>
 
@@ -1042,7 +1866,7 @@ you are in control; release and Nav2 continues.
 
 ---
 
-## 23. Autonomous driving with python library  `[gewijzigd]`
+## 30. Autonomous driving with python library  `[gewijzigd]`
 
 <sub>autonomous-driving-with-python-library.md</sub>
 
@@ -1171,7 +1995,7 @@ Nav2 on the status page must be stopped for this (only one Nav2 at a time).
 
 ---
 
-## 24. Compare planners and controllers  `[nieuw]`
+## 31. Compare planners and controllers  `[nieuw]`
 
 <sub>compare-planners-and-controllers.md</sub>
 
@@ -1222,7 +2046,7 @@ at the goal.
 
 ---
 
-## 25. Zones  `[nieuw]`
+## 32. Zones  `[nieuw]`
 
 <sub>zones.md</sub>
 
@@ -1265,7 +2089,7 @@ Show your zones and the result to the lecturer.
 
 ---
 
-## 26. Simulation of sensors  `[gewijzigd]`
+## 33. Simulation of sensors  `[gewijzigd]`
 
 <sub>simulation-of-sensors.md</sub>
 
@@ -1363,7 +2187,7 @@ Use the ros2 command to echo the published topics, e.g. `ros2 topic echo /sim/ba
 
 ---
 
-## 27. Measure while driving  `[ongewijzigd]`
+## 34. Measure while driving  `[ongewijzigd]`
 
 <sub>measure-while-driving.md</sub>
 
@@ -1478,7 +2302,7 @@ if __name__ == "__main__":
 
 ---
 
-## 28. Install python libraries in container  `[gewijzigd]`
+## 35. Install python libraries in container  `[gewijzigd]`
 
 <sub>install-python-libraries-in-container.md</sub>
 
@@ -1526,7 +2350,7 @@ access point has internet.
 
 ---
 
-## 29. Solution: Measure while driving  `[ongewijzigd]`
+## 36. Solution: Measure while driving  `[ongewijzigd]`
 
 <sub>solution-measure-while-driving.md</sub>
 
@@ -1645,7 +2469,7 @@ def main():
 
 ---
 
-## 30. Play a sound  `[ongewijzigd]`
+## 37. Play a sound  `[ongewijzigd]`
 
 <sub>play-a-sound.md</sub>
 
@@ -1715,7 +2539,7 @@ Try to start the command.
 
 ---
 
-## 31. Location files on wsl  `[gewijzigd]`
+## 38. Location files on wsl  `[gewijzigd]`
 
 <sub>location-files-on-wsl.md</sub>
 
