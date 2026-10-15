@@ -1,6 +1,16 @@
-# GitBook Git Sync config (same content as .gitbook.yaml / gitbook.yaml)
-root: ./
-
-structure:
-  readme: turtlebot3-in-the-real-world.md
-  summary: SUMMARY.md
+# GitBook site configuration (Git Sync project directory: docs/gitbook/turtlebot3).
+# The space content (pages + SUMMARY.md) is in this same directory; .gitbook.yaml
+# here says which page is the start page. Keep the key unchanged once the site
+# is live: GitBook matches spaces by key (a new key = a new space).
+$schema: https://api.gitbook.com/gitbook-docs.yaml
+site:
+  title: Turtlebot3
+  structure:
+    - type: space
+      key: turtlebot3
+      title: Turtlebot3
+      path: turtlebot3
+      default: true
+      content:
+        directory: ./
+        language: en
