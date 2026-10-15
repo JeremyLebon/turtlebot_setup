@@ -1,0 +1,6 @@
+# GitBook Git Sync config (same content as .gitbook.yaml / gitbook.yaml)
+root: ./
+
+structure:
+  readme: turtlebot3-in-the-real-world.md
+  summary: SUMMARY.md
