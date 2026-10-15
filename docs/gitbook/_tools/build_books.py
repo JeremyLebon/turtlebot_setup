@@ -55,6 +55,15 @@ def top(path):
     return path.split("/")[0].replace(".md", "")
 
 
+def fpath(book, path):
+    """File of a page. GitBook stores a page that has subpages as <dir>/README.md
+    (its export after Git Sync renamed e.g. theory.md -> theory/README.md);
+    use that file when it exists, else <page>.md. 'path' stays the logical
+    page path (original lookup, nesting depth, ORDER)."""
+    readme = path[:-3] + "/README.md"
+    return readme if os.path.exists(os.path.join(GB, book, readme)) else path
+
+
 def is_hidden(text):
     m = re.match(r"---\n(.*?)\n---\n", text, re.S)
     return bool(m and re.search(r"^hidden:\s*true\s*$", m.group(1), re.M))
@@ -78,7 +87,7 @@ for book, (title, dl, base, new_pages) in BOOKS.items():
 
     status = {}
     for path, t in pages:
-        dst = os.path.join(GB, book, path)
+        dst = os.path.join(GB, book, fpath(book, path))
         src = os.path.join(DL, dl, path.replace("/", "__"))
         orig = None
         if os.path.exists(src):
@@ -100,7 +109,7 @@ for book, (title, dl, base, new_pages) in BOOKS.items():
     lines = ["# Table of contents", ""]
     for path, t in pages:
         depth = path.count("/")
-        lines.append("  " * depth + "* [%s](%s)" % (t, path))
+        lines.append("  " * depth + "* [%s](%s)" % (t.replace("_", "\\_"), fpath(book, path)))   # as GitBook writes it
     open(os.path.join(GB, book, "SUMMARY.md"), "w").write("\n".join(lines) + "\n")
 
     label = {"gewijzigd": "🟠 gewijzigd", "nieuw": "🟢 nieuw", "ongewijzigd": "⚪ ongewijzigd",
@@ -109,8 +118,8 @@ for book, (title, dl, base, new_pages) in BOOKS.items():
           "Volgorde zoals in GitBook. Klik een pagina aan, of lees alles achter elkaar in [BOOK.md](BOOK.md).", "",
           "| # | Pagina | Status |", "|---|---|---|"]
     for n, (path, t) in enumerate(pages, 1):
-        hidden = " 🙈 verborgen" if is_hidden(open(os.path.join(GB, book, path)).read()) else ""
-        ov.append("| %d | %s[%s](%s) | %s%s |" % (n, "&nbsp;&nbsp;&nbsp;&nbsp;" * path.count("/"), t, path, label[status[path]], hidden))
+        hidden = " 🙈 verborgen" if is_hidden(open(os.path.join(GB, book, fpath(book, path))).read()) else ""
+        ov.append("| %d | %s[%s](%s) | %s%s |" % (n, "&nbsp;&nbsp;&nbsp;&nbsp;" * path.count("/"), t, fpath(book, path), label[status[path]], hidden))
     counts = {}
     for v in status.values():
         counts[v] = counts.get(v, 0) + 1
@@ -120,10 +129,10 @@ for book, (title, dl, base, new_pages) in BOOKS.items():
     book_md = ["# %s" % title, "",
                "_Alle pagina's in leesvolgorde. Statuslabel per pagina tussen haakjes; bron: `docs/gitbook/%s/`._" % book, ""]
     for n, (path, t) in enumerate(pages, 1):
-        body = open(os.path.join(GB, book, path)).read().strip()
+        body = open(os.path.join(GB, book, fpath(book, path))).read().strip()
         body = re.sub(r"^---\n.*?\n---\n+", "", body, count=1, flags=re.S)   # GitBook front matter (hidden: true)
         body = re.sub(r"^# .*\n", "", body, count=1)            # page title comes from the header below
         h = "#" * min(2 + path.count("/"), 4)
-        book_md += ["---", "", "%s %d. %s  `[%s]`" % (h, n, t, status[path]), "", "<sub>%s</sub>" % path, "", body, ""]
+        book_md += ["---", "", "%s %d. %s  `[%s]`" % (h, n, t, status[path]), "", "<sub>%s</sub>" % fpath(book, path), "", body, ""]
     open(os.path.join(GB, book, "BOOK.md"), "w").write("\n".join(book_md) + "\n")
     print(book, len(pages), "pagina's:", counts)

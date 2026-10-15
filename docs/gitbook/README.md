@@ -13,6 +13,14 @@ De twee VIVES-GitBooks, aangepast aan de nieuwe labo-opstelling (Raspberry Pi OS
 
 Status: 🟠 gewijzigd, 🟢 nieuw, 🟡 kleine aanpassing (`ros_ws` -> `ros2_ws`), ⚪ ongewijzigd.
 
+## Git Sync met GitBook (sinds 2026-10-15)
+
+Het boek **Turtlebot3** is via Git Sync gekoppeld aan branch `master`, map
+`docs/gitbook/turtlebot3`. GitBook schrijft wijzigingen uit de editor terug als
+commits ("GitBook: ..."): doe eerst `git pull` voor je hier iets aanpast.
+GitBook bewaart een pagina met subpagina's als `<map>/README.md` (bv.
+`theory/README.md` i.p.v. `theory.md`); `build_books.py` volgt die conventie.
+
 ## Structuur
 
 ```
@@ -55,7 +63,7 @@ docs/gitbook/
 | `turtlebot3/turtlebot3-startup/setup-laptop-student.md` | Setup laptop (student) | no firewall rules (Zenoh); `git clone` (Zenoh is on `master` now) / `git pull` for an old clone; `docker compose pull`; `.env`: `ROS_DOMAIN_ID` + `ROBOT_ZENOH_IP`; troubleshooting |
 | `turtlebot3/controlling-the-robot/manual-control-by-terminal.md` | Manual control by terminal | + twist_mux: who is in control (priorities) |
 | `turtlebot3/controlling-the-robot/manual-control-with-gamepad.md` | Manual control with gamepad | switch on via the status page; **LB** = enable (was "right joystick"), RB = faster |
-| `turtlebot3/ros2-nodes.md` | ROS2 nodes | workspace `/root/ros2_ws` on laptop and robot |
+| `turtlebot3/ros2-nodes/README.md` | ROS2 nodes | workspace `/root/ros2_ws` on laptop and robot |
 | `turtlebot3/ros2-nodes/read-in-the-scan-topic.md` | Read in the scan topic | `/root/ros2_ws`; 220-230 points per rotation (LDS-02) |
 | `turtlebot3/ros2-nodes/drive-10cm-with-a-button.md` | Drive 10cm with a button | `/root/ros2_ws`; + twist_mux hint; Twist (Humble) vs TwistStamped (Jazzy) |
 | `turtlebot3/slam.md` | SLAM | way 1 yourself (Cartographer on the laptop), way 2 status page (on the robot); `map_saver_cli --free 0.196` into `ros2_ws/maps` |
@@ -65,7 +73,7 @@ docs/gitbook/
 | `turtlebot3/install-python-libraries-in-container.md` | Install python libraries in container | `turtlebot-vis` (Humble, Python 3.10), venv in `ros2_ws` with `--system-site-packages` |
 | `turtlebot3/location-files-on-wsl.md` | Location files on wsl | `turtlebot_vis/ros2_ws`, `\\wsl$\...` path |
 | `turtlebot3/turtlebot3-in-the-real-world.md` | Turtlebot3 in the real world | (2026-10-15) intro: lab setup, **download the laptop image before the lab** (TB-AP has no internet), link to theory. Check in GitBook whether the page has an image you want to keep |
-| `turtlebot3/turtlebot3-startup.md` | Turtlebot3 - startup | (2026-10-15) numbered steps with relative links, `<nr>` explained once |
+| `turtlebot3/turtlebot3-startup/README.md` | Turtlebot3 - startup | (2026-10-15) numbered steps with relative links, `<nr>` explained once |
 | `turtlebot3/turtlebot3-startup/startup-of-the-turtlebot3.md` | Startup of the turtlebot3 | (2026-10-15) lidar not turning = USB power saving (normal); battery 11.0 V |
 | `turtlebot3/turtlebot3-startup/connect-to-the-turtlebot3.md` | Connect to the turtlebot3 | (2026-10-15) **terminal first** (SSH, web terminal), status page only optional; `ssh-keygen -R` after a reinstall |
 | `turtlebot3/turtlebot3-startup/startup-docker.md` | Startup docker | (2026-10-15) check with `docker ps` instead of the status page |

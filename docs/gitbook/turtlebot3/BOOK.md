@@ -9,28 +9,20 @@ _Alle pagina's in leesvolgorde. Statuslabel per pagina tussen haakjes; bron: `do
 <sub>turtlebot3-in-the-real-world.md</sub>
 
 
-In the simulation you drove a virtual TurtleBot3 in Gazebo. Now you work with
-the **real robot**. The ROS 2 topics are the same (`/scan`, `/odom`, `/imu`,
-`/cmd_vel`, ...), so most of what you learned still works - but the real world
-has a battery, a wifi connection, wheel slip and sensor noise.
+In the simulation you drove a virtual TurtleBot3 in Gazebo. Now you work with the **real robot**. The ROS 2 topics are the same (`/scan`, `/odom`, `/imu`, `/cmd_vel`, ...), so most of what you learned still works - but the real world has a battery, a wifi connection, wheel slip and sensor noise.
 
 How the lab is set up:
 
 * Every TurtleBot has its **own wifi network** `TB-AP-<nr>`.
-* The robot software runs in a **Docker container** on the Raspberry Pi of the
-  robot (`turtlebot_<nr>`). It starts by itself when the robot boots.
-* On your laptop you use the **`turtlebot-vis`** container (RViz2, teleop and
-  your own nodes). It talks to the robot with ROS 2 over **Zenoh**.
+* The robot software runs in a **Docker container** on the Raspberry Pi of the robot (`turtlebot_<nr>`). It starts by itself when the robot boots.
+* On your laptop you use the **`turtlebot-vis`** container (RViz2, teleop and your own nodes). It talks to the robot with ROS 2 over **Zenoh**.
 
 {% hint style="warning" %}
-**Before the lab, with internet** (eduroam, at home): download the laptop
-container, see [Setup laptop (student)](turtlebot3-startup/setup-laptop-student.md).
-It is about 4 GB, and the robot wifi has no (or only slow) internet.
+**Before the lab, with internet** (eduroam, at home): download the laptop container, see [Setup laptop (student)](turtlebot3-startup/setup-laptop-student.md). It is about 4 GB, and the robot wifi has no (or only slow) internet.
 {% endhint %}
 
 {% hint style="info" %}
-New to the topics, TF, odometry or QoS? Read the
-[Theory: what the robot measures](theory.md) first.
+New to the topics, TF, odometry or QoS? Read the [Theory: what the robot measures](theory/) first.
 {% endhint %}
 
 ---
@@ -58,21 +50,20 @@ autonomously in the mapped environment.
 
 ## 3. Turtlebot3 - startup  `[gewijzigd]`
 
-<sub>turtlebot3-startup.md</sub>
+<sub>turtlebot3-startup/README.md</sub>
 
 
 Follow these steps in this order:
 
-1. [Connect to the WIFI](turtlebot3-startup/connect-to-the-wifi.md) - your laptop on `TB-AP-<nr>`
-2. [Startup of the turtlebot3](turtlebot3-startup/startup-of-the-turtlebot3.md) - battery on, wait for the beep
-3. [Connect to the turtlebot3](turtlebot3-startup/connect-to-the-turtlebot3.md) - a terminal inside the robot container
-4. [Startup docker](turtlebot3-startup/startup-docker.md) - check that the robot container runs (nothing to start)
-5. [Startup turtlebot software](turtlebot3-startup/startup-turtlebot-software.md) - start the bringup
-6. [Setup laptop (student)](turtlebot3-startup/setup-laptop-student.md) - the `turtlebot-vis` container on your laptop
+1. [Connect to the WIFI](connect-to-the-wifi.md) - your laptop on `TB-AP-<nr>`
+2. [Startup of the turtlebot3](startup-of-the-turtlebot3.md) - battery on, wait for the beep
+3. [Connect to the turtlebot3](connect-to-the-turtlebot3.md) - a terminal inside the robot container
+4. [Startup docker](startup-docker.md) - check that the robot container runs (nothing to start)
+5. [Startup turtlebot software](startup-turtlebot-software.md) - start the bringup
+6. [Setup laptop (student)](setup-laptop-student.md) - the `turtlebot-vis` container on your laptop
 
 {% hint style="info" %}
-Replace `<nr>` everywhere by the number of **your** robot, without a leading
-zero: robot 5 -> `TB-AP-05`, `10.0.5.10`, `turtlebot_5`, `ROS_DOMAIN_ID=5`.
+Replace `<nr>` everywhere by the number of **your** robot, without a leading zero: robot 5 -> `TB-AP-05`, `10.0.5.10`, `turtlebot_5`, `ROS_DOMAIN_ID=5`.
 {% endhint %}
 
 ---
@@ -451,7 +442,7 @@ Scan (lidar)
 
 ## 11. Controlling the robot  `[ongewijzigd]`
 
-<sub>controlling-the-robot.md</sub>
+<sub>controlling-the-robot/README.md</sub>
 
 
 Manual controlling of the robot can be done in several ways:
@@ -573,7 +564,7 @@ Show the progress to the lecturer.
 
 
 {% hint style="info" %}
-What do these topics mean? See [Theory: what the robot measures](theory.md).
+What do these topics mean? See [Theory: what the robot measures](theory/).
 {% endhint %}
 
 Get an overview of all available ROS 2 topics on the TurtleBot via terminal command.
@@ -597,9 +588,7 @@ Show it to the lecturer.
 
 
 {% hint style="info" %}
-The terminal and rqt parts work right away (the bringup must be running). For
-the last part, a ROS 2 node in Python, first read [ROS2 nodes](ros2-nodes.md):
-where to write your code (`/root/ros2_ws`) and how to connect with VS Code.
+The terminal and rqt parts work right away (the bringup must be running). For the last part, a ROS 2 node in Python, first read [ROS2 nodes](ros2-nodes/): where to write your code (`/root/ros2_ws`) and how to connect with VS Code.
 {% endhint %}
 
 ## Play a sound by terminal
@@ -616,7 +605,7 @@ Only value 0,1, 2 and 3 are implemented.
 
 ## Play a sound with rqt
 
-<figure><img src="https://1503299445-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FjFguour9DiTaRsxIJsRZ%2Fuploads%2FcP4tbpiXSomyXAWwtjVJ%2Fimage.png?alt=media&amp;token=30733453-b8af-45da-8b5a-917d9f71af3c" alt=""><figcaption></figcaption></figure>
+<figure><img src="https://1503299445-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FjFguour9DiTaRsxIJsRZ%2Fuploads%2FcP4tbpiXSomyXAWwtjVJ%2Fimage.png?alt=media&#x26;token=30733453-b8af-45da-8b5a-917d9f71af3c" alt=""><figcaption></figcaption></figure>
 
 Play a sound with ros2 node
 
@@ -669,7 +658,7 @@ Try to start the command.
 
 ## 16. ROS2 nodes  `[gewijzigd]`
 
-<sub>ros2-nodes.md</sub>
+<sub>ros2-nodes/README.md</sub>
 
 
 To make ROS 2 nodes in Python, 2 ways can be used:
@@ -696,11 +685,11 @@ The overlay (`install/setup.bash`) is sourced automatically in every new termina
 
 ### 17. Read in the scan topic  `[gewijzigd]`
 
-<sub>ros2-nodes/read-in-the-scan-topic.md</sub>
+<sub>ros2-nodes/read-in-the-scan-topic/README.md</sub>
 
 
 {% hint style="info" %}
-Theory: [Laser scan (/scan)](../theory/laser-scan.md) - angles, indices, invalid values and QoS.
+Theory: [Laser scan (/scan)](../../theory/laser-scan.md) - angles, indices, invalid values and QoS.
 {% endhint %}
 
 Make a Python script (`sub_scan.py`) that is subscribed to the `/scan` topic. Make the script inside the `turtlebot-vis` container in the directory `/root/ros2_ws`.
@@ -721,14 +710,13 @@ import math
 ```
 
 {% hint style="info" %}
-
 * `rclpy`: ROS 2 Python library
 * `Node`: Base class for ROS 2 nodes
 * `LaserScan`: Message type published on `/scan`
 * `QoSProfile` & `ReliabilityPolicy`: Needed to match subscriber QoS with publisher
 * `numpy`: Calculate the mean of the laserscan
 * `math`: check if something is finite
-  {% endhint %}
+{% endhint %}
 
 ## Main function and lifecycle
 
@@ -769,7 +757,7 @@ class ScanSubscriber(Node):
 ```
 
 \
-Change the QoS (Quality of Service)&#x20;
+Change the QoS (Quality of Service)
 
 Add this to the `__init__` function
 
@@ -784,7 +772,7 @@ qos_profile = QoSProfile(
 * TurtleBot3 /scan LIDAR uses Best Effort, so we must match it.
 * depth=10 sets the queue size.
 
-Add the `create_subscription`  also to the `__init__` function.
+Add the `create_subscription` also to the `__init__` function.
 
 ```python
 self.subscription = self.create_subscription(
@@ -857,9 +845,9 @@ self.get_logger().info(f"Valid ranges: {len(msg.ranges)}")
 This logs the number of valid range readings that remain after filtering.\
 It helps you verify that the data is being received and processed correctly.
 
-Below you see the build up of the laserscan. You get roughly 220-230 points per rotation (LDS-02 lidar, ~5 rotations per second)
+Below you see the build up of the laserscan. You get roughly 220-230 points per rotation (LDS-02 lidar, \~5 rotations per second)
 
-<img src="https://1503299445-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FjFguour9DiTaRsxIJsRZ%2Fuploads%2Fjl07REjZyMmR6JgmDR3O%2Ffile.excalidraw.svg?alt=media&amp;token=22bfd257-79c7-429b-afb2-85ec2fa16979" alt="" class="gitbook-drawing">
+![](https://1503299445-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FjFguour9DiTaRsxIJsRZ%2Fuploads%2Fjl07REjZyMmR6JgmDR3O%2Ffile.excalidraw.svg?alt=media\&token=22bfd257-79c7-429b-afb2-85ec2fa16979)
 
 ```python
 # Get front sector — for example, 15 readings on each side of the forward direction
@@ -891,7 +879,7 @@ Finally, this logs how many front readings were used and what their average dist
 
 ---
 
-#### 18. Exercise  `[ongewijzigd]`
+#### 18. Exercise  `[gewijzigd]`
 
 <sub>ros2-nodes/read-in-the-scan-topic/exercise.md</sub>
 
@@ -900,7 +888,7 @@ Try to filter out a right, back and left part. Try to print this in the terminal
 
 Show the result to the lecturer.
 
-<img src="https://1503299445-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FjFguour9DiTaRsxIJsRZ%2Fuploads%2FODudHqthpJTbo5FEnO7l%2Ffile.excalidraw.svg?alt=media&amp;token=95719208-4142-42a1-8c38-e621c706bd27" alt="" class="gitbook-drawing">
+![](https://1503299445-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FjFguour9DiTaRsxIJsRZ%2Fuploads%2FODudHqthpJTbo5FEnO7l%2Ffile.excalidraw.svg?alt=media\&token=95719208-4142-42a1-8c38-e621c706bd27)
 
 ---
 
@@ -1204,8 +1192,7 @@ There are two ways. Do **way 1 first** - that's where you learn what happens.
 
 ## Way 1 - yourself, with ROS 2 commands
 
-Make sure the bringup runs on the robot and the `turtlebot-vis` container on
-your laptop is started (see [Turtlebot3 - startup](turtlebot3-startup.md)).
+Make sure the bringup runs on the robot and the `turtlebot-vis` container on your laptop is started (see [Turtlebot3 - startup](turtlebot3-startup/)).
 
 In the **robot** container (web terminal or SSH):
 
@@ -1219,9 +1206,7 @@ In a new WSL terminal, in the **turtlebot-vis** container on your laptop:
 ros2 launch turtlebot3_cartographer cartographer.launch.py
 ```
 
-RViz2 opens with the map being built. Drive around (gamepad, status page or
-`teleop_keyboard`) and try to map the whole room. Drive slowly and turn slowly:
-Cartographer needs time to match the lidar scans.
+RViz2 opens with the map being built. Drive around (gamepad, status page or `teleop_keyboard`) and try to map the whole room. Drive slowly and turn slowly: Cartographer needs time to match the lidar scans.
 
 When ready, save the map. Make the directory first:
 
@@ -1232,26 +1217,20 @@ ros2 run nav2_map_server map_saver_cli -f /root/ros2_ws/maps/classroom --free 0.
 
 {% hint style="warning" %}
 * Don't stop the mapping (Cartographer) before the map is saved.
-* `--free 0.196`: otherwise grey (unknown) cells are loaded as free later on,
-  and Nav2 plans paths through unexplored space.
+* `--free 0.196`: otherwise grey (unknown) cells are loaded as free later on, and Nav2 plans paths through unexplored space.
 {% endhint %}
 
-You get two files: `classroom.pgm` (the image) and `classroom.yaml` (resolution,
-origin, thresholds). Open the `.pgm` in VS Code or Windows to look at it.
+You get two files: `classroom.pgm` (the image) and `classroom.yaml` (resolution, origin, thresholds). Open the `.pgm` in VS Code or Windows to look at it.
 
 {% hint style="info" %}
-Here Cartographer runs on your laptop and receives all lidar data over the wifi.
-That works, but it is heavy for the wifi and your laptop.
+Here Cartographer runs on your laptop and receives all lidar data over the wifi. That works, but it is heavy for the wifi and your laptop.
 {% endhint %}
 
 ## Way 2 - with the status page
 
-Status page > **Rijden** > **Kaart maken**: the bringup and Cartographer start
-**on the robot**. You see the map grow live with the robot and the lidar points.
-Give the map a name and click the save button (disk icon).
+Status page > **Rijden** > **Kaart maken**: the bringup and Cartographer start **on the robot**. You see the map grow live with the robot and the lidar points. Give the map a name and click the save button (disk icon).
 
-The map is stored **on the robot** and can be chosen directly on the
-**Navigatie** tab.
+The map is stored **on the robot** and can be chosen directly on the **Navigatie** tab.
 
 Show the map to the lecturer.
 
@@ -1860,20 +1839,17 @@ updates - but it is shared by everyone who uses that robot.
 
 ## 32. Theory: what the robot measures  `[nieuw]`
 
-<sub>theory.md</sub>
+<sub>theory/README.md</sub>
 
 
-Reference chapter: **where the data comes from** and **what it means**, for
-each important topic, applied to our TurtleBot3 Burger. You saw most of it in
-the simulation; here are the values of the real robot. The exercises link to
-the page you need.
+Reference chapter: **where the data comes from** and **what it means**, for each important topic, applied to our TurtleBot3 Burger. You saw most of it in the simulation; here are the values of the real robot. The exercises link to the page you need.
 
-* [Laser scan (`/scan`)](theory/laser-scan.md) - what the lidar sees
-* [Odometry (`/odom`) and encoders](theory/odometry.md) - where the robot thinks it is
-* [IMU (`/imu`)](theory/imu.md) - rotation and acceleration
-* [TF - coordinate frames](theory/tf.md) - how everything fits together
-* [Driving the robot (`/cmd_vel`)](theory/cmd-vel.md) - speed commands and twist_mux
-* [QoS - Quality of Service](theory/qos.md) - why you sometimes receive nothing
+* [Laser scan (`/scan`)](laser-scan.md) - what the lidar sees
+* [Odometry (`/odom`) and encoders](odometry.md) - where the robot thinks it is
+* [IMU (`/imu`)](imu.md) - rotation and acceleration
+* [TF - coordinate frames](tf.md) - how everything fits together
+* [Driving the robot (`/cmd_vel`)](cmd-vel.md) - speed commands and twist\_mux
+* [QoS - Quality of Service](qos.md) - why you sometimes receive nothing
 
 ## Where does the data come from?
 
@@ -1895,24 +1871,21 @@ the page you need.
  └─────────────────────────────────────────────────────┘
 ```
 
-* The **OpenCR** board is a microcontroller board. It reads the motor encoders,
-  the IMU, the battery and the buttons and drives the two motors.
-* `turtlebot3_node` on the Raspberry Pi talks to the OpenCR over USB and turns
-  everything into ROS 2 topics. It also **calculates the odometry** and
-  publishes the transform `odom -> base_footprint`.
+* The **OpenCR** board is a microcontroller board. It reads the motor encoders, the IMU, the battery and the buttons and drives the two motors.
+* `turtlebot3_node` on the Raspberry Pi talks to the OpenCR over USB and turns everything into ROS 2 topics. It also **calculates the odometry** and publishes the transform `odom -> base_footprint`.
 * The **LDS-02** lidar has its own driver (`ld08_driver`) that publishes `/scan`.
 
 ## Conventions used by all ROS robots
 
 ROS uses fixed conventions (REP-103), so every robot and every tool agrees:
 
-| Quantity | Unit | |
-|---|---|---|
-| distance | metre (m) | not cm or mm! |
-| angle | radian (rad) | 1 rad ≈ 57.3°, 90° = π/2 ≈ 1.571 rad |
-| linear speed | m/s | |
-| angular speed | rad/s | |
-| time | seconds (ROS time stamp in the `header`) | |
+| Quantity      | Unit                                     |                                      |
+| ------------- | ---------------------------------------- | ------------------------------------ |
+| distance      | metre (m)                                | not cm or mm!                        |
+| angle         | radian (rad)                             | 1 rad ≈ 57.3°, 90° = π/2 ≈ 1.571 rad |
+| linear speed  | m/s                                      |                                      |
+| angular speed | rad/s                                    |                                      |
+| time          | seconds (ROS time stamp in the `header`) |                                      |
 
 Axes of the robot (right-hand rule):
 
@@ -1925,12 +1898,10 @@ Axes of the robot (right-hand rule):
 ```
 
 * **x** = forward, **y** = left, **z** = up.
-* A **positive rotation** around z is **counterclockwise** (to the left).
-  So `angular.z = +0.5` in `/cmd_vel` turns the robot to the left.
+* A **positive rotation** around z is **counterclockwise** (to the left). So `angular.z = +0.5` in `/cmd_vel` turns the robot to the left.
 
 {% hint style="info" %}
-Try it: `ros2 topic list` and `ros2 topic info /odom` (in the `turtlebot-vis`
-container). Which node publishes `/odom`? Which nodes publish `/scan` and `/imu`?
+Try it: `ros2 topic list` and `ros2 topic info /odom` (in the `turtlebot-vis` container). Which node publishes `/odom`? Which nodes publish `/scan` and `/imu`?
 {% endhint %}
 
 ---
@@ -1942,11 +1913,7 @@ container). Which node publishes `/odom`? Which nodes publish `/scan` and `/imu`
 
 ## How a lidar works
 
-On top of the TurtleBot is a **LDS-02** lidar (Laser Distance Sensor). Inside,
-a laser and a receiver turn around (about 5 rotations per second). For every
-small angle step the sensor measures the distance to the first object the laser
-hits. The result of one rotation is a **2D slice** of the world at the height of
-the lidar (about 18 cm above the floor).
+On top of the TurtleBot is a **LDS-02** lidar (Laser Distance Sensor). Inside, a laser and a receiver turn around (about 5 rotations per second). For every small angle step the sensor measures the distance to the first object the laser hits. The result of one rotation is a **2D slice** of the world at the height of the lidar (about 18 cm above the floor).
 
 ```
                     0 rad (front, x)
@@ -1962,34 +1929,32 @@ the lidar (about 18 cm above the floor).
 ```
 
 {% hint style="warning" %}
-The lidar only sees what is **at its own height**. A low object (a cable, a
-foot of a chair) or a table top above the robot is invisible to it. Glass and
-black, shiny surfaces can also give no (or a wrong) reflection.
+The lidar only sees what is **at its own height**. A low object (a cable, a foot of a chair) or a table top above the robot is invisible to it. Glass and black, shiny surfaces can also give no (or a wrong) reflection.
 {% endhint %}
 
 ## LDS-02 on our robot
 
-| | LDS-02 |
-|---|---|
-| rotations per second | ~5 Hz → `/scan` arrives about 5 times per second |
-| points per rotation | ~220-230 (not always exactly the same!) |
-| angular resolution | ~1.6° per point |
-| range | ~0.16 m to 8 m |
-| frame | `base_scan` (see [TF](tf.md)) |
+|                      | LDS-02                                            |
+| -------------------- | ------------------------------------------------- |
+| rotations per second | \~5 Hz → `/scan` arrives about 5 times per second |
+| points per rotation  | \~220-230 (not always exactly the same!)          |
+| angular resolution   | \~1.6° per point                                  |
+| range                | \~0.16 m to 8 m                                   |
+| frame                | `base_scan` (see [TF](tf.md))                     |
 
 ## The LaserScan message
 
 `/scan` is of type `sensor_msgs/msg/LaserScan`:
 
-| field | meaning |
-|---|---|
-| `header.stamp` | time of the measurement |
-| `header.frame_id` | `base_scan`: the distances are measured from the centre of the lidar |
-| `angle_min`, `angle_max` | angle of the first and the last point (rad) |
-| `angle_increment` | angle between two points (rad) |
-| `range_min`, `range_max` | limits of the sensor (m) |
-| `ranges[]` | the distances (m), one per angle step |
-| `intensities[]` | strength of the reflection (here: the confidence of the point) |
+| field                    | meaning                                                              |
+| ------------------------ | -------------------------------------------------------------------- |
+| `header.stamp`           | time of the measurement                                              |
+| `header.frame_id`        | `base_scan`: the distances are measured from the centre of the lidar |
+| `angle_min`, `angle_max` | angle of the first and the last point (rad)                          |
+| `angle_increment`        | angle between two points (rad)                                       |
+| `range_min`, `range_max` | limits of the sensor (m)                                             |
+| `ranges[]`               | the distances (m), one per angle step                                |
+| `intensities[]`          | strength of the reflection (here: the confidence of the point)       |
 
 The **index** `i` in `ranges[]` belongs to the angle:
 
@@ -2003,14 +1968,10 @@ and the other way around, the index for a given angle:
 i = round((angle - angle_min) / angle_increment)
 ```
 
-Index `0` is the **front** of the robot, the angle grows **counterclockwise**:
-a quarter of the array further is the **left** side, half way is the **back**,
-three quarters is the **right**.
+Index `0` is the **front** of the robot, the angle grows **counterclockwise**: a quarter of the array further is the **left** side, half way is the **back**, three quarters is the **right**.
 
 {% hint style="info" %}
-Because the number of points is not always the same (220, 221, ...), never use
-fixed indices like `ranges[55]` for "left". Calculate the index from
-`angle_increment`, or use `len(msg.ranges) // 4`.
+Because the number of points is not always the same (220, 221, ...), never use fixed indices like `ranges[55]` for "left". Calculate the index from `angle_increment`, or use `len(msg.ranges) // 4`.
 {% endhint %}
 
 ## Invalid values
@@ -2019,7 +1980,7 @@ Not every angle gives a good measurement. In `ranges[]` you can find:
 
 * `nan` - no measurement for that angle
 * `inf` - nothing within range
-* `0.0` or a value smaller than ~0.12 m - no valid echo
+* `0.0` or a value smaller than \~0.12 m - no valid echo
 
 Always filter these before you calculate a mean or a minimum, for example:
 
@@ -2029,25 +1990,18 @@ valid = [r for r in msg.ranges if math.isfinite(r) and r > 0.12]
 
 ## From distance and angle to a point (x, y)
 
-A lidar point is given in **polar coordinates** (distance `r`, angle `θ`). To
-get the point in the frame of the lidar (`base_scan`):
+A lidar point is given in **polar coordinates** (distance `r`, angle `θ`). To get the point in the frame of the lidar (`base_scan`):
 
 ```
 x = r * cos(θ)        (forward)
 y = r * sin(θ)        (left)
 ```
 
-This is exactly what RViz2 does to draw the red dots. To place the points on the
-map, RViz2 also needs the position of the lidar on the robot and the position of
-the robot in the world: that is [TF](tf.md).
+This is exactly what RViz2 does to draw the red dots. To place the points on the map, RViz2 also needs the position of the lidar on the robot and the position of the robot in the world: that is [TF](tf.md).
 
 ## QoS: Best Effort
 
-The lidar publishes with **Best Effort** reliability: if a message is lost on the
-wifi, it is not sent again (the next scan arrives 0.2 s later anyway). With
-the standard DDS middleware a subscriber that asks for **Reliable** does not
-match and receives nothing (our robot uses Zenoh, which is less strict). That is
-why you set Best Effort in RViz2 and in your own node. More in [QoS](qos.md).
+The lidar publishes with **Best Effort** reliability: if a message is lost on the wifi, it is not sent again (the next scan arrives 0.2 s later anyway). With the standard DDS middleware a subscriber that asks for **Reliable** does not match and receives nothing (our robot uses Zenoh, which is less strict). That is why you set Best Effort in RViz2 and in your own node. More in [QoS](qos.md).
 
 ## Try it
 
@@ -2070,7 +2024,7 @@ ros2 topic echo /scan --once --field ranges
 
 </details>
 
-Next: [Read in the scan topic](../ros2-nodes/read-in-the-scan-topic.md).
+Next: [Read in the scan topic](../ros2-nodes/read-in-the-scan-topic/).
 
 ---
 
@@ -2552,73 +2506,61 @@ Next: [Drive 10cm with a button](../ros2-nodes/drive-10cm-with-a-button.md).
 
 Not every topic needs the same kind of delivery:
 
-* A **laser scan** arrives 5 times per second. If one is lost on the wifi, it is
-  no use sending it again: the next one is newer anyway.
+* A **laser scan** arrives 5 times per second. If one is lost on the wifi, it is no use sending it again: the next one is newer anyway.
 * A **map** is published once. A node that starts later must still get it.
 * A **command** that has to arrive should be sent again when it gets lost.
 
-With **QoS** (Quality of Service) every publisher and subscriber says how it
-wants to send or receive messages.
+With **QoS** (Quality of Service) every publisher and subscriber says how it wants to send or receive messages.
 
 ## The three settings you need
 
-| setting | options | meaning |
-|---|---|---|
-| **Reliability** | `RELIABLE` | a lost message is sent again (like TCP) |
-| | `BEST_EFFORT` | a lost message is lost, no waiting (like UDP) - good for sensors |
-| **Durability** | `VOLATILE` | you only get messages sent **after** you subscribed |
-| | `TRANSIENT_LOCAL` | the publisher keeps the last message(s); a **late** subscriber still gets them ("latched") |
-| **History + depth** | `KEEP_LAST` + `depth` | how many messages are kept in the queue (e.g. 10) |
+| setting             | options               | meaning                                                                                    |
+| ------------------- | --------------------- | ------------------------------------------------------------------------------------------ |
+| **Reliability**     | `RELIABLE`            | a lost message is sent again (like TCP)                                                    |
+|                     | `BEST_EFFORT`         | a lost message is lost, no waiting (like UDP) - good for sensors                           |
+| **Durability**      | `VOLATILE`            | you only get messages sent **after** you subscribed                                        |
+|                     | `TRANSIENT_LOCAL`     | the publisher keeps the last message(s); a **late** subscriber still gets them ("latched") |
+| **History + depth** | `KEEP_LAST` + `depth` | how many messages are kept in the queue (e.g. 10)                                          |
 
-There are more settings (deadline, lifespan, liveliness), but you won't need
-them in this lab.
+There are more settings (deadline, lifespan, liveliness), but you won't need them in this lab.
 
-When you write `self.create_subscription(Imu, '/imu', self.cb, 10)`, the `10`
-is the depth, and you get the **default** QoS: `RELIABLE`, `VOLATILE`, `KEEP_LAST 10`.
+When you write `self.create_subscription(Imu, '/imu', self.cb, 10)`, the `10` is the depth, and you get the **default** QoS: `RELIABLE`, `VOLATILE`, `KEEP_LAST 10`.
 
 ## Publisher and subscriber must match
 
-In standard ROS 2 (DDS middleware, e.g. the simulation) a subscriber only
-receives messages if it asks for **the same or less** than the publisher offers:
+In standard ROS 2 (DDS middleware, e.g. the simulation) a subscriber only receives messages if it asks for **the same or less** than the publisher offers:
 
-| publisher offers | subscriber asks | works? |
-|---|---|---|
-| RELIABLE | RELIABLE | ✅ |
-| RELIABLE | BEST_EFFORT | ✅ |
-| BEST_EFFORT | BEST_EFFORT | ✅ |
-| BEST_EFFORT | **RELIABLE** | ❌ no messages |
-| TRANSIENT_LOCAL | VOLATILE or TRANSIENT_LOCAL | ✅ |
-| VOLATILE | **TRANSIENT_LOCAL** | ❌ no messages |
+| publisher offers | subscriber asks              | works?        |
+| ---------------- | ---------------------------- | ------------- |
+| RELIABLE         | RELIABLE                     | ✅             |
+| RELIABLE         | BEST\_EFFORT                 | ✅             |
+| BEST\_EFFORT     | BEST\_EFFORT                 | ✅             |
+| BEST\_EFFORT     | **RELIABLE**                 | ❌ no messages |
+| TRANSIENT\_LOCAL | VOLATILE or TRANSIENT\_LOCAL | ✅             |
+| VOLATILE         | **TRANSIENT\_LOCAL**         | ❌ no messages |
 
-The nasty part: there is **no error**, you simply get nothing (at most a warning
-*"incompatible QoS"*). With DDS, that is the classic "RViz2 does not show my laser scan".
+The nasty part: there is **no error**, you simply get nothing (at most a warning _"incompatible QoS"_). With DDS, that is the classic "RViz2 does not show my laser scan".
 
 {% hint style="info" %}
-**Our real robot uses Zenoh** (`rmw_zenoh_cpp`) instead of DDS. Zenoh is less
-strict: a `RELIABLE` subscriber still receives a `BEST_EFFORT` topic. But your
-code and RViz2 settings should also work with DDS (other robots, other setups).
+**Our real robot uses Zenoh** (`rmw_zenoh_cpp`) instead of DDS. Zenoh is less strict: a `RELIABLE` subscriber still receives a `BEST_EFFORT` topic. But your code and RViz2 settings should also work with DDS (other robots, other setups).
 {% endhint %}
 
 {% hint style="success" %}
-**Rule of thumb:** subscribe to sensor data (`/scan`, `/imu`, ...) with
-**Best Effort**. A Best Effort subscriber works with a Reliable *and* a Best
-Effort publisher: in the simulation (where the Gazebo bridge publishes `/scan`
-as Reliable), on our robot, and with DDS or Zenoh.
+**Rule of thumb:** subscribe to sensor data (`/scan`, `/imu`, ...) with **Best Effort**. A Best Effort subscriber works with a Reliable _and_ a Best Effort publisher: in the simulation (where the Gazebo bridge publishes `/scan` as Reliable), on our robot, and with DDS or Zenoh.
 {% endhint %}
 
 ## QoS of the TurtleBot3 topics
 
-| topic | reliability | durability | why |
-|---|---|---|---|
-| `/scan` | **BEST_EFFORT** | VOLATILE | sensor data (`SensorDataQoS`), newest is most important |
-| `/odom`, `/imu`, `/joint_states`, `/battery_state`, `/sensor_state` | RELIABLE | VOLATILE | default QoS of `turtlebot3_node` |
-| `/cmd_vel` | RELIABLE | VOLATILE | default QoS |
-| `/tf` | RELIABLE | VOLATILE | changes all the time |
-| `/tf_static` | RELIABLE | **TRANSIENT_LOCAL** | sent once; nodes that start later must still get it |
-| `/map` (map server, Nav2) | RELIABLE | **TRANSIENT_LOCAL** | sent once; RViz2 started later must still see the map |
+| topic                                                               | reliability      | durability           | why                                                     |
+| ------------------------------------------------------------------- | ---------------- | -------------------- | ------------------------------------------------------- |
+| `/scan`                                                             | **BEST\_EFFORT** | VOLATILE             | sensor data (`SensorDataQoS`), newest is most important |
+| `/odom`, `/imu`, `/joint_states`, `/battery_state`, `/sensor_state` | RELIABLE         | VOLATILE             | default QoS of `turtlebot3_node`                        |
+| `/cmd_vel`                                                          | RELIABLE         | VOLATILE             | default QoS                                             |
+| `/tf`                                                               | RELIABLE         | VOLATILE             | changes all the time                                    |
+| `/tf_static`                                                        | RELIABLE         | **TRANSIENT\_LOCAL** | sent once; nodes that start later must still get it     |
+| `/map` (map server, Nav2)                                           | RELIABLE         | **TRANSIENT\_LOCAL** | sent once; RViz2 started later must still see the map   |
 
-Check it yourself: `ros2 topic info -v /scan` shows the QoS of every publisher
-and subscriber.
+Check it yourself: `ros2 topic info -v /scan` shows the QoS of every publisher and subscriber.
 
 ## QoS in Python
 
@@ -2630,7 +2572,7 @@ from rclpy.qos import qos_profile_sensor_data
 self.create_subscription(LaserScan, '/scan', self.scan_callback, qos_profile_sensor_data)
 ```
 
-Or set it yourself, as in [Read in the scan topic](../ros2-nodes/read-in-the-scan-topic.md):
+Or set it yourself, as in [Read in the scan topic](../ros2-nodes/read-in-the-scan-topic/):
 
 ```python
 from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
@@ -2643,8 +2585,7 @@ map_qos = QoSProfile(depth=1,
                      durability=DurabilityPolicy.TRANSIENT_LOCAL)
 ```
 
-In RViz2 you find the same settings per display under **Topic**: *Reliability
-Policy*, *Durability Policy*, *Depth*.
+In RViz2 you find the same settings per display under **Topic**: _Reliability Policy_, _Durability Policy_, _Depth_.
 
 ## Try it
 
@@ -2661,9 +2602,9 @@ ros2 topic echo --qos-reliability best_effort /scan --field ranges
 1. Why is `/scan` Best Effort and not Reliable?
    * Resending an old scan over the wifi is useless (the next one arrives 0.2 s later) and causes extra traffic and delay.
 2. With DDS, your subscriber on the real `/scan` uses `10` as QoS. What happens? And on our robot with Zenoh?
-   * DDS: default = RELIABLE, publisher offers BEST_EFFORT → incompatible, no messages. Zenoh: you receive the scans anyway.
+   * DDS: default = RELIABLE, publisher offers BEST\_EFFORT → incompatible, no messages. Zenoh: you receive the scans anyway.
 3. You start RViz2 after the map server. Which durability do you need to see `/map`?
-   * TRANSIENT_LOCAL.
+   * TRANSIENT\_LOCAL.
 
 </details>
 

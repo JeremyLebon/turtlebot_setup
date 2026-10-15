@@ -10,7 +10,7 @@
     * [Odometry (/odom) and wheels](turtlebot-in-simulation/theory/odometry.md)
     * [IMU (/imu)](turtlebot-in-simulation/theory/imu.md)
     * [TF - coordinate frames](turtlebot-in-simulation/theory/tf.md)
-    * [Driving the robot (/cmd_vel)](turtlebot-in-simulation/theory/cmd-vel.md)
+    * [Driving the robot (/cmd\_vel)](turtlebot-in-simulation/theory/cmd-vel.md)
     * [QoS - Quality of Service](turtlebot-in-simulation/theory/qos.md)
   * [Moving the turtlebot](turtlebot-in-simulation/moving-the-turtlebot.md)
   * [Show me the robot](turtlebot-in-simulation/show-me-the-robot.md)
