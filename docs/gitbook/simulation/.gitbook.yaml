@@ -1,0 +1,6 @@
+# GitBook Git Sync: project directory docs/gitbook/simulation
+root: ./
+
+structure:
+  readme: installation.md
+  summary: SUMMARY.md

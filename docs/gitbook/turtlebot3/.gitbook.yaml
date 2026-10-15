@@ -1,0 +1,6 @@
+# GitBook Git Sync: project directory docs/gitbook/turtlebot3
+root: ./
+
+structure:
+  readme: turtlebot3-in-the-real-world.md
+  summary: SUMMARY.md

@@ -36,6 +36,12 @@ docs/gitbook/
      map `docs/gitbook/turtlebot3` (resp. `simulation`); GitBook leest
      `SUMMARY.md` en de pagina's. Daarna is GitHub de bron, geen kopiëren meer.
    * of per pagina kopiëren en plakken (zie de tabellen hieronder: wat er veranderd is).
+   * **Nieuw boek naast het oude** (aanbevolen om te testen): maak in GitBook een nieuwe,
+     lege space, koppel ze via Git Sync aan deze repo, branch `raspios-migration`,
+     projectmap `docs/gitbook/turtlebot3` (of `docs/gitbook/simulation`) en kies bij de
+     eerste sync **GitHub -> GitBook**. `.gitbook.yaml` in elke boekmap zegt welke pagina
+     de startpagina is en waar `SUMMARY.md` staat. Laat het oude boek staan: de
+     afbeeldingen in de pagina's verwijzen naar bestanden in die oude GitBook-space.
 
 ## Book "Turtlebot3" - https://vives-4.gitbook.io/turtlebot3/
 
