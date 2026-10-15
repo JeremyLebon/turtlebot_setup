@@ -1,9 +1,7 @@
 # Play a sound
 
 {% hint style="info" %}
-The terminal and rqt parts work right away (the bringup must be running). For
-the last part, a ROS 2 node in Python, first read [ROS2 nodes](ros2-nodes.md):
-where to write your code (`/root/ros2_ws`) and how to connect with VS Code.
+The terminal and rqt parts work right away (the bringup must be running). For the last part, a ROS 2 node in Python, first read [ROS2 nodes](ros2-nodes/): where to write your code (`/root/ros2_ws`) and how to connect with VS Code.
 {% endhint %}
 
 ## Play a sound by terminal
@@ -20,7 +18,7 @@ Only value 0,1, 2 and 3 are implemented.
 
 ## Play a sound with rqt
 
-<figure><img src="https://1503299445-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FjFguour9DiTaRsxIJsRZ%2Fuploads%2FcP4tbpiXSomyXAWwtjVJ%2Fimage.png?alt=media&amp;token=30733453-b8af-45da-8b5a-917d9f71af3c" alt=""><figcaption></figcaption></figure>
+<figure><img src="https://1503299445-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FjFguour9DiTaRsxIJsRZ%2Fuploads%2FcP4tbpiXSomyXAWwtjVJ%2Fimage.png?alt=media&#x26;token=30733453-b8af-45da-8b5a-917d9f71af3c" alt=""><figcaption></figcaption></figure>
 
 Play a sound with ros2 node
 
