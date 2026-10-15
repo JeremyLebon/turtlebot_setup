@@ -18,7 +18,7 @@ Volgorde zoals in GitBook. Klik een pagina aan, of lees alles achter elkaar in [
 | 12 | &nbsp;&nbsp;&nbsp;&nbsp;[Manual control by terminal](controlling-the-robot/manual-control-by-terminal.md) | 🟠 gewijzigd |
 | 13 | &nbsp;&nbsp;&nbsp;&nbsp;[Manual control with gamepad](controlling-the-robot/manual-control-with-gamepad.md) | 🟠 gewijzigd |
 | 14 | [See turtlebot3 topics](see-turtlebot3-topics.md) | 🟠 gewijzigd |
-| 15 | [Play a sound](play-a-sound.md) | ⚪ ongewijzigd |
+| 15 | [Play a sound](play-a-sound.md) | 🟠 gewijzigd |
 | 16 | [ROS2 nodes](ros2-nodes.md) | 🟠 gewijzigd |
 | 17 | &nbsp;&nbsp;&nbsp;&nbsp;[Read in the scan topic](ros2-nodes/read-in-the-scan-topic.md) | 🟠 gewijzigd |
 | 18 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Exercise](ros2-nodes/read-in-the-scan-topic/exercise.md) | ⚪ ongewijzigd |
@@ -43,4 +43,4 @@ Volgorde zoals in GitBook. Klik een pagina aan, of lees alles achter elkaar in [
 | 37 | &nbsp;&nbsp;&nbsp;&nbsp;[Driving the robot (/cmd_vel)](theory/cmd-vel.md) | 🟢 nieuw |
 | 38 | &nbsp;&nbsp;&nbsp;&nbsp;[QoS - Quality of Service](theory/qos.md) | 🟢 nieuw |
 
-Samen: 26 gewijzigd, 3 ongewijzigd, 9 nieuw.
+Samen: 27 gewijzigd, 2 ongewijzigd, 9 nieuw.

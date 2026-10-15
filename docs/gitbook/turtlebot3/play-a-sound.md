@@ -1,5 +1,11 @@
 # Play a sound
 
+{% hint style="info" %}
+The terminal and rqt parts work right away (the bringup must be running). For
+the last part, a ROS 2 node in Python, first read [ROS2 nodes](ros2-nodes.md):
+where to write your code (`/root/ros2_ws`) and how to connect with VS Code.
+{% endhint %}
+
 ## Play a sound by terminal
 
 The turtlebot can play a sound when sending a specific ros2 service.
