@@ -1,5 +1,9 @@
 # Show me the robot
 
+{% hint style="info" %}
+Theory: [TF - coordinate frames](theory/tf.md).
+{% endhint %}
+
 Make sure the turtlebot3 is still running in the Gazebo environment
 
 Open a new terminal and connect to the running Docker container.

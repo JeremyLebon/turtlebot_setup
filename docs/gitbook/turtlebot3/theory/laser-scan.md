@@ -105,9 +105,9 @@ the robot in the world: that is [TF](tf.md).
 
 The lidar publishes with **Best Effort** reliability: if a message is lost on the
 wifi, it is not sent again (the next scan arrives 0.2 s later anyway). With
-standard ROS 2 (DDS, as in the simulation) a subscriber that asks for
-**Reliable** does not match and receives nothing. That is why you set Best Effort
-in RViz2 and in your own node. More in [QoS](qos.md).
+the standard DDS middleware a subscriber that asks for **Reliable** does not
+match and receives nothing (our robot uses Zenoh, which is less strict). That is
+why you set Best Effort in RViz2 and in your own node. More in [QoS](qos.md).
 
 ## Try it
 

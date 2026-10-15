@@ -24,7 +24,14 @@ BOOKS = {
                     ("theory/tf.md", "theory/cmd-vel.md", "Driving the robot (/cmd_vel)"),
                     ("theory/cmd-vel.md", "theory/qos.md", "QoS - Quality of Service")]),
     "simulation": ("ROS2 - Simulation - Turtlebot - Gazebo", "simulation", "https://vives-4.gitbook.io/ros2-simulation-turtlebo-gazebo/",
-                   [("autonomous-navigation/autonomous-driving-with-python-library.md", "simulation-vs-real-robot.md", "Simulation vs. real robot")]),
+                   [("autonomous-navigation/autonomous-driving-with-python-library.md", "simulation-vs-real-robot.md", "Simulation vs. real robot"),
+                    ("turtlebot-in-simulation/startup.md", "turtlebot-in-simulation/theory.md", "Theory: what the robot measures"),
+                    ("turtlebot-in-simulation/theory.md", "turtlebot-in-simulation/theory/laser-scan.md", "Laser scan (/scan)"),
+                    ("turtlebot-in-simulation/theory/laser-scan.md", "turtlebot-in-simulation/theory/odometry.md", "Odometry (/odom) and wheels"),
+                    ("turtlebot-in-simulation/theory/odometry.md", "turtlebot-in-simulation/theory/imu.md", "IMU (/imu)"),
+                    ("turtlebot-in-simulation/theory/imu.md", "turtlebot-in-simulation/theory/tf.md", "TF - coordinate frames"),
+                    ("turtlebot-in-simulation/theory/tf.md", "turtlebot-in-simulation/theory/cmd-vel.md", "Driving the robot (/cmd_vel)"),
+                    ("turtlebot-in-simulation/theory/cmd-vel.md", "turtlebot-in-simulation/theory/qos.md", "QoS - Quality of Service")]),
 }
 
 for book, (title, dl, base, new_pages) in BOOKS.items():

@@ -82,6 +82,9 @@ where it occurs.
 | `simulation/slam-mapping/save-map.md` | Save map | `--free 0.196 --occ 0.65`; `.yaml` is what Nav2 needs |
 | `simulation/autonomous-navigation.md` | Autonomous Navigation | `map:=/home/dockeruserjazzy/my_map.yaml` added (else the default map is loaded) |
 | `simulation/simulation-vs-real-robot.md` | **new** (end of the book) | Jazzy vs Humble, TwistStamped vs Twist, slam_toolbox vs Cartographer, use_sim_time, Zenoh, twist_mux |
+| `simulation/turtlebot-in-simulation/theory.md` + `theory/*.md` | **new** chapter after Startup: Theory (scan, odometry, IMU, TF, cmd_vel, QoS) | same theory as the real-robot book, with the Gazebo values (lidar 360 points / 3.5 m, IMU 200 Hz, DiffDrive odom, TwistStamped, no speed limit, bridge QoS = RELIABLE, CycloneDDS strict) |
+| `simulation/turtlebot-in-simulation/here-come-the-sensors.md` | Here come the sensors | angle increment fixed: 0.0175 rad = **1°** (was "0.1 degree"); + theory link |
+| `simulation/turtlebot-in-simulation/show-me-the-robot.md`, `moving-the-turtlebot.md`, `the-first-ros2-node.md` | (several) | + hint with a link to the theory page |
 
 ## Still to check in the lab
 

@@ -30,7 +30,7 @@ is the depth, and you get the **default** QoS: `RELIABLE`, `VOLATILE`, `KEEP_LAS
 
 ## Publisher and subscriber must match
 
-In standard ROS 2 (DDS middleware, as in the **simulation**) a subscriber only
+In standard ROS 2 (DDS middleware, e.g. the simulation) a subscriber only
 receives messages if it asks for **the same or less** than the publisher offers:
 
 | publisher offers | subscriber asks | works? |
@@ -43,13 +43,19 @@ receives messages if it asks for **the same or less** than the publisher offers:
 | VOLATILE | **TRANSIENT_LOCAL** | ❌ no messages |
 
 The nasty part: there is **no error**, you simply get nothing (at most a warning
-*"incompatible QoS"*). That is the classic "RViz2 does not show my laser scan".
+*"incompatible QoS"*). With DDS, that is the classic "RViz2 does not show my laser scan".
 
 {% hint style="info" %}
 **Our real robot uses Zenoh** (`rmw_zenoh_cpp`) instead of DDS. Zenoh is less
-strict: a `RELIABLE` subscriber still receives a `BEST_EFFORT` topic. But code
-and RViz2 settings must also work in the simulation and on other robots, so
-**always match the QoS of the publisher**. For sensor data: use Best Effort.
+strict: a `RELIABLE` subscriber still receives a `BEST_EFFORT` topic. But your
+code and RViz2 settings should also work with DDS (other robots, other setups).
+{% endhint %}
+
+{% hint style="success" %}
+**Rule of thumb:** subscribe to sensor data (`/scan`, `/imu`, ...) with
+**Best Effort**. A Best Effort subscriber works with a Reliable *and* a Best
+Effort publisher: in the simulation (where the Gazebo bridge publishes `/scan`
+as Reliable), on our robot, and with DDS or Zenoh.
 {% endhint %}
 
 ## QoS of the TurtleBot3 topics
@@ -106,8 +112,8 @@ ros2 topic echo --qos-reliability best_effort /scan --field ranges
 
 1. Why is `/scan` Best Effort and not Reliable?
    * Resending an old scan over the wifi is useless (the next one arrives 0.2 s later) and causes extra traffic and delay.
-2. In the simulation, your subscriber on `/scan` uses `10` as QoS. What happens?
-   * Default = RELIABLE, publisher offers BEST_EFFORT → incompatible, no messages.
+2. With DDS, your subscriber on the real `/scan` uses `10` as QoS. What happens? And on our robot with Zenoh?
+   * DDS: default = RELIABLE, publisher offers BEST_EFFORT → incompatible, no messages. Zenoh: you receive the scans anyway.
 3. You start RViz2 after the map server. Which durability do you need to see `/map`?
    * TRANSIENT_LOCAL.
 

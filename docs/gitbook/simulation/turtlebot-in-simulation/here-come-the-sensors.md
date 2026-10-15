@@ -1,5 +1,9 @@
 # Here come the sensors
 
+{% hint style="info" %}
+Theory: [Laser scan](theory/laser-scan.md), [Odometry](theory/odometry.md) and [IMU](theory/imu.md).
+{% endhint %}
+
 ## 2D lidar
 
 In this step, we want to visualise the 2D lidar present on the Turtlebot3.
@@ -23,7 +27,7 @@ ros2 topic echo /scan
 You can see the following:
 
 * the angle scan range (0-6.28 rad)
-* The angle increment: 0.017 rad or 0.1 degree
+* The angle increment: 0.0175 rad or 1 degree (360 points per rotation)
 * Minimum range detected: 0.1199 m
 * Maximum range detected: 3.5m
 * In the item *ranges,* you can see all distances of every point.

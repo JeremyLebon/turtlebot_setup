@@ -1,5 +1,9 @@
 # The first ros2 node
 
+{% hint style="info" %}
+Theory: [Odometry](turtlebot-in-simulation/theory/odometry.md) (quaternion to yaw: [IMU](turtlebot-in-simulation/theory/imu.md)), [Driving the robot (/cmd_vel)](turtlebot-in-simulation/theory/cmd-vel.md) and [QoS](turtlebot-in-simulation/theory/qos.md).
+{% endhint %}
+
 ## Connect to the container via VScode
 
 Make sure the `turtlebot3_gazebo` node and t`eleop_twist_keyboard` is running.

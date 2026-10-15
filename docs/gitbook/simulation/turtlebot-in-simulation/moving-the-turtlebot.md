@@ -1,5 +1,9 @@
 # Moving the turtlebot
 
+{% hint style="info" %}
+Theory: [Driving the robot (/cmd_vel)](theory/cmd-vel.md).
+{% endhint %}
+
 Load the turtlebot again in the turtlebot world.
 
 <pre><code><strong>ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py

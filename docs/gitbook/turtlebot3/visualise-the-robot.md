@@ -13,7 +13,7 @@ Try to show the RobotModel, odometry, TF and laserscan in RViz2
 <figure><img src="https://1503299445-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FjFguour9DiTaRsxIJsRZ%2Fuploads%2F6mYEBmeKnLrh8C6W5M8Y%2Fimage.png?alt=media&amp;token=f700b34e-308d-4445-b580-d844b375abd2" alt=""><figcaption></figcaption></figure>
 
 {% hint style="warning" %}
-To see the laserscan in RViz2, set the **reliability policy** to Best Effort: the lidar publishes Best Effort. In the simulation (DDS) the scan isn't shown otherwise; on the real robot (Zenoh) it works anyway, but match it all the same. See [QoS](theory/qos.md).
+To see the laserscan in RViz2, set the **reliability policy** to Best Effort: the lidar publishes Best Effort. With the standard DDS middleware the scan isn't shown otherwise; on our robot (Zenoh) it works anyway, but match it all the same. See [QoS](theory/qos.md).
 
 ![](https://1503299445-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FjFguour9DiTaRsxIJsRZ%2Fuploads%2FbmNIRml1AdtYoQZ0KFmX%2Fimage.png?alt=media\&token=279c9ddd-a69e-490d-af55-15ef51e869c6)
 {% endhint %}
