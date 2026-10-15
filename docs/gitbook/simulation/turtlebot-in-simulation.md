@@ -20,10 +20,10 @@ Why first in simulation?
 1. [Objectives](turtlebot-in-simulation/objectives.md) - what you should be able to do at the end
 2. [Tools](turtlebot-in-simulation/tools.md) - Gazebo and RViz2: what is the difference?
 3. [Startup](turtlebot-in-simulation/startup.md) - load the TurtleBot3 in a Gazebo world
-4. [Theory: what the robot measures](turtlebot-in-simulation/theory.md) - scan, odometry, IMU, TF, `cmd_vel` and QoS
-5. [Moving the turtlebot](turtlebot-in-simulation/moving-the-turtlebot.md) - drive with the keyboard, look at `/cmd_vel`
-6. [Show me the robot](turtlebot-in-simulation/show-me-the-robot.md) - the robot model and TF in RViz2
-7. [Here come the sensors](turtlebot-in-simulation/here-come-the-sensors.md) - lidar, odometry and IMU in RViz2
+4. [Moving the turtlebot](turtlebot-in-simulation/moving-the-turtlebot.md) - drive with the keyboard, look at `/cmd_vel`
+5. [Show me the robot](turtlebot-in-simulation/show-me-the-robot.md) - the robot model and TF in RViz2
+6. [Here come the sensors](turtlebot-in-simulation/here-come-the-sensors.md) - lidar, odometry and IMU in RViz2
+7. [Theory: what the robot measures](turtlebot-in-simulation/theory.md) - scan, odometry, IMU, TF, `cmd_vel` and QoS
 
 After this chapter you write your own ROS 2 nodes in
 [The first ros2 node](the-first-ros2-node.md).

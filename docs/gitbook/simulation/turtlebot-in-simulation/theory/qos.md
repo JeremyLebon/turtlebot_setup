@@ -115,3 +115,5 @@ ros2 topic echo --qos-durability transient_local /scan --once    # what happens?
    * `/robot_description` and `/tf_static` are TRANSIENT_LOCAL: a late subscriber still gets them.
 
 </details>
+
+Next: [The first ros2 node](../../the-first-ros2-node.md) - write your own nodes.

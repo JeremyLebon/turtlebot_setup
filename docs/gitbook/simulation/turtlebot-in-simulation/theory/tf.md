@@ -121,4 +121,6 @@ self.get_logger().info(f"x={t.transform.translation.x:.2f} y={t.transform.transl
 
 </details>
 
-Next: [Show me the robot](../show-me-the-robot.md).
+Exercise: [Show me the robot](../show-me-the-robot.md).
+
+Next: [Driving the robot (/cmd_vel)](cmd-vel.md).

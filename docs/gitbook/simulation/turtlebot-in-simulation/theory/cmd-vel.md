@@ -97,4 +97,6 @@ ros2 topic info /cmd_vel
 
 </details>
 
-Next: [Moving the turtlebot](../moving-the-turtlebot.md).
+Exercise: [Moving the turtlebot](../moving-the-turtlebot.md).
+
+Next: [QoS - Quality of Service](qos.md).

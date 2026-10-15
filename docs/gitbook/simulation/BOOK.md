@@ -99,10 +99,10 @@ Why first in simulation?
 1. [Objectives](turtlebot-in-simulation/objectives.md) - what you should be able to do at the end
 2. [Tools](turtlebot-in-simulation/tools.md) - Gazebo and RViz2: what is the difference?
 3. [Startup](turtlebot-in-simulation/startup.md) - load the TurtleBot3 in a Gazebo world
-4. [Theory: what the robot measures](turtlebot-in-simulation/theory.md) - scan, odometry, IMU, TF, `cmd_vel` and QoS
-5. [Moving the turtlebot](turtlebot-in-simulation/moving-the-turtlebot.md) - drive with the keyboard, look at `/cmd_vel`
-6. [Show me the robot](turtlebot-in-simulation/show-me-the-robot.md) - the robot model and TF in RViz2
-7. [Here come the sensors](turtlebot-in-simulation/here-come-the-sensors.md) - lidar, odometry and IMU in RViz2
+4. [Moving the turtlebot](turtlebot-in-simulation/moving-the-turtlebot.md) - drive with the keyboard, look at `/cmd_vel`
+5. [Show me the robot](turtlebot-in-simulation/show-me-the-robot.md) - the robot model and TF in RViz2
+6. [Here come the sensors](turtlebot-in-simulation/here-come-the-sensors.md) - lidar, odometry and IMU in RViz2
+7. [Theory: what the robot measures](turtlebot-in-simulation/theory.md) - scan, odometry, IMU, TF, `cmd_vel` and QoS
 
 After this chapter you write your own ROS 2 nodes in
 [The first ros2 node](the-first-ros2-node.md).
@@ -216,835 +216,7 @@ With `CTRL+C` in the terminal, Gazebo and the ros2 launch are stopped.
 
 ---
 
-### 6. Theory: what the robot measures  `[nieuw]`
-
-<sub>turtlebot-in-simulation/theory.md</sub>
-
-
-Before you look at the robot in RViz2 and write your own nodes, it helps to know
-**where the data comes from** and **what it means**. This chapter gives a short
-piece of theory for each important topic, applied to the TurtleBot3 Burger in
-Gazebo.
-
-* [Laser scan (`/scan`)](theory/laser-scan.md) - what the lidar sees
-* [Odometry (`/odom`) and wheels](theory/odometry.md) - where the robot thinks it is
-* [IMU (`/imu`)](theory/imu.md) - rotation and acceleration
-* [TF - coordinate frames](theory/tf.md) - how everything fits together
-* [Driving the robot (`/cmd_vel`)](theory/cmd-vel.md) - speed commands
-* [QoS - Quality of Service](theory/qos.md) - why you sometimes receive nothing
-
-## Where does the data come from?
-
-In the simulation there is no real hardware: **Gazebo** calculates the physics
-(wheels, floor, walls) and simulates the sensors. A **bridge** turns the Gazebo
-messages into ROS 2 topics.
-
-```
-            Docker container gazebo_turtlebot_cont (your laptop)
- ┌──────────────────────────────────────────────────────────────────────┐
- │  Gazebo (gz sim)                    ros_gz_bridge         ROS 2      │
- │  ┌──────────────────────────┐                                         │
- │  │ lidar sensor   ──────────┼──────────────────────────►  /scan       │
- │  │ IMU sensor     ──────────┼──────────────────────────►  /imu        │
- │  │ DiffDrive plugin ────────┼──────────────────────────►  /odom, /tf  │
- │  │ JointState plugin ───────┼──────────────────────────►  /joint_states
- │  │ simulation time ─────────┼──────────────────────────►  /clock      │
- │  │ DiffDrive plugin ◄───────┼───────────────────────────  /cmd_vel    │
- │  └──────────────────────────┘                                         │
- │                                                                       │
- │  robot_state_publisher (URDF + /joint_states) ───────►  /tf, /tf_static,
- │                                                          /robot_description
- │  RViz2, teleop_twist_keyboard, your nodes                             │
- └──────────────────────────────────────────────────────────────────────┘
-```
-
-* The **DiffDrive plugin** moves the wheels when you send `/cmd_vel` and
-  **calculates the odometry**.
-* The sensors in Gazebo get a bit of **noise** on purpose, so the data looks
-  like real sensor data.
-* Gazebo has its own clock (`/clock`). That is why nodes in the simulation use
-  `use_sim_time:=True`: they follow the simulation time, not the clock of your laptop.
-
-On the real robot the same topics come from real hardware (see
-[Simulation vs. real robot](../simulation-vs-real-robot.md)). That is the strength
-of ROS: your code does not see the difference.
-
-## Conventions used by all ROS robots
-
-ROS uses fixed conventions (REP-103), so every robot and every tool agrees:
-
-| Quantity | Unit | |
-|---|---|---|
-| distance | metre (m) | not cm or mm! |
-| angle | radian (rad) | 1 rad ≈ 57.3°, 90° = π/2 ≈ 1.571 rad |
-| linear speed | m/s | |
-| angular speed | rad/s | |
-| time | seconds (ROS time stamp in the `header`) | |
-
-Axes of the robot (right-hand rule):
-
-```
-            x (forward)
-            ▲
-            │
-   y ◄──────●        z points up, out of the screen
-  (left)   robot
-```
-
-* **x** = forward, **y** = left, **z** = up.
-* A **positive rotation** around z is **counterclockwise** (to the left).
-  So `angular.z = +0.5` in `/cmd_vel` turns the robot to the left.
-
-{% hint style="info" %}
-Try it: start the simulation, then `ros2 topic list` and `ros2 topic info /odom`.
-Which node publishes `/odom`? (Hint: it is the bridge.)
-{% endhint %}
-
----
-
-#### 7. Laser scan (/scan)  `[nieuw]`
-
-<sub>turtlebot-in-simulation/theory/laser-scan.md</sub>
-
-
-## How a lidar works
-
-On top of the TurtleBot is a lidar (Laser Distance Sensor). Inside, a laser and
-a receiver turn around (about 5 rotations per second). For every small angle
-step the sensor measures the distance to the first object the laser hits. The
-result of one rotation is a **2D slice** of the world at the height of the lidar
-(about 18 cm above the floor).
-
-```
-                    0 rad (front, x)
-                         ▲
-                 ·  ·  · │ ·  ·  ·
-             ·           │           ·
-   +π/2   ·              │              ·    3π/2 (or -π/2)
-  (left) ·───────────────●───────────────·  (right)
-          ·            robot            ·
-             ·                       ·
-                 ·  ·  ·   ·  ·  ·
-                        π (back)
-```
-
-{% hint style="warning" %}
-The lidar only sees what is **at its own height**. A low object or a table top
-above the robot is invisible to it. On the real robot glass and black, shiny
-surfaces can also give no (or a wrong) reflection - Gazebo does not simulate that.
-{% endhint %}
-
-## The lidar in Gazebo
-
-| | simulation (Gazebo) | real robot (LDS-02) |
-|---|---|---|
-| scans per second | 5 Hz | ~5 Hz |
-| points per rotation | **360**, always the same | ~220-230, varies |
-| angular resolution | 1° (0.0175 rad) | ~1.6° |
-| angles | 0 → 6.28 rad | |
-| range | 0.12 m to **3.5 m** | ~0.16 m to 8 m |
-| noise | ±1 cm (gaussian, added by Gazebo) | real noise |
-| frame | `base_scan` (see [TF](tf.md)) | `base_scan` |
-
-## The LaserScan message
-
-`/scan` is of type `sensor_msgs/msg/LaserScan`:
-
-| field | meaning |
-|---|---|
-| `header.stamp` | time of the measurement (simulation time) |
-| `header.frame_id` | `base_scan`: the distances are measured from the centre of the lidar |
-| `angle_min`, `angle_max` | angle of the first and the last point (rad) |
-| `angle_increment` | angle between two points (rad) |
-| `range_min`, `range_max` | limits of the sensor (m) |
-| `ranges[]` | the distances (m), one per angle step |
-| `intensities[]` | strength of the reflection |
-
-The **index** `i` in `ranges[]` belongs to the angle:
-
-```
-angle(i) = angle_min + i * angle_increment
-```
-
-and the other way around, the index for a given angle:
-
-```
-i = round((angle - angle_min) / angle_increment)
-```
-
-Index `0` is the **front** of the robot, the angle grows **counterclockwise**:
-in the simulation index 90 is the **left** side, 180 the **back**, 270 the **right**.
-
-{% hint style="info" %}
-On the real robot the number of points is not always the same (220, 221, ...).
-Code with fixed indices like `ranges[90]` works in the simulation but not on
-the real robot. Calculate the index from `angle_increment`, or use
-`len(msg.ranges) // 4` - then your code works on both.
-{% endhint %}
-
-## Invalid values
-
-Not every angle gives a good measurement. In `ranges[]` you can find:
-
-* `inf` - nothing within range (in the simulation: nothing within 3.5 m)
-* `nan` - no measurement for that angle (happens on the real robot)
-* values below `range_min` - no valid echo
-
-Always filter these before you calculate a mean or a minimum, for example:
-
-```python
-valid = [r for r in msg.ranges if math.isfinite(r) and r >= msg.range_min]
-```
-
-## From distance and angle to a point (x, y)
-
-A lidar point is given in **polar coordinates** (distance `r`, angle `θ`). To
-get the point in the frame of the lidar (`base_scan`):
-
-```
-x = r * cos(θ)        (forward)
-y = r * sin(θ)        (left)
-```
-
-This is exactly what RViz2 does to draw the red dots. To place the points in the
-world, RViz2 also needs the position of the lidar on the robot and the position
-of the robot in the world: that is [TF](tf.md).
-
-## Try it
-
-```bash
-ros2 topic hz /scan                     # how many scans per second?
-ros2 topic echo /scan --once --field angle_increment
-ros2 topic echo /scan --once --field ranges
-```
-
-Put the robot in front of a wall in Gazebo and look at `ranges[0]`. Then
-drive 0.5 m back: does the value change by 0.5?
-
-<details>
-
-<summary>Check yourself</summary>
-
-1. `angle_increment` is 0.0175 rad. How many degrees is that, and how many points per rotation?
-   * 0.0175 × 57.3 ≈ 1°; 2π / 0.0175 ≈ 360 points.
-2. Which index points to the right?
-   * 270 (angle 3π/2, or -π/2).
-3. The robot is in an empty part of the world. Most values in `ranges` are `inf`. Is the lidar broken?
-   * No: there is nothing within 3.5 m.
-
-</details>
-
-Next: [Here come the sensors](../here-come-the-sensors.md).
-
----
-
-#### 8. Odometry (/odom) and wheels  `[nieuw]`
-
-<sub>turtlebot-in-simulation/theory/odometry.md</sub>
-
-
-## What is odometry?
-
-**Odometry** is estimating the position of the robot by **counting how far the
-wheels have turned**. It is like walking with your eyes closed and counting your
-steps: it works well for a short time, but small errors add up.
-
-The robot starts at `(x, y, θ) = (0, 0, 0)` when the simulation starts. From
-then on every small movement is added to that position.
-
-## The wheels of the TurtleBot3 Burger
-
-| | Burger |
-|---|---|
-| wheel radius `r` | 0.033 m |
-| distance between the wheels `L` | 0.160 m |
-| wheel circumference `2πr` | 0.207 m |
-
-The topic `/joint_states` (`sensor_msgs/msg/JointState`) shows the wheels:
-
-* `name[]`: `wheel_left_joint`, `wheel_right_joint`
-* `position[]`: how far each wheel has turned, in **radians** (keeps counting)
-* `velocity[]`: rotation speed of each wheel in rad/s
-
-From wheel rotation to distance:
-
-```
-distance     = position * r          [m]
-speed_wheel  = velocity * r          [m/s]
-```
-
-{% hint style="info" %}
-The real robot has **encoders** on the motors: 4096 ticks per wheel rotation,
-in the topic `/sensor_state`. The simulation only has `/joint_states`, which the
-real robot also has.
-{% endhint %}
-
-## From two wheels to the position of the robot
-
-The TurtleBot3 is a **differential drive** robot: two driven wheels and a
-caster at the back. It cannot drive sideways. Every small time step:
-
-```
-d_left, d_right = distance of each wheel since the last step
-
-d     = (d_right + d_left) / 2          distance of the robot centre
-dθ    = (d_right - d_left) / L          rotation of the robot
-
-x    += d * cos(θ + dθ/2)
-y    += d * sin(θ + dθ/2)
-θ    += dθ
-```
-
-* Both wheels the same distance → driving straight (`dθ = 0`).
-* Wheels in opposite directions → turning on the spot (`d = 0`).
-
-The same formulas the other way around turn a command on `/cmd_vel`
-(`linear.x = v`, `angular.z = ω`) into wheel speeds:
-
-```
-v_left  = v - ω * L / 2
-v_right = v + ω * L / 2
-```
-
-In Gazebo the **DiffDrive plugin** does both: it turns `/cmd_vel` into wheel
-speeds, and it calculates `/odom` from the wheels (30 times per second).
-
-## The Odometry message
-
-`/odom` is of type `nav_msgs/msg/Odometry`:
-
-| field | meaning |
-|---|---|
-| `header.frame_id` | `odom` - the position is relative to the start point |
-| `child_frame_id` | `base_footprint` - the robot |
-| `pose.pose.position` | `x`, `y` (m), `z` is always 0 |
-| `pose.pose.orientation` | rotation as a **quaternion** (`x, y, z, w`) - see [IMU](imu.md) |
-| `twist.twist.linear.x` | forward speed (m/s) |
-| `twist.twist.angular.z` | rotation speed (rad/s) |
-| `pose.covariance`, `twist.covariance` | how uncertain the estimate is |
-
-The same position is also published as the transform `odom -> base_footprint` on
-`/tf` (see [TF](tf.md)).
-
-## Why does odometry drift?
-
-On a real robot:
-
-* the wheels **slip** (smooth floor, accelerating, turning)
-* the wheel radius is not exactly 0.033 m (wear, dust)
-* bumps, thresholds, cables
-* small errors in θ become large errors in x, y after a few metres
-
-In **Gazebo** the floor is perfect and the wheel radius is exact, so the odometry
-is almost perfect. Don't be fooled: on the real robot it drifts much more. That
-is why SLAM or AMCL compares the [laser scan](laser-scan.md) with a map and
-publishes a correction (`map -> odom`, see [TF](tf.md)).
-
-## Try it
-
-```bash
-ros2 topic echo /odom --field pose.pose.position
-ros2 topic echo /joint_states
-```
-
-Drive straight ahead with `teleop_twist_keyboard` and compare the change of `x`
-in `/odom` with the change of `position` × 0.033 in `/joint_states`.
-
-<details>
-
-<summary>Check yourself</summary>
-
-1. The left wheel `position` went from 10.0 to 28.85 rad. How far did the left wheel drive?
-   * 18.85 rad × 0.033 m ≈ 0.62 m (= 3 wheel rotations).
-2. `/cmd_vel` has `linear.x = 0`, `angular.z = 1.0` rad/s. What are the wheel speeds?
-   * v_left = -0.08 m/s, v_right = +0.08 m/s: turning left on the spot.
-3. In the simulation `/odom` stays correct for minutes. Will that also be the case on the real robot?
-   * No: slip and small errors make the real odometry drift.
-
-</details>
-
-Next: [The first ros2 node](../../the-first-ros2-node.md) (subscribe to `/odom`).
-
----
-
-#### 9. IMU (/imu)  `[nieuw]`
-
-<sub>turtlebot-in-simulation/theory/imu.md</sub>
-
-
-## What is an IMU?
-
-An **IMU** (Inertial Measurement Unit) is a small chip that measures how the
-robot **moves and rotates**. On the real TurtleBot3 it is on the OpenCR board;
-in Gazebo it is a simulated sensor in the frame `imu_link`. It contains:
-
-* a **gyroscope**: rotation speed around x, y and z (rad/s)
-* an **accelerometer**: acceleration along x, y and z (m/s²)
-
-(You know these sensors from your phone and from the flight controller of a drone.)
-
-From both, the **orientation** of the robot is calculated: how it is turned in space.
-
-```
-          z (yaw)
-          ▲
-          │
-          │
-          ●─────► x (roll)      roll  = rotation around x (tilt left/right)
-         ╱                      pitch = rotation around y (nose up/down)
-        ╱                       yaw   = rotation around z (heading)
-       ▼
-      y (pitch)
-```
-
-For a ground robot, **yaw** (the heading) is by far the most important one.
-Roll and pitch stay almost 0 on a flat floor.
-
-## The IMU in Gazebo
-
-| | simulation | real robot |
-|---|---|---|
-| rate | 200 Hz | lower (check with `ros2 topic hz /imu`) |
-| noise | gaussian, added by Gazebo | real noise and drift |
-| frame | `imu_link` | `imu_link` |
-
-## The Imu message
-
-`/imu` is of type `sensor_msgs/msg/Imu`:
-
-| field | meaning | robot standing still on the floor |
-|---|---|---|
-| `orientation` | rotation as a quaternion (`x, y, z, w`) | depends on the heading |
-| `angular_velocity` | rad/s around x, y, z | ≈ 0, 0, 0 (+ noise) |
-| `linear_acceleration` | m/s² along x, y, z | ≈ 0, 0, **9.81** |
-
-{% hint style="info" %}
-Standing still, the accelerometer measures **9.81 m/s² upwards**: it measures
-gravity. That is how the IMU knows which way is down (roll and pitch). For yaw
-there is no such reference, so on a real robot yaw slowly **drifts**.
-{% endhint %}
-
-## Quaternions
-
-ROS does not store orientation as three angles, but as a **quaternion**: four
-numbers `(x, y, z, w)`. Quaternions have no problems with angles that jump from
-+180° to -180° and are easy to combine. You don't have to understand the
-maths, just remember:
-
-* no rotation: `(0, 0, 0, 1)`
-* for a ground robot only `z` and `w` change
-* convert to **yaw** (in rad) like this (you will see this code again in
-  [The first ros2 node](../../the-first-ros2-node.md)):
-
-```python
-import math
-
-q = msg.orientation          # also works for msg.pose.pose.orientation of /odom
-yaw = math.atan2(2.0 * (q.w * q.z + q.x * q.y),
-                 1.0 - 2.0 * (q.y * q.y + q.z * q.z))
-print(math.degrees(yaw))
-```
-
-## IMU and wheels
-
-| | wheels (odometry) | IMU (gyroscope) |
-|---|---|---|
-| distance | ✅ good | ❌ (double integration of acceleration → very large drift) |
-| rotation | ⚠️ errors from slip | ✅ good, slow drift over time |
-
-That is why the real TurtleBot3 combines both: distance from the wheels, heading
-from the IMU. Combining sensors to get a better result than each sensor alone
-is called **sensor fusion**. (In the simulation `/odom` only uses the wheels -
-the perfect Gazebo floor makes that good enough.)
-
-## Try it
-
-```bash
-ros2 topic hz /imu
-ros2 topic echo /imu --field angular_velocity
-ros2 topic echo /imu --field linear_acceleration
-```
-
-* Turn the robot left with `teleop_twist_keyboard`: which value of `angular_velocity` changes? Positive or negative?
-* Compare `angular_velocity.z` of `/imu` with `twist.twist.angular.z` of `/odom`.
-
-<details>
-
-<summary>Check yourself</summary>
-
-1. The robot turns left at 0.5 rad/s. What does `angular_velocity.z` show?
-   * About +0.5 (counterclockwise is positive).
-2. The quaternion is `(0, 0, 0.707, 0.707)`. What is the yaw?
-   * atan2(2·0.707·0.707, 1 − 2·0.707²) = atan2(1, 0) = π/2 → 90°, turned to the left.
-3. Why can't we calculate the position of the robot from the accelerometer?
-   * Acceleration has to be integrated twice; every small error grows very fast (quadratically in time).
-
-</details>
-
-Next: [Here come the sensors](../here-come-the-sensors.md) (IMU part).
-
----
-
-#### 10. TF - coordinate frames  `[nieuw]`
-
-<sub>turtlebot-in-simulation/theory/tf.md</sub>
-
-
-## The problem
-
-Every sensor measures in **its own coordinate frame**:
-
-* the lidar says "there is a wall 1.0 m in front of **me**" (frame `base_scan`)
-* the IMU measures in **its** frame (`imu_link`)
-* odometry says where the **robot** is relative to the **start point** (`odom`)
-
-To draw the wall in the world, or to drive to it, we have to know how these
-frames are positioned relative to each other. That is the job of **TF** (the
-`tf2` library).
-
-## Frames and transforms
-
-A **frame** is a coordinate system with a name. A **transform** between two
-frames is a translation (x, y, z) + a rotation (quaternion). All transforms
-together form a **tree**: every frame has exactly one parent.
-
-The TF tree of the TurtleBot3 Burger in the simulation:
-
-```
-map                     ← only with SLAM or Nav2 (later in this book)
- └── odom               ← start point of the odometry
-      └── base_footprint     ← the robot, on the floor (dynamic: Gazebo DiffDrive)
-           └── base_link          ← centre of the robot, 1 cm higher (static)
-                ├── base_scan          ← the lidar        (static)
-                ├── imu_link           ← the IMU          (static)
-                ├── caster_back_link   ← caster           (static)
-                ├── wheel_left_link    ← left wheel  (turns: robot_state_publisher)
-                └── wheel_right_link   ← right wheel (turns: robot_state_publisher)
-```
-
-| transform | published by | kind |
-|---|---|---|
-| `map -> odom` | slam_toolbox (SLAM) or AMCL (Nav2) | dynamic, correction of the drift |
-| `odom -> base_footprint` | Gazebo DiffDrive plugin (via the bridge) | dynamic, changes when driving |
-| `base_footprint -> base_link -> base_scan, imu_link, ...` | `robot_state_publisher` (from the URDF) | **static**, fixed on the robot |
-| `base_link -> wheel_*_link` | `robot_state_publisher` (from `/joint_states`) | dynamic, the wheels turn |
-
-* **Dynamic** transforms are published on `/tf` many times per second.
-* **Static** transforms are published once on `/tf_static` (they never change).
-
-On the real robot the tree is exactly the same; only `odom -> base_footprint`
-comes from the robot driver instead of Gazebo.
-
-## Positions on the Burger (from the URDF)
-
-| from `base_link` to | x | y | z |
-|---|---|---|---|
-| `base_scan` (lidar) | -0.032 m | 0 | 0.172 m |
-| `imu_link` | -0.032 m | 0 | 0.068 m |
-| `wheel_left_link` | 0 | +0.080 m | 0.023 m |
-| `wheel_right_link` | 0 | -0.080 m | 0.023 m |
-
-`base_link` is 0.010 m above `base_footprint` (the floor).
-
-So the lidar is **3.2 cm behind** the centre between the wheels. A wall at
-1.000 m in the scan is at 1.000 - 0.032 = 0.968 m in front of `base_link`. TF
-does this calculation for you.
-
-## Why both `map` and `odom`?
-
-* `odom` is **smooth** (no jumps) but **drifts** - good for the controller that drives.
-* `map` is **correct** (SLAM/AMCL compares the scan with the map) but **can jump** - good for "where am I".
-* SLAM/AMCL publishes `map -> odom` so that `map -> odom -> base_footprint`
-  gives the corrected position, without changing the odometry itself.
-
-## Fixed frame in RViz2
-
-In RViz2 the **Fixed Frame** is the frame in which everything is drawn:
-
-* `base_link` - the robot stands still, the world moves around it
-* `odom` - the world stands still, the robot drives
-* `map` - the robot drives on the map (only with SLAM / Nav2)
-
-If RViz2 says *"No transform from [base_scan] to [map]"*, a link in the tree is
-missing: for example SLAM is not running, so there is no `map -> odom`. That is
-the Global Status error you see in [Show me the robot](../show-me-the-robot.md).
-
-## Try it
-
-```bash
-# Show the TF tree as a PDF (frames_<date>.pdf in the current folder)
-ros2 run tf2_tools view_frames
-
-# Position of the robot relative to odom, live
-ros2 run tf2_ros tf2_echo odom base_footprint
-
-# Fixed offset of the lidar
-ros2 run tf2_ros tf2_echo base_link base_scan
-```
-
-In RViz2: add the **TF** display and enable *Show Names*.
-
-In Python you can ask TF for a transform with a `tf2_ros.Buffer` and a
-`tf2_ros.TransformListener`:
-
-```python
-from tf2_ros import Buffer, TransformListener
-
-self.tf_buffer = Buffer()
-self.tf_listener = TransformListener(self.tf_buffer, self)
-...
-t = self.tf_buffer.lookup_transform('odom', 'base_footprint', rclpy.time.Time())
-self.get_logger().info(f"x={t.transform.translation.x:.2f} y={t.transform.translation.y:.2f}")
-```
-
-<details>
-
-<summary>Check yourself</summary>
-
-1. Who publishes `odom -> base_footprint` in the simulation? And on the real robot?
-   * Simulation: the Gazebo DiffDrive plugin (via `ros_gz_bridge`). Real robot: the robot driver `turtlebot3_node`.
-2. You start RViz2 with Fixed Frame `map` but without SLAM. What do you see?
-   * An error: there is no transform `map -> odom`, nothing is drawn.
-3. You mount a camera 5 cm in front of the lidar. What do you need to add to the TF tree?
-   * A static transform, e.g. `base_link -> camera_link` with x = -0.032 + 0.05 = 0.018 m (and the height):
-     `ros2 run tf2_ros static_transform_publisher --x 0.018 --z 0.17 --frame-id base_link --child-frame-id camera_link`
-
-</details>
-
-Next: [Show me the robot](../show-me-the-robot.md).
-
----
-
-#### 11. Driving the robot (/cmd_vel)  `[nieuw]`
-
-<sub>turtlebot-in-simulation/theory/cmd-vel.md</sub>
-
-
-## A speed, not a position
-
-You don't tell the robot **where** to go, you tell it **how fast** to move
-*right now*. That is the job of the topic `/cmd_vel` ("command velocity").
-
-So "drive 10 cm" always becomes: drive at speed `v` during a time `t`, then
-send speed 0 (or: drive until [odometry](odometry.md) says you did 10 cm).
-
-## The TwistStamped message
-
-In the simulation (ROS 2 Jazzy) `/cmd_vel` is a `geometry_msgs/msg/TwistStamped`:
-a `header` (time stamp + frame) and a `twist` with the speeds.
-
-```
-header:
-  stamp: ...
-  frame_id: base_link
-twist:
-  linear:            angular:
-    x: 0.1   ← forward (m/s)    x: 0.0
-    y: 0.0                      y: 0.0
-    z: 0.0                      z: 0.5   ← turn (rad/s), positive = left
-```
-
-That is why `teleop_twist_keyboard` is started with `-p stamped:=true`.
-
-A **differential drive** robot can only use two of the six numbers:
-
-| field | meaning | real Burger max |
-|---|---|---|
-| `twist.linear.x` | forward (+) / backward (-) | 0.22 m/s |
-| `twist.angular.z` | turn left (+) / right (-) | 2.84 rad/s |
-| other fields | ignored: the robot cannot drive sideways, fly or roll | - |
-
-{% hint style="warning" %}
-Gazebo does **not** limit the speed: you can drive the simulated robot at 1 m/s.
-The real Burger can do at most 0.22 m/s. Keep your code within the real limits.
-{% endhint %}
-
-Combining both gives a **curve** with radius `R = v / ω`. For example
-`linear.x = 0.1`, `angular.z = 0.5` → a circle with a radius of 0.2 m.
-
-How this becomes two wheel speeds is explained in [Odometry](odometry.md):
-`v_left = v - ω·L/2`, `v_right = v + ω·L/2`.
-
-## The path of a command
-
-```
- teleop_twist_keyboard ─┐
- Nav2                  ─┼─► /cmd_vel ─► ros_gz_bridge ─► Gazebo DiffDrive plugin ─► wheels
- your node             ─┘   (TwistStamped)
-```
-
-In the simulation **everyone publishes on the same topic**: if two nodes send
-`/cmd_vel` at the same time, the robot jerks between both commands. On the real
-robot a *twist_mux* decides who is in control (see
-[Simulation vs. real robot](../../simulation-vs-real-robot.md)).
-
-{% hint style="info" %}
-On the real robot (ROS 2 Humble) `/cmd_vel` is a plain `Twist`, without header.
-Code from the simulation needs a small change.
-{% endhint %}
-
-## Good habits
-
-* **Publish regularly** (e.g. 10-20 times per second), not just once.
-* **Always stop explicitly**: publish a message with all speeds 0 when you are
-  done, and also when your node stops (Ctrl+C).
-* **Start slow** and stay within the real limits (0.22 m/s, 2.84 rad/s): then your
-  code also works on the real robot.
-
-## Try it
-
-```bash
-# Turn slowly to the left, 10 times per second (Ctrl+C to stop)
-ros2 topic pub -r 10 /cmd_vel geometry_msgs/msg/TwistStamped "{twist: {angular: {z: 0.3}}}"
-
-# Stop
-ros2 topic pub --once /cmd_vel geometry_msgs/msg/TwistStamped "{}"
-
-# Which type does the robot expect?
-ros2 topic info /cmd_vel
-```
-
-<details>
-
-<summary>Check yourself</summary>
-
-1. You publish `twist.linear.y = 0.1`. What does the robot do?
-   * Nothing: a differential drive robot cannot drive sideways.
-2. Which command drives a circle with a radius of 0.5 m at 0.1 m/s, to the right?
-   * `linear.x = 0.1`, `angular.z = -0.2` (ω = v / R = 0.1 / 0.5).
-3. Your node publishes a `Twist` (without header) on `/cmd_vel` in the simulation. What happens?
-   * Nothing, or an error about the type: the simulation expects `TwistStamped`.
-
-</details>
-
-Next: [Moving the turtlebot](../moving-the-turtlebot.md).
-
----
-
-#### 12. QoS - Quality of Service  `[nieuw]`
-
-<sub>turtlebot-in-simulation/theory/qos.md</sub>
-
-
-## Why QoS?
-
-Not every topic needs the same kind of delivery:
-
-* A **laser scan** arrives 5 times per second. If one is lost on the network, it
-  is no use sending it again: the next one is newer anyway.
-* A **map** is published once. A node that starts later must still get it.
-* A **command** that has to arrive should be sent again when it gets lost.
-
-With **QoS** (Quality of Service) every publisher and subscriber says how it
-wants to send or receive messages.
-
-## The three settings you need
-
-| setting | options | meaning |
-|---|---|---|
-| **Reliability** | `RELIABLE` | a lost message is sent again (like TCP) |
-| | `BEST_EFFORT` | a lost message is lost, no waiting (like UDP) - good for sensors |
-| **Durability** | `VOLATILE` | you only get messages sent **after** you subscribed |
-| | `TRANSIENT_LOCAL` | the publisher keeps the last message(s); a **late** subscriber still gets them ("latched") |
-| **History + depth** | `KEEP_LAST` + `depth` | how many messages are kept in the queue (e.g. 10) |
-
-There are more settings (deadline, lifespan, liveliness), but you won't need
-them in this lab.
-
-When you write `self.create_subscription(Odometry, '/odom', self.cb, 10)`, the
-`10` is the depth, and you get the **default** QoS: `RELIABLE`, `VOLATILE`, `KEEP_LAST 10`.
-
-## Publisher and subscriber must match
-
-The simulation uses the DDS middleware (CycloneDDS). A subscriber only receives
-messages if it asks for **the same or less** than the publisher offers:
-
-| publisher offers | subscriber asks | works? |
-|---|---|---|
-| RELIABLE | RELIABLE | ✅ |
-| RELIABLE | BEST_EFFORT | ✅ |
-| BEST_EFFORT | BEST_EFFORT | ✅ |
-| BEST_EFFORT | **RELIABLE** | ❌ no messages |
-| TRANSIENT_LOCAL | VOLATILE or TRANSIENT_LOCAL | ✅ |
-| VOLATILE | **TRANSIENT_LOCAL** | ❌ no messages |
-
-The nasty part: there is **no error**, you simply get nothing (at most a warning
-*"incompatible QoS"*).
-
-{% hint style="success" %}
-**Rule of thumb:** subscribe to sensor data (`/scan`, `/imu`, ...) with
-**Best Effort**. A Best Effort subscriber works with a Reliable *and* a Best
-Effort publisher, so your code works in the simulation **and** on the real robot.
-{% endhint %}
-
-## QoS of the topics in the simulation
-
-| topic | reliability | durability | published by |
-|---|---|---|---|
-| `/scan`, `/imu`, `/odom`, `/joint_states`, `/tf`, `/clock` | RELIABLE | VOLATILE | `ros_gz_bridge` (default QoS) |
-| `/tf_static`, `/robot_description` | RELIABLE | **TRANSIENT_LOCAL** | `robot_state_publisher`: sent once, nodes that start later still get it |
-| `/map` (SLAM / Nav2, later in this book) | RELIABLE | **TRANSIENT_LOCAL** | sent once, RViz2 started later must still see it |
-
-{% hint style="info" %}
-On the real robot the lidar driver publishes `/scan` as **BEST_EFFORT**. In the
-simulation the bridge publishes it as RELIABLE. That is why the real-robot
-tutorial tells you to set Best Effort in RViz2 - following the rule of thumb
-above, you do that in the simulation as well.
-{% endhint %}
-
-Check it yourself: `ros2 topic info -v /scan` shows the QoS of every publisher
-and subscriber.
-
-## QoS in Python
-
-For sensor data there is a ready-made profile:
-
-```python
-from rclpy.qos import qos_profile_sensor_data
-
-self.create_subscription(LaserScan, '/scan', self.scan_callback, qos_profile_sensor_data)
-```
-
-Or set it yourself:
-
-```python
-from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
-
-qos = QoSProfile(depth=10,
-                 reliability=ReliabilityPolicy.BEST_EFFORT)
-
-map_qos = QoSProfile(depth=1,
-                     reliability=ReliabilityPolicy.RELIABLE,
-                     durability=DurabilityPolicy.TRANSIENT_LOCAL)
-```
-
-In RViz2 you find the same settings per display under **Topic**: *Reliability
-Policy*, *Durability Policy*, *Depth*.
-
-## Try it
-
-```bash
-ros2 topic info -v /scan
-ros2 topic info -v /tf_static
-ros2 topic echo --qos-durability transient_local /scan --once    # what happens?
-```
-
-<details>
-
-<summary>Check yourself</summary>
-
-1. Why would you use Best Effort for a laser scan?
-   * Resending an old scan is useless (the next one arrives 0.2 s later) and causes extra traffic and delay.
-2. The last command above (`transient_local` on `/scan`) waits forever. Why?
-   * The bridge offers VOLATILE, the subscriber asks TRANSIENT_LOCAL → incompatible, no messages.
-3. You start RViz2 after `robot_state_publisher`. Why do you still see the robot model?
-   * `/robot_description` and `/tf_static` are TRANSIENT_LOCAL: a late subscriber still gets them.
-
-</details>
-
----
-
-### 13. Moving the turtlebot  `[gewijzigd]`
+### 6. Moving the turtlebot  `[gewijzigd]`
 
 <sub>turtlebot-in-simulation/moving-the-turtlebot.md</sub>
 
@@ -1145,7 +317,7 @@ Close rqt with `CTRL+C` in the terminal.
 
 ---
 
-### 14. Show me the robot  `[gewijzigd]`
+### 7. Show me the robot  `[gewijzigd]`
 
 <sub>turtlebot-in-simulation/show-me-the-robot.md</sub>
 
@@ -1297,7 +469,7 @@ Echo the `/joint_states` topic and let the robot turn. You should see the joint 
 
 ---
 
-### 15. Here come the sensors  `[gewijzigd]`
+### 8. Here come the sensors  `[gewijzigd]`
 
 <sub>turtlebot-in-simulation/here-come-the-sensors.md</sub>
 
@@ -1365,6 +537,849 @@ ros2 topic echo /imu
 ```
 
 <figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2FgwaDgaLqETpefgG11ng0%2Fimage.png?alt=media&amp;token=996d4617-b5d6-4fb5-85cb-761768b59c2b" alt=""><figcaption></figcaption></figure>
+
+Next: [Theory: what the robot measures](theory.md) - what these topics mean.
+
+---
+
+### 9. Theory: what the robot measures  `[nieuw]`
+
+<sub>turtlebot-in-simulation/theory.md</sub>
+
+
+You have now seen the topics of the robot in Gazebo, RViz2 and the terminal.
+Before you write your own nodes, this chapter explains **where the data comes
+from** and **what it means**: a short piece of theory for each important topic,
+applied to the TurtleBot3 Burger in Gazebo. Keep the simulation running: every
+page has a few commands to try.
+
+* [Laser scan (`/scan`)](theory/laser-scan.md) - what the lidar sees
+* [Odometry (`/odom`) and wheels](theory/odometry.md) - where the robot thinks it is
+* [IMU (`/imu`)](theory/imu.md) - rotation and acceleration
+* [TF - coordinate frames](theory/tf.md) - how everything fits together
+* [Driving the robot (`/cmd_vel`)](theory/cmd-vel.md) - speed commands
+* [QoS - Quality of Service](theory/qos.md) - why you sometimes receive nothing
+
+## Where does the data come from?
+
+In the simulation there is no real hardware: **Gazebo** calculates the physics
+(wheels, floor, walls) and simulates the sensors. A **bridge** turns the Gazebo
+messages into ROS 2 topics.
+
+```
+            Docker container gazebo_turtlebot_cont (your laptop)
+ ┌──────────────────────────────────────────────────────────────────────┐
+ │  Gazebo (gz sim)                    ros_gz_bridge         ROS 2      │
+ │  ┌──────────────────────────┐                                         │
+ │  │ lidar sensor   ──────────┼──────────────────────────►  /scan       │
+ │  │ IMU sensor     ──────────┼──────────────────────────►  /imu        │
+ │  │ DiffDrive plugin ────────┼──────────────────────────►  /odom, /tf  │
+ │  │ JointState plugin ───────┼──────────────────────────►  /joint_states
+ │  │ simulation time ─────────┼──────────────────────────►  /clock      │
+ │  │ DiffDrive plugin ◄───────┼───────────────────────────  /cmd_vel    │
+ │  └──────────────────────────┘                                         │
+ │                                                                       │
+ │  robot_state_publisher (URDF + /joint_states) ───────►  /tf, /tf_static,
+ │                                                          /robot_description
+ │  RViz2, teleop_twist_keyboard, your nodes                             │
+ └──────────────────────────────────────────────────────────────────────┘
+```
+
+* The **DiffDrive plugin** moves the wheels when you send `/cmd_vel` and
+  **calculates the odometry**.
+* The sensors in Gazebo get a bit of **noise** on purpose, so the data looks
+  like real sensor data.
+* Gazebo has its own clock (`/clock`). That is why nodes in the simulation use
+  `use_sim_time:=True`: they follow the simulation time, not the clock of your laptop.
+
+On the real robot the same topics come from real hardware (see
+[Simulation vs. real robot](../simulation-vs-real-robot.md)). That is the strength
+of ROS: your code does not see the difference.
+
+## Conventions used by all ROS robots
+
+ROS uses fixed conventions (REP-103), so every robot and every tool agrees:
+
+| Quantity | Unit | |
+|---|---|---|
+| distance | metre (m) | not cm or mm! |
+| angle | radian (rad) | 1 rad ≈ 57.3°, 90° = π/2 ≈ 1.571 rad |
+| linear speed | m/s | |
+| angular speed | rad/s | |
+| time | seconds (ROS time stamp in the `header`) | |
+
+Axes of the robot (right-hand rule):
+
+```
+            x (forward)
+            ▲
+            │
+   y ◄──────●        z points up, out of the screen
+  (left)   robot
+```
+
+* **x** = forward, **y** = left, **z** = up.
+* A **positive rotation** around z is **counterclockwise** (to the left).
+  So `angular.z = +0.5` in `/cmd_vel` turns the robot to the left.
+
+{% hint style="info" %}
+Try it: start the simulation, then `ros2 topic list` and `ros2 topic info /odom`.
+Which node publishes `/odom`? (Hint: it is the bridge.)
+{% endhint %}
+
+---
+
+#### 10. Laser scan (/scan)  `[nieuw]`
+
+<sub>turtlebot-in-simulation/theory/laser-scan.md</sub>
+
+
+## How a lidar works
+
+On top of the TurtleBot is a lidar (Laser Distance Sensor). Inside, a laser and
+a receiver turn around (about 5 rotations per second). For every small angle
+step the sensor measures the distance to the first object the laser hits. The
+result of one rotation is a **2D slice** of the world at the height of the lidar
+(about 18 cm above the floor).
+
+```
+                    0 rad (front, x)
+                         ▲
+                 ·  ·  · │ ·  ·  ·
+             ·           │           ·
+   +π/2   ·              │              ·    3π/2 (or -π/2)
+  (left) ·───────────────●───────────────·  (right)
+          ·            robot            ·
+             ·                       ·
+                 ·  ·  ·   ·  ·  ·
+                        π (back)
+```
+
+{% hint style="warning" %}
+The lidar only sees what is **at its own height**. A low object or a table top
+above the robot is invisible to it. On the real robot glass and black, shiny
+surfaces can also give no (or a wrong) reflection - Gazebo does not simulate that.
+{% endhint %}
+
+## The lidar in Gazebo
+
+| | simulation (Gazebo) | real robot (LDS-02) |
+|---|---|---|
+| scans per second | 5 Hz | ~5 Hz |
+| points per rotation | **360**, always the same | ~220-230, varies |
+| angular resolution | 1° (0.0175 rad) | ~1.6° |
+| angles | 0 → 6.28 rad | |
+| range | 0.12 m to **3.5 m** | ~0.16 m to 8 m |
+| noise | ±1 cm (gaussian, added by Gazebo) | real noise |
+| frame | `base_scan` (see [TF](tf.md)) | `base_scan` |
+
+## The LaserScan message
+
+`/scan` is of type `sensor_msgs/msg/LaserScan`:
+
+| field | meaning |
+|---|---|
+| `header.stamp` | time of the measurement (simulation time) |
+| `header.frame_id` | `base_scan`: the distances are measured from the centre of the lidar |
+| `angle_min`, `angle_max` | angle of the first and the last point (rad) |
+| `angle_increment` | angle between two points (rad) |
+| `range_min`, `range_max` | limits of the sensor (m) |
+| `ranges[]` | the distances (m), one per angle step |
+| `intensities[]` | strength of the reflection |
+
+The **index** `i` in `ranges[]` belongs to the angle:
+
+```
+angle(i) = angle_min + i * angle_increment
+```
+
+and the other way around, the index for a given angle:
+
+```
+i = round((angle - angle_min) / angle_increment)
+```
+
+Index `0` is the **front** of the robot, the angle grows **counterclockwise**:
+in the simulation index 90 is the **left** side, 180 the **back**, 270 the **right**.
+
+{% hint style="info" %}
+On the real robot the number of points is not always the same (220, 221, ...).
+Code with fixed indices like `ranges[90]` works in the simulation but not on
+the real robot. Calculate the index from `angle_increment`, or use
+`len(msg.ranges) // 4` - then your code works on both.
+{% endhint %}
+
+## Invalid values
+
+Not every angle gives a good measurement. In `ranges[]` you can find:
+
+* `inf` - nothing within range (in the simulation: nothing within 3.5 m)
+* `nan` - no measurement for that angle (happens on the real robot)
+* values below `range_min` - no valid echo
+
+Always filter these before you calculate a mean or a minimum, for example:
+
+```python
+valid = [r for r in msg.ranges if math.isfinite(r) and r >= msg.range_min]
+```
+
+## From distance and angle to a point (x, y)
+
+A lidar point is given in **polar coordinates** (distance `r`, angle `θ`). To
+get the point in the frame of the lidar (`base_scan`):
+
+```
+x = r * cos(θ)        (forward)
+y = r * sin(θ)        (left)
+```
+
+This is exactly what RViz2 does to draw the red dots. To place the points in the
+world, RViz2 also needs the position of the lidar on the robot and the position
+of the robot in the world: that is [TF](tf.md).
+
+## Try it
+
+```bash
+ros2 topic hz /scan                     # how many scans per second?
+ros2 topic echo /scan --once --field angle_increment
+ros2 topic echo /scan --once --field ranges
+```
+
+Put the robot in front of a wall in Gazebo and look at `ranges[0]`. Then
+drive 0.5 m back: does the value change by 0.5?
+
+<details>
+
+<summary>Check yourself</summary>
+
+1. `angle_increment` is 0.0175 rad. How many degrees is that, and how many points per rotation?
+   * 0.0175 × 57.3 ≈ 1°; 2π / 0.0175 ≈ 360 points.
+2. Which index points to the right?
+   * 270 (angle 3π/2, or -π/2).
+3. The robot is in an empty part of the world. Most values in `ranges` are `inf`. Is the lidar broken?
+   * No: there is nothing within 3.5 m.
+
+</details>
+
+Exercise: [Here come the sensors](../here-come-the-sensors.md).
+
+Next: [Odometry (/odom) and wheels](odometry.md).
+
+---
+
+#### 11. Odometry (/odom) and wheels  `[nieuw]`
+
+<sub>turtlebot-in-simulation/theory/odometry.md</sub>
+
+
+## What is odometry?
+
+**Odometry** is estimating the position of the robot by **counting how far the
+wheels have turned**. It is like walking with your eyes closed and counting your
+steps: it works well for a short time, but small errors add up.
+
+The robot starts at `(x, y, θ) = (0, 0, 0)` when the simulation starts. From
+then on every small movement is added to that position.
+
+## The wheels of the TurtleBot3 Burger
+
+| | Burger |
+|---|---|
+| wheel radius `r` | 0.033 m |
+| distance between the wheels `L` | 0.160 m |
+| wheel circumference `2πr` | 0.207 m |
+
+The topic `/joint_states` (`sensor_msgs/msg/JointState`) shows the wheels:
+
+* `name[]`: `wheel_left_joint`, `wheel_right_joint`
+* `position[]`: how far each wheel has turned, in **radians** (keeps counting)
+* `velocity[]`: rotation speed of each wheel in rad/s
+
+From wheel rotation to distance:
+
+```
+distance     = position * r          [m]
+speed_wheel  = velocity * r          [m/s]
+```
+
+{% hint style="info" %}
+The real robot has **encoders** on the motors: 4096 ticks per wheel rotation,
+in the topic `/sensor_state`. The simulation only has `/joint_states`, which the
+real robot also has.
+{% endhint %}
+
+## From two wheels to the position of the robot
+
+The TurtleBot3 is a **differential drive** robot: two driven wheels and a
+caster at the back. It cannot drive sideways. Every small time step:
+
+```
+d_left, d_right = distance of each wheel since the last step
+
+d     = (d_right + d_left) / 2          distance of the robot centre
+dθ    = (d_right - d_left) / L          rotation of the robot
+
+x    += d * cos(θ + dθ/2)
+y    += d * sin(θ + dθ/2)
+θ    += dθ
+```
+
+* Both wheels the same distance → driving straight (`dθ = 0`).
+* Wheels in opposite directions → turning on the spot (`d = 0`).
+
+The same formulas the other way around turn a command on `/cmd_vel`
+(`linear.x = v`, `angular.z = ω`) into wheel speeds:
+
+```
+v_left  = v - ω * L / 2
+v_right = v + ω * L / 2
+```
+
+In Gazebo the **DiffDrive plugin** does both: it turns `/cmd_vel` into wheel
+speeds, and it calculates `/odom` from the wheels (30 times per second).
+
+## The Odometry message
+
+`/odom` is of type `nav_msgs/msg/Odometry`:
+
+| field | meaning |
+|---|---|
+| `header.frame_id` | `odom` - the position is relative to the start point |
+| `child_frame_id` | `base_footprint` - the robot |
+| `pose.pose.position` | `x`, `y` (m), `z` is always 0 |
+| `pose.pose.orientation` | rotation as a **quaternion** (`x, y, z, w`) - see [IMU](imu.md) |
+| `twist.twist.linear.x` | forward speed (m/s) |
+| `twist.twist.angular.z` | rotation speed (rad/s) |
+| `pose.covariance`, `twist.covariance` | how uncertain the estimate is |
+
+The same position is also published as the transform `odom -> base_footprint` on
+`/tf` (see [TF](tf.md)).
+
+## Why does odometry drift?
+
+On a real robot:
+
+* the wheels **slip** (smooth floor, accelerating, turning)
+* the wheel radius is not exactly 0.033 m (wear, dust)
+* bumps, thresholds, cables
+* small errors in θ become large errors in x, y after a few metres
+
+In **Gazebo** the floor is perfect and the wheel radius is exact, so the odometry
+is almost perfect. Don't be fooled: on the real robot it drifts much more. That
+is why SLAM or AMCL compares the [laser scan](laser-scan.md) with a map and
+publishes a correction (`map -> odom`, see [TF](tf.md)).
+
+## Try it
+
+```bash
+ros2 topic echo /odom --field pose.pose.position
+ros2 topic echo /joint_states
+```
+
+Drive straight ahead with `teleop_twist_keyboard` and compare the change of `x`
+in `/odom` with the change of `position` × 0.033 in `/joint_states`.
+
+<details>
+
+<summary>Check yourself</summary>
+
+1. The left wheel `position` went from 10.0 to 28.85 rad. How far did the left wheel drive?
+   * 18.85 rad × 0.033 m ≈ 0.62 m (= 3 wheel rotations).
+2. `/cmd_vel` has `linear.x = 0`, `angular.z = 1.0` rad/s. What are the wheel speeds?
+   * v_left = -0.08 m/s, v_right = +0.08 m/s: turning left on the spot.
+3. In the simulation `/odom` stays correct for minutes. Will that also be the case on the real robot?
+   * No: slip and small errors make the real odometry drift.
+
+</details>
+
+Exercise: [The first ros2 node](../../the-first-ros2-node.md) (subscribe to `/odom`).
+
+Next: [IMU (/imu)](imu.md).
+
+---
+
+#### 12. IMU (/imu)  `[nieuw]`
+
+<sub>turtlebot-in-simulation/theory/imu.md</sub>
+
+
+## What is an IMU?
+
+An **IMU** (Inertial Measurement Unit) is a small chip that measures how the
+robot **moves and rotates**. On the real TurtleBot3 it is on the OpenCR board;
+in Gazebo it is a simulated sensor in the frame `imu_link`. It contains:
+
+* a **gyroscope**: rotation speed around x, y and z (rad/s)
+* an **accelerometer**: acceleration along x, y and z (m/s²)
+
+(You know these sensors from your phone and from the flight controller of a drone.)
+
+From both, the **orientation** of the robot is calculated: how it is turned in space.
+
+```
+          z (yaw)
+          ▲
+          │
+          │
+          ●─────► x (roll)      roll  = rotation around x (tilt left/right)
+         ╱                      pitch = rotation around y (nose up/down)
+        ╱                       yaw   = rotation around z (heading)
+       ▼
+      y (pitch)
+```
+
+For a ground robot, **yaw** (the heading) is by far the most important one.
+Roll and pitch stay almost 0 on a flat floor.
+
+## The IMU in Gazebo
+
+| | simulation | real robot |
+|---|---|---|
+| rate | 200 Hz | lower (check with `ros2 topic hz /imu`) |
+| noise | gaussian, added by Gazebo | real noise and drift |
+| frame | `imu_link` | `imu_link` |
+
+## The Imu message
+
+`/imu` is of type `sensor_msgs/msg/Imu`:
+
+| field | meaning | robot standing still on the floor |
+|---|---|---|
+| `orientation` | rotation as a quaternion (`x, y, z, w`) | depends on the heading |
+| `angular_velocity` | rad/s around x, y, z | ≈ 0, 0, 0 (+ noise) |
+| `linear_acceleration` | m/s² along x, y, z | ≈ 0, 0, **9.81** |
+
+{% hint style="info" %}
+Standing still, the accelerometer measures **9.81 m/s² upwards**: it measures
+gravity. That is how the IMU knows which way is down (roll and pitch). For yaw
+there is no such reference, so on a real robot yaw slowly **drifts**.
+{% endhint %}
+
+## Quaternions
+
+ROS does not store orientation as three angles, but as a **quaternion**: four
+numbers `(x, y, z, w)`. Quaternions have no problems with angles that jump from
++180° to -180° and are easy to combine. You don't have to understand the
+maths, just remember:
+
+* no rotation: `(0, 0, 0, 1)`
+* for a ground robot only `z` and `w` change
+* convert to **yaw** (in rad) like this (you will see this code again in
+  [The first ros2 node](../../the-first-ros2-node.md)):
+
+```python
+import math
+
+q = msg.orientation          # also works for msg.pose.pose.orientation of /odom
+yaw = math.atan2(2.0 * (q.w * q.z + q.x * q.y),
+                 1.0 - 2.0 * (q.y * q.y + q.z * q.z))
+print(math.degrees(yaw))
+```
+
+## IMU and wheels
+
+| | wheels (odometry) | IMU (gyroscope) |
+|---|---|---|
+| distance | ✅ good | ❌ (double integration of acceleration → very large drift) |
+| rotation | ⚠️ errors from slip | ✅ good, slow drift over time |
+
+That is why the real TurtleBot3 combines both: distance from the wheels, heading
+from the IMU. Combining sensors to get a better result than each sensor alone
+is called **sensor fusion**. (In the simulation `/odom` only uses the wheels -
+the perfect Gazebo floor makes that good enough.)
+
+## Try it
+
+```bash
+ros2 topic hz /imu
+ros2 topic echo /imu --field angular_velocity
+ros2 topic echo /imu --field linear_acceleration
+```
+
+* Turn the robot left with `teleop_twist_keyboard`: which value of `angular_velocity` changes? Positive or negative?
+* Compare `angular_velocity.z` of `/imu` with `twist.twist.angular.z` of `/odom`.
+
+<details>
+
+<summary>Check yourself</summary>
+
+1. The robot turns left at 0.5 rad/s. What does `angular_velocity.z` show?
+   * About +0.5 (counterclockwise is positive).
+2. The quaternion is `(0, 0, 0.707, 0.707)`. What is the yaw?
+   * atan2(2·0.707·0.707, 1 − 2·0.707²) = atan2(1, 0) = π/2 → 90°, turned to the left.
+3. Why can't we calculate the position of the robot from the accelerometer?
+   * Acceleration has to be integrated twice; every small error grows very fast (quadratically in time).
+
+</details>
+
+Exercise: [Here come the sensors](../here-come-the-sensors.md) (IMU part).
+
+Next: [TF - coordinate frames](tf.md).
+
+---
+
+#### 13. TF - coordinate frames  `[nieuw]`
+
+<sub>turtlebot-in-simulation/theory/tf.md</sub>
+
+
+## The problem
+
+Every sensor measures in **its own coordinate frame**:
+
+* the lidar says "there is a wall 1.0 m in front of **me**" (frame `base_scan`)
+* the IMU measures in **its** frame (`imu_link`)
+* odometry says where the **robot** is relative to the **start point** (`odom`)
+
+To draw the wall in the world, or to drive to it, we have to know how these
+frames are positioned relative to each other. That is the job of **TF** (the
+`tf2` library).
+
+## Frames and transforms
+
+A **frame** is a coordinate system with a name. A **transform** between two
+frames is a translation (x, y, z) + a rotation (quaternion). All transforms
+together form a **tree**: every frame has exactly one parent.
+
+The TF tree of the TurtleBot3 Burger in the simulation:
+
+```
+map                     ← only with SLAM or Nav2 (later in this book)
+ └── odom               ← start point of the odometry
+      └── base_footprint     ← the robot, on the floor (dynamic: Gazebo DiffDrive)
+           └── base_link          ← centre of the robot, 1 cm higher (static)
+                ├── base_scan          ← the lidar        (static)
+                ├── imu_link           ← the IMU          (static)
+                ├── caster_back_link   ← caster           (static)
+                ├── wheel_left_link    ← left wheel  (turns: robot_state_publisher)
+                └── wheel_right_link   ← right wheel (turns: robot_state_publisher)
+```
+
+| transform | published by | kind |
+|---|---|---|
+| `map -> odom` | slam_toolbox (SLAM) or AMCL (Nav2) | dynamic, correction of the drift |
+| `odom -> base_footprint` | Gazebo DiffDrive plugin (via the bridge) | dynamic, changes when driving |
+| `base_footprint -> base_link -> base_scan, imu_link, ...` | `robot_state_publisher` (from the URDF) | **static**, fixed on the robot |
+| `base_link -> wheel_*_link` | `robot_state_publisher` (from `/joint_states`) | dynamic, the wheels turn |
+
+* **Dynamic** transforms are published on `/tf` many times per second.
+* **Static** transforms are published once on `/tf_static` (they never change).
+
+On the real robot the tree is exactly the same; only `odom -> base_footprint`
+comes from the robot driver instead of Gazebo.
+
+## Positions on the Burger (from the URDF)
+
+| from `base_link` to | x | y | z |
+|---|---|---|---|
+| `base_scan` (lidar) | -0.032 m | 0 | 0.172 m |
+| `imu_link` | -0.032 m | 0 | 0.068 m |
+| `wheel_left_link` | 0 | +0.080 m | 0.023 m |
+| `wheel_right_link` | 0 | -0.080 m | 0.023 m |
+
+`base_link` is 0.010 m above `base_footprint` (the floor).
+
+So the lidar is **3.2 cm behind** the centre between the wheels. A wall at
+1.000 m in the scan is at 1.000 - 0.032 = 0.968 m in front of `base_link`. TF
+does this calculation for you.
+
+## Why both `map` and `odom`?
+
+* `odom` is **smooth** (no jumps) but **drifts** - good for the controller that drives.
+* `map` is **correct** (SLAM/AMCL compares the scan with the map) but **can jump** - good for "where am I".
+* SLAM/AMCL publishes `map -> odom` so that `map -> odom -> base_footprint`
+  gives the corrected position, without changing the odometry itself.
+
+## Fixed frame in RViz2
+
+In RViz2 the **Fixed Frame** is the frame in which everything is drawn:
+
+* `base_link` - the robot stands still, the world moves around it
+* `odom` - the world stands still, the robot drives
+* `map` - the robot drives on the map (only with SLAM / Nav2)
+
+If RViz2 says *"No transform from [base_scan] to [map]"*, a link in the tree is
+missing: for example SLAM is not running, so there is no `map -> odom`. That is
+the Global Status error you see in [Show me the robot](../show-me-the-robot.md).
+
+## Try it
+
+```bash
+# Show the TF tree as a PDF (frames_<date>.pdf in the current folder)
+ros2 run tf2_tools view_frames
+
+# Position of the robot relative to odom, live
+ros2 run tf2_ros tf2_echo odom base_footprint
+
+# Fixed offset of the lidar
+ros2 run tf2_ros tf2_echo base_link base_scan
+```
+
+In RViz2: add the **TF** display and enable *Show Names*.
+
+In Python you can ask TF for a transform with a `tf2_ros.Buffer` and a
+`tf2_ros.TransformListener`:
+
+```python
+from tf2_ros import Buffer, TransformListener
+
+self.tf_buffer = Buffer()
+self.tf_listener = TransformListener(self.tf_buffer, self)
+...
+t = self.tf_buffer.lookup_transform('odom', 'base_footprint', rclpy.time.Time())
+self.get_logger().info(f"x={t.transform.translation.x:.2f} y={t.transform.translation.y:.2f}")
+```
+
+<details>
+
+<summary>Check yourself</summary>
+
+1. Who publishes `odom -> base_footprint` in the simulation? And on the real robot?
+   * Simulation: the Gazebo DiffDrive plugin (via `ros_gz_bridge`). Real robot: the robot driver `turtlebot3_node`.
+2. You start RViz2 with Fixed Frame `map` but without SLAM. What do you see?
+   * An error: there is no transform `map -> odom`, nothing is drawn.
+3. You mount a camera 5 cm in front of the lidar. What do you need to add to the TF tree?
+   * A static transform, e.g. `base_link -> camera_link` with x = -0.032 + 0.05 = 0.018 m (and the height):
+     `ros2 run tf2_ros static_transform_publisher --x 0.018 --z 0.17 --frame-id base_link --child-frame-id camera_link`
+
+</details>
+
+Exercise: [Show me the robot](../show-me-the-robot.md).
+
+Next: [Driving the robot (/cmd_vel)](cmd-vel.md).
+
+---
+
+#### 14. Driving the robot (/cmd_vel)  `[nieuw]`
+
+<sub>turtlebot-in-simulation/theory/cmd-vel.md</sub>
+
+
+## A speed, not a position
+
+You don't tell the robot **where** to go, you tell it **how fast** to move
+*right now*. That is the job of the topic `/cmd_vel` ("command velocity").
+
+So "drive 10 cm" always becomes: drive at speed `v` during a time `t`, then
+send speed 0 (or: drive until [odometry](odometry.md) says you did 10 cm).
+
+## The TwistStamped message
+
+In the simulation (ROS 2 Jazzy) `/cmd_vel` is a `geometry_msgs/msg/TwistStamped`:
+a `header` (time stamp + frame) and a `twist` with the speeds.
+
+```
+header:
+  stamp: ...
+  frame_id: base_link
+twist:
+  linear:            angular:
+    x: 0.1   ← forward (m/s)    x: 0.0
+    y: 0.0                      y: 0.0
+    z: 0.0                      z: 0.5   ← turn (rad/s), positive = left
+```
+
+That is why `teleop_twist_keyboard` is started with `-p stamped:=true`.
+
+A **differential drive** robot can only use two of the six numbers:
+
+| field | meaning | real Burger max |
+|---|---|---|
+| `twist.linear.x` | forward (+) / backward (-) | 0.22 m/s |
+| `twist.angular.z` | turn left (+) / right (-) | 2.84 rad/s |
+| other fields | ignored: the robot cannot drive sideways, fly or roll | - |
+
+{% hint style="warning" %}
+Gazebo does **not** limit the speed: you can drive the simulated robot at 1 m/s.
+The real Burger can do at most 0.22 m/s. Keep your code within the real limits.
+{% endhint %}
+
+Combining both gives a **curve** with radius `R = v / ω`. For example
+`linear.x = 0.1`, `angular.z = 0.5` → a circle with a radius of 0.2 m.
+
+How this becomes two wheel speeds is explained in [Odometry](odometry.md):
+`v_left = v - ω·L/2`, `v_right = v + ω·L/2`.
+
+## The path of a command
+
+```
+ teleop_twist_keyboard ─┐
+ Nav2                  ─┼─► /cmd_vel ─► ros_gz_bridge ─► Gazebo DiffDrive plugin ─► wheels
+ your node             ─┘   (TwistStamped)
+```
+
+In the simulation **everyone publishes on the same topic**: if two nodes send
+`/cmd_vel` at the same time, the robot jerks between both commands. On the real
+robot a *twist_mux* decides who is in control (see
+[Simulation vs. real robot](../../simulation-vs-real-robot.md)).
+
+{% hint style="info" %}
+On the real robot (ROS 2 Humble) `/cmd_vel` is a plain `Twist`, without header.
+Code from the simulation needs a small change.
+{% endhint %}
+
+## Good habits
+
+* **Publish regularly** (e.g. 10-20 times per second), not just once.
+* **Always stop explicitly**: publish a message with all speeds 0 when you are
+  done, and also when your node stops (Ctrl+C).
+* **Start slow** and stay within the real limits (0.22 m/s, 2.84 rad/s): then your
+  code also works on the real robot.
+
+## Try it
+
+```bash
+# Turn slowly to the left, 10 times per second (Ctrl+C to stop)
+ros2 topic pub -r 10 /cmd_vel geometry_msgs/msg/TwistStamped "{twist: {angular: {z: 0.3}}}"
+
+# Stop
+ros2 topic pub --once /cmd_vel geometry_msgs/msg/TwistStamped "{}"
+
+# Which type does the robot expect?
+ros2 topic info /cmd_vel
+```
+
+<details>
+
+<summary>Check yourself</summary>
+
+1. You publish `twist.linear.y = 0.1`. What does the robot do?
+   * Nothing: a differential drive robot cannot drive sideways.
+2. Which command drives a circle with a radius of 0.5 m at 0.1 m/s, to the right?
+   * `linear.x = 0.1`, `angular.z = -0.2` (ω = v / R = 0.1 / 0.5).
+3. Your node publishes a `Twist` (without header) on `/cmd_vel` in the simulation. What happens?
+   * Nothing, or an error about the type: the simulation expects `TwistStamped`.
+
+</details>
+
+Exercise: [Moving the turtlebot](../moving-the-turtlebot.md).
+
+Next: [QoS - Quality of Service](qos.md).
+
+---
+
+#### 15. QoS - Quality of Service  `[nieuw]`
+
+<sub>turtlebot-in-simulation/theory/qos.md</sub>
+
+
+## Why QoS?
+
+Not every topic needs the same kind of delivery:
+
+* A **laser scan** arrives 5 times per second. If one is lost on the network, it
+  is no use sending it again: the next one is newer anyway.
+* A **map** is published once. A node that starts later must still get it.
+* A **command** that has to arrive should be sent again when it gets lost.
+
+With **QoS** (Quality of Service) every publisher and subscriber says how it
+wants to send or receive messages.
+
+## The three settings you need
+
+| setting | options | meaning |
+|---|---|---|
+| **Reliability** | `RELIABLE` | a lost message is sent again (like TCP) |
+| | `BEST_EFFORT` | a lost message is lost, no waiting (like UDP) - good for sensors |
+| **Durability** | `VOLATILE` | you only get messages sent **after** you subscribed |
+| | `TRANSIENT_LOCAL` | the publisher keeps the last message(s); a **late** subscriber still gets them ("latched") |
+| **History + depth** | `KEEP_LAST` + `depth` | how many messages are kept in the queue (e.g. 10) |
+
+There are more settings (deadline, lifespan, liveliness), but you won't need
+them in this lab.
+
+When you write `self.create_subscription(Odometry, '/odom', self.cb, 10)`, the
+`10` is the depth, and you get the **default** QoS: `RELIABLE`, `VOLATILE`, `KEEP_LAST 10`.
+
+## Publisher and subscriber must match
+
+The simulation uses the DDS middleware (CycloneDDS). A subscriber only receives
+messages if it asks for **the same or less** than the publisher offers:
+
+| publisher offers | subscriber asks | works? |
+|---|---|---|
+| RELIABLE | RELIABLE | ✅ |
+| RELIABLE | BEST_EFFORT | ✅ |
+| BEST_EFFORT | BEST_EFFORT | ✅ |
+| BEST_EFFORT | **RELIABLE** | ❌ no messages |
+| TRANSIENT_LOCAL | VOLATILE or TRANSIENT_LOCAL | ✅ |
+| VOLATILE | **TRANSIENT_LOCAL** | ❌ no messages |
+
+The nasty part: there is **no error**, you simply get nothing (at most a warning
+*"incompatible QoS"*).
+
+{% hint style="success" %}
+**Rule of thumb:** subscribe to sensor data (`/scan`, `/imu`, ...) with
+**Best Effort**. A Best Effort subscriber works with a Reliable *and* a Best
+Effort publisher, so your code works in the simulation **and** on the real robot.
+{% endhint %}
+
+## QoS of the topics in the simulation
+
+| topic | reliability | durability | published by |
+|---|---|---|---|
+| `/scan`, `/imu`, `/odom`, `/joint_states`, `/tf`, `/clock` | RELIABLE | VOLATILE | `ros_gz_bridge` (default QoS) |
+| `/tf_static`, `/robot_description` | RELIABLE | **TRANSIENT_LOCAL** | `robot_state_publisher`: sent once, nodes that start later still get it |
+| `/map` (SLAM / Nav2, later in this book) | RELIABLE | **TRANSIENT_LOCAL** | sent once, RViz2 started later must still see it |
+
+{% hint style="info" %}
+On the real robot the lidar driver publishes `/scan` as **BEST_EFFORT**. In the
+simulation the bridge publishes it as RELIABLE. That is why the real-robot
+tutorial tells you to set Best Effort in RViz2 - following the rule of thumb
+above, you do that in the simulation as well.
+{% endhint %}
+
+Check it yourself: `ros2 topic info -v /scan` shows the QoS of every publisher
+and subscriber.
+
+## QoS in Python
+
+For sensor data there is a ready-made profile:
+
+```python
+from rclpy.qos import qos_profile_sensor_data
+
+self.create_subscription(LaserScan, '/scan', self.scan_callback, qos_profile_sensor_data)
+```
+
+Or set it yourself:
+
+```python
+from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
+
+qos = QoSProfile(depth=10,
+                 reliability=ReliabilityPolicy.BEST_EFFORT)
+
+map_qos = QoSProfile(depth=1,
+                     reliability=ReliabilityPolicy.RELIABLE,
+                     durability=DurabilityPolicy.TRANSIENT_LOCAL)
+```
+
+In RViz2 you find the same settings per display under **Topic**: *Reliability
+Policy*, *Durability Policy*, *Depth*.
+
+## Try it
+
+```bash
+ros2 topic info -v /scan
+ros2 topic info -v /tf_static
+ros2 topic echo --qos-durability transient_local /scan --once    # what happens?
+```
+
+<details>
+
+<summary>Check yourself</summary>
+
+1. Why would you use Best Effort for a laser scan?
+   * Resending an old scan is useless (the next one arrives 0.2 s later) and causes extra traffic and delay.
+2. The last command above (`transient_local` on `/scan`) waits forever. Why?
+   * The bridge offers VOLATILE, the subscriber asks TRANSIENT_LOCAL → incompatible, no messages.
+3. You start RViz2 after `robot_state_publisher`. Why do you still see the robot model?
+   * `/robot_description` and `/tf_static` are TRANSIENT_LOCAL: a late subscriber still gets them.
+
+</details>
+
+Next: [The first ros2 node](../../the-first-ros2-node.md) - write your own nodes.
 
 ---
 

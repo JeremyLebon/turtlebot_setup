@@ -120,4 +120,6 @@ in `/odom` with the change of `position` × 0.033 in `/joint_states`.
 
 </details>
 
-Next: [The first ros2 node](../../the-first-ros2-node.md) (subscribe to `/odom`).
+Exercise: [The first ros2 node](../../the-first-ros2-node.md) (subscribe to `/odom`).
+
+Next: [IMU (/imu)](imu.md).

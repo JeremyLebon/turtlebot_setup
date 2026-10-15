@@ -1,9 +1,10 @@
 # Theory: what the robot measures
 
-Before you look at the robot in RViz2 and write your own nodes, it helps to know
-**where the data comes from** and **what it means**. This chapter gives a short
-piece of theory for each important topic, applied to the TurtleBot3 Burger in
-Gazebo.
+You have now seen the topics of the robot in Gazebo, RViz2 and the terminal.
+Before you write your own nodes, this chapter explains **where the data comes
+from** and **what it means**: a short piece of theory for each important topic,
+applied to the TurtleBot3 Burger in Gazebo. Keep the simulation running: every
+page has a few commands to try.
 
 * [Laser scan (`/scan`)](theory/laser-scan.md) - what the lidar sees
 * [Odometry (`/odom`) and wheels](theory/odometry.md) - where the robot thinks it is

@@ -63,3 +63,5 @@ ros2 topic echo /imu
 ```
 
 <figure><img src="https://2210214786-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2Fu6u3SP6puU3zF003QGfq%2Fuploads%2FgwaDgaLqETpefgG11ng0%2Fimage.png?alt=media&amp;token=996d4617-b5d6-4fb5-85cb-761768b59c2b" alt=""><figcaption></figcaption></figure>
+
+Next: [Theory: what the robot measures](theory.md) - what these topics mean.

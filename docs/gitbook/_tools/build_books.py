@@ -25,7 +25,7 @@ BOOKS = {
                     ("theory/cmd-vel.md", "theory/qos.md", "QoS - Quality of Service")]),
     "simulation": ("ROS2 - Simulation - Turtlebot - Gazebo", "simulation", "https://vives-4.gitbook.io/ros2-simulation-turtlebo-gazebo/",
                    [("autonomous-navigation/autonomous-driving-with-python-library.md", "simulation-vs-real-robot.md", "Simulation vs. real robot"),
-                    ("turtlebot-in-simulation/startup.md", "turtlebot-in-simulation/theory.md", "Theory: what the robot measures"),
+                    ("turtlebot-in-simulation/here-come-the-sensors.md", "turtlebot-in-simulation/theory.md", "Theory: what the robot measures"),
                     ("turtlebot-in-simulation/theory.md", "turtlebot-in-simulation/theory/laser-scan.md", "Laser scan (/scan)"),
                     ("turtlebot-in-simulation/theory/laser-scan.md", "turtlebot-in-simulation/theory/odometry.md", "Odometry (/odom) and wheels"),
                     ("turtlebot-in-simulation/theory/odometry.md", "turtlebot-in-simulation/theory/imu.md", "IMU (/imu)"),

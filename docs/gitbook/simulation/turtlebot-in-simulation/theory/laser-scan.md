@@ -127,4 +127,6 @@ drive 0.5 m back: does the value change by 0.5?
 
 </details>
 
-Next: [Here come the sensors](../here-come-the-sensors.md).
+Exercise: [Here come the sensors](../here-come-the-sensors.md).
+
+Next: [Odometry (/odom) and wheels](odometry.md).
