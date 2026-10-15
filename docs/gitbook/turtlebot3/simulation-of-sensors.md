@@ -1,8 +1,10 @@
----
-hidden: true
----
-
 # Simulation of sensors
+
+{% hint style="info" %}
+For **at home**, without a robot (see [Homework](homework.md)): run this script
+in the simulation container `gazebo_turtlebot_cont`, in `/home/dockeruser/dev_ws`.
+It gives you battery and sensor values to test your own nodes.
+{% endhint %}
 
 Make a script `simulation_sensors.py` and add the code below. This code will simulate the following parameters. These parameters will be published on ROS 2 topics under `/sim/...`:
 

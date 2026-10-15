@@ -25,22 +25,23 @@ Volgorde zoals in GitBook. Klik een pagina aan, of lees alles achter elkaar in [
 | 19 | &nbsp;&nbsp;&nbsp;&nbsp;[Read the battery level](ros2-nodes/read-the-battery-level.md) | 🟠 gewijzigd |
 | 20 | &nbsp;&nbsp;&nbsp;&nbsp;[Read the encoder value](ros2-nodes/read-the-encoder-value.md) | 🟠 gewijzigd |
 | 21 | &nbsp;&nbsp;&nbsp;&nbsp;[Drive 10cm with a button](ros2-nodes/drive-10cm-with-a-button.md) | 🟠 gewijzigd |
-| 22 | [Simulation of sensors](simulation-of-sensors.md) | 🟠 gewijzigd 🙈 verborgen |
-| 23 | [SLAM](slam.md) | 🟠 gewijzigd 🙈 verborgen |
-| 24 | [Autonomous driving](autonomous-driving.md) | 🟠 gewijzigd 🙈 verborgen |
-| 25 | [Autonomous driving with python library](autonomous-driving-with-python-library.md) | 🟠 gewijzigd 🙈 verborgen |
-| 26 | [Compare planners and controllers](compare-planners-and-controllers.md) | 🟢 nieuw 🙈 verborgen |
-| 27 | [Zones](zones.md) | 🟢 nieuw 🙈 verborgen |
-| 28 | [Measure while driving](measure-while-driving.md) | 🟠 gewijzigd 🙈 verborgen |
-| 29 | [Solution: Measure while driving](solution-measure-while-driving.md) | 🟠 gewijzigd 🙈 verborgen |
-| 30 | [Install python libraries in container](install-python-libraries-in-container.md) | 🟠 gewijzigd |
-| 31 | [Location files on wsl](location-files-on-wsl.md) | 🟠 gewijzigd |
-| 32 | [Theory: what the robot measures](theory/README.md) | 🟢 nieuw |
-| 33 | &nbsp;&nbsp;&nbsp;&nbsp;[Laser scan (/scan)](theory/laser-scan.md) | 🟢 nieuw |
-| 34 | &nbsp;&nbsp;&nbsp;&nbsp;[Odometry (/odom) and encoders](theory/odometry.md) | 🟢 nieuw |
-| 35 | &nbsp;&nbsp;&nbsp;&nbsp;[IMU (/imu)](theory/imu.md) | 🟢 nieuw |
-| 36 | &nbsp;&nbsp;&nbsp;&nbsp;[TF - coordinate frames](theory/tf.md) | 🟢 nieuw |
-| 37 | &nbsp;&nbsp;&nbsp;&nbsp;[Driving the robot (/cmd_vel)](theory/cmd-vel.md) | 🟢 nieuw |
-| 38 | &nbsp;&nbsp;&nbsp;&nbsp;[QoS - Quality of Service](theory/qos.md) | 🟢 nieuw |
+| 22 | [Homework](homework.md) | 🟢 nieuw |
+| 23 | [Simulation of sensors](simulation-of-sensors.md) | 🟠 gewijzigd |
+| 24 | [SLAM](slam.md) | 🟠 gewijzigd 🙈 verborgen |
+| 25 | [Autonomous driving](autonomous-driving.md) | 🟠 gewijzigd 🙈 verborgen |
+| 26 | [Autonomous driving with python library](autonomous-driving-with-python-library.md) | 🟠 gewijzigd 🙈 verborgen |
+| 27 | [Compare planners and controllers](compare-planners-and-controllers.md) | 🟢 nieuw 🙈 verborgen |
+| 28 | [Zones](zones.md) | 🟢 nieuw 🙈 verborgen |
+| 29 | [Measure while driving](measure-while-driving.md) | 🟠 gewijzigd 🙈 verborgen |
+| 30 | [Solution: Measure while driving](solution-measure-while-driving.md) | 🟠 gewijzigd 🙈 verborgen |
+| 31 | [Install python libraries in container](install-python-libraries-in-container.md) | 🟠 gewijzigd |
+| 32 | [Location files on wsl](location-files-on-wsl.md) | 🟠 gewijzigd |
+| 33 | [Theory: what the robot measures](theory/README.md) | 🟢 nieuw |
+| 34 | &nbsp;&nbsp;&nbsp;&nbsp;[Laser scan (/scan)](theory/laser-scan.md) | 🟢 nieuw |
+| 35 | &nbsp;&nbsp;&nbsp;&nbsp;[Odometry (/odom) and encoders](theory/odometry.md) | 🟢 nieuw |
+| 36 | &nbsp;&nbsp;&nbsp;&nbsp;[IMU (/imu)](theory/imu.md) | 🟢 nieuw |
+| 37 | &nbsp;&nbsp;&nbsp;&nbsp;[TF - coordinate frames](theory/tf.md) | 🟢 nieuw |
+| 38 | &nbsp;&nbsp;&nbsp;&nbsp;[Driving the robot (/cmd_vel)](theory/cmd-vel.md) | 🟢 nieuw |
+| 39 | &nbsp;&nbsp;&nbsp;&nbsp;[QoS - Quality of Service](theory/qos.md) | 🟢 nieuw |
 
-Samen: 10 nieuw, 27 gewijzigd, 1 ongewijzigd.
+Samen: 11 nieuw, 27 gewijzigd, 1 ongewijzigd.

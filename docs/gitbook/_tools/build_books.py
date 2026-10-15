@@ -18,6 +18,7 @@ BOOKS = {
                     ("compare-planners-and-controllers.md", "zones.md", "Zones"),
                     ("turtlebot3-startup/setup-laptop-student.md", "theory.md", "Theory: what the robot measures"),
                     ("turtlebot3-in-the-real-world.md", "installation.md", "Installation"),
+                    ("simulation-of-sensors.md", "homework.md", "Homework"),
                     ("theory.md", "theory/laser-scan.md", "Laser scan (/scan)"),
                     ("theory/laser-scan.md", "theory/odometry.md", "Odometry (/odom) and encoders"),
                     ("theory/odometry.md", "theory/imu.md", "IMU (/imu)"),
@@ -41,7 +42,7 @@ ORDER = {
     "turtlebot3": [
         "installation.md", "turtlebot3-in-the-real-world.md", "turtlebot3-startup.md",
         "visualise-the-robot.md", "controlling-the-robot.md", "see-turtlebot3-topics.md",
-        "play-a-sound.md", "ros2-nodes.md", "simulation-of-sensors.md",
+        "play-a-sound.md", "ros2-nodes.md", "homework.md", "simulation-of-sensors.md",
         # SLAM / navigation (hidden for now: 'hidden: true' front matter)
         "slam.md", "autonomous-driving.md", "autonomous-driving-with-python-library.md",
         "compare-planners-and-controllers.md", "zones.md",

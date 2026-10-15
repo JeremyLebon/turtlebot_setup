@@ -1145,10 +1145,89 @@ if __name__ == '__main__':
 
 ---
 
-## 22. Simulation of sensors  `[gewijzigd]`
+## 22. Homework  `[nieuw]`
+
+<sub>homework.md</sub>
+
+
+Finish these tasks **at home, before the next session**. You have no robot at
+home, so you work in the **simulation**: the container `gazebo_turtlebot_cont`
+from the simulation book (Gazebo + ROS 2 Jazzy).
+
+{% hint style="warning" %}
+* Store your scripts in `/home/dockeruser/dev_ws` (the `dev_ws` folder of the
+  `ros2-jazzy-gazebo-turtlebot` repository), not in the `turtlebot-vis` container:
+  without a robot, the `turtlebot-vis` container has no Zenoh router to talk to.
+* Simulation vs. real robot: in the simulation `/cmd_vel` is a `TwistStamped`,
+  the lidar has 360 points, and there is no `/battery_state`.
+{% endhint %}
+
+## Task 1 - Scan sectors
+
+Do the [Exercise](ros2-nodes/read-in-the-scan-topic/exercise.md) of *Read in the
+scan topic* in the simulation (`turtlebot3_world.launch.py`): print the mean
+distance **in front**, **left**, **behind** and **right** of the robot, and the
+**closest obstacle** with its angle.
+
+{% hint style="info" %}
+Calculate the indices from `angle_increment` (see [Laser scan](theory/laser-scan.md)),
+not with fixed numbers: then the same script works in the simulation (360 points)
+and on the real robot (about 220-230 points).
+{% endhint %}
+
+## Task 2 - Battery warning
+
+Start [Simulation of sensors](simulation-of-sensors.md): it publishes random
+values on `/sim/battery_state`. Write a node that subscribes to
+`/sim/battery_state`, prints the voltage and the percentage, and prints a
+**warning** when the voltage is below **11.2 V** or the percentage below **50 %**.
+
+On the real robot you only change the topic to `/battery_state`.
+
+## Task 3 - Drive exactly 1 m with odometry
+
+In *Drive 10cm with a button* the robot drives on **time**. Now use **`/odom`**:
+drive forward at 0.1 m/s until the robot has driven **1.0 m** from its start
+position, then stop (publish all speeds 0).
+
+* Subscribe to `/odom` and remember the start position.
+* Distance from the start: `math.hypot(x - x0, y - y0)`.
+* Publish `TwistStamped` on `/cmd_vel` (simulation).
+
+Extra: turn exactly **90°** to the left, using the yaw from the quaternion
+(see [IMU](theory/imu.md)).
+
+## Task 4 - Theory
+
+Answer the **Check yourself** questions of the theory pages:
+[Laser scan](theory/laser-scan.md), [Odometry](theory/odometry.md),
+[IMU](theory/imu.md), [TF](theory/tf.md), [cmd_vel](theory/cmd-vel.md) and
+[QoS](theory/qos.md).
+
+## Hand in
+
+Upload on Toledo, before the next session:
+
+* your Python scripts of task 1, 2 and 3;
+* a screenshot of the terminal output of each script;
+* your answers of task 4.
+
+{% hint style="success" %}
+Next session: SLAM (make a map) and autonomous navigation with the real robot.
+{% endhint %}
+
+---
+
+## 23. Simulation of sensors  `[gewijzigd]`
 
 <sub>simulation-of-sensors.md</sub>
 
+
+{% hint style="info" %}
+For **at home**, without a robot (see [Homework](homework.md)): run this script
+in the simulation container `gazebo_turtlebot_cont`, in `/home/dockeruser/dev_ws`.
+It gives you battery and sensor values to test your own nodes.
+{% endhint %}
 
 Make a script `simulation_sensors.py` and add the code below. This code will simulate the following parameters. These parameters will be published on ROS 2 topics under `/sim/...`:
 
@@ -1243,7 +1322,7 @@ Use the ros2 command to echo the published topics, e.g. `ros2 topic echo /sim/ba
 
 ---
 
-## 23. SLAM  `[gewijzigd]`
+## 24. SLAM  `[gewijzigd]`
 
 <sub>slam.md</sub>
 
@@ -1298,7 +1377,7 @@ Show the map to the lecturer.
 
 ---
 
-## 24. Autonomous driving  `[gewijzigd]`
+## 25. Autonomous driving  `[gewijzigd]`
 
 <sub>autonomous-driving.md</sub>
 
@@ -1364,7 +1443,7 @@ you are in control; release and Nav2 continues.
 
 ---
 
-## 25. Autonomous driving with python library  `[gewijzigd]`
+## 26. Autonomous driving with python library  `[gewijzigd]`
 
 <sub>autonomous-driving-with-python-library.md</sub>
 
@@ -1493,7 +1572,7 @@ Nav2 on the status page must be stopped for this (only one Nav2 at a time).
 
 ---
 
-## 26. Compare planners and controllers  `[nieuw]`
+## 27. Compare planners and controllers  `[nieuw]`
 
 <sub>compare-planners-and-controllers.md</sub>
 
@@ -1544,7 +1623,7 @@ at the goal.
 
 ---
 
-## 27. Zones  `[nieuw]`
+## 28. Zones  `[nieuw]`
 
 <sub>zones.md</sub>
 
@@ -1587,7 +1666,7 @@ Show your zones and the result to the lecturer.
 
 ---
 
-## 28. Measure while driving  `[gewijzigd]`
+## 29. Measure while driving  `[gewijzigd]`
 
 <sub>measure-while-driving.md</sub>
 
@@ -1702,7 +1781,7 @@ if __name__ == "__main__":
 
 ---
 
-## 29. Solution: Measure while driving  `[gewijzigd]`
+## 30. Solution: Measure while driving  `[gewijzigd]`
 
 <sub>solution-measure-while-driving.md</sub>
 
@@ -1821,7 +1900,7 @@ def main():
 
 ---
 
-## 30. Install python libraries in container  `[gewijzigd]`
+## 31. Install python libraries in container  `[gewijzigd]`
 
 <sub>install-python-libraries-in-container.md</sub>
 
@@ -1869,7 +1948,7 @@ access point has internet.
 
 ---
 
-## 31. Location files on wsl  `[gewijzigd]`
+## 32. Location files on wsl  `[gewijzigd]`
 
 <sub>location-files-on-wsl.md</sub>
 
@@ -1899,7 +1978,7 @@ updates - but it is shared by everyone who uses that robot.
 
 ---
 
-## 32. Theory: what the robot measures  `[nieuw]`
+## 33. Theory: what the robot measures  `[nieuw]`
 
 <sub>theory/README.md</sub>
 
@@ -1968,7 +2047,7 @@ Try it: `ros2 topic list` and `ros2 topic info /odom` (in the `turtlebot-vis` co
 
 ---
 
-### 33. Laser scan (/scan)  `[nieuw]`
+### 34. Laser scan (/scan)  `[nieuw]`
 
 <sub>theory/laser-scan.md</sub>
 
@@ -2090,7 +2169,7 @@ Next: [Read in the scan topic](../ros2-nodes/read-in-the-scan-topic/).
 
 ---
 
-### 34. Odometry (/odom) and encoders  `[nieuw]`
+### 35. Odometry (/odom) and encoders  `[nieuw]`
 
 <sub>theory/odometry.md</sub>
 
@@ -2221,7 +2300,7 @@ Next: [Read the encoder value](../ros2-nodes/read-the-encoder-value.md).
 
 ---
 
-### 35. IMU (/imu)  `[nieuw]`
+### 36. IMU (/imu)  `[nieuw]`
 
 <sub>theory/imu.md</sub>
 
@@ -2332,7 +2411,7 @@ ros2 topic echo /imu --field linear_acceleration
 
 ---
 
-### 36. TF - coordinate frames  `[nieuw]`
+### 37. TF - coordinate frames  `[nieuw]`
 
 <sub>theory/tf.md</sub>
 
@@ -2458,7 +2537,7 @@ Next: [Visualise the robot](../visualise-the-robot.md).
 
 ---
 
-### 37. Driving the robot (/cmd_vel)  `[nieuw]`
+### 38. Driving the robot (/cmd_vel)  `[nieuw]`
 
 <sub>theory/cmd-vel.md</sub>
 
@@ -2559,7 +2638,7 @@ Next: [Drive 10cm with a button](../ros2-nodes/drive-10cm-with-a-button.md).
 
 ---
 
-### 38. QoS - Quality of Service  `[nieuw]`
+### 39. QoS - Quality of Service  `[nieuw]`
 
 <sub>theory/qos.md</sub>
 
