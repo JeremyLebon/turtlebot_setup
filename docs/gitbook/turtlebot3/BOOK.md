@@ -946,11 +946,117 @@ Finally, this logs how many front readings were used and what their average dist
 <sub>ros2-nodes/read-in-the-scan-topic/exercise.md</sub>
 
 
-Try to filter out a right, back and left part. Try to print this in the terminal.
+## Exercise 1 - Obstacle alarm
+
+Extend your `sub_scan.py` (or make `obstacle_alarm.py`): when something is
+**closer than 0.30 m in front of the robot**, print a warning and let the robot
+**play a sound**. The robot doesn't drive: test it by holding your hand or foot
+in front of the lidar.
+
+1. Take the front part of the scan, as in the guided part (`ranges[:n] + ranges[-n:]`).
+2. Use the **closest** distance (`min`) instead of the mean. Why is the mean not good for an alarm?
+3. Ignore invalid values: keep only finite values **larger than 0.12 m** (the
+   real lidar gives `0.0` when there is no echo).
+4. Closest distance below 0.30 m: log a warning with `self.get_logger().warn(...)`.
+5. Play a sound with the `/sound` service (see [Play a sound](../../play-a-sound.md)),
+   value `3` (error melody) - but **only once** when the obstacle appears, not 5
+   times per second.
+
+<details>
+
+<summary>Hints</summary>
+
+* A single chair leg in front of the robot hardly changes the **mean** of 30
+  values; the **minimum** shows it immediately.
+* "Only once": remember in `self.alarm` whether the obstacle was already there in
+  the previous scan - the same idea as the rising edge of the A button in
+  [Drive 10cm with a button](../drive-10cm-with-a-button.md).
+* Make the service client in `__init__` (`self.create_client(Sound, '/sound')`)
+  and use `call_async(...)` in the callback. Never wait for the answer inside a
+  callback: that blocks your node.
+
+</details>
+
+<details>
+
+<summary>Solution</summary>
+
+```python
+import math
+
+import rclpy
+from rclpy.node import Node
+from rclpy.qos import QoSProfile, ReliabilityPolicy
+from sensor_msgs.msg import LaserScan
+from turtlebot3_msgs.srv import Sound
+
+ALARM_DISTANCE = 0.30   # m
+MIN_VALID = 0.12        # m: smaller values (0.0) = no echo
+
+
+class ObstacleAlarm(Node):
+    def __init__(self):
+        super().__init__('obstacle_alarm')
+        qos = QoSProfile(reliability=ReliabilityPolicy.BEST_EFFORT, depth=10)
+        self.create_subscription(LaserScan, '/scan', self.scan_callback, qos)
+        self.sound_client = self.create_client(Sound, '/sound')
+        self.alarm = False   # was the obstacle already there in the previous scan?
+        self.get_logger().info('Obstacle alarm started')
+
+    def scan_callback(self, msg):
+        n = 15
+        front = list(msg.ranges[:n]) + list(msg.ranges[-n:])
+        front = [r for r in front if math.isfinite(r) and r > MIN_VALID]
+        if not front:
+            return
+        closest = min(front)
+
+        if closest < ALARM_DISTANCE:
+            self.get_logger().warn(f'Obstacle at {closest:.2f} m!')
+            if not self.alarm:             # only once, when the obstacle appears
+                self.play_sound(3)         # 3 = error melody
+            self.alarm = True
+        else:
+            self.alarm = False
+
+    def play_sound(self, value):
+        if not self.sound_client.service_is_ready():
+            self.get_logger().warn('/sound service not available')
+            return
+        request = Sound.Request()
+        request.value = value
+        self.sound_client.call_async(request)   # don't wait inside a callback
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = ObstacleAlarm()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.try_shutdown()
+
+
+if __name__ == '__main__':
+    main()
+```
+
+</details>
 
 Show the result to the lecturer.
 
-![](https://1503299445-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FjFguour9DiTaRsxIJsRZ%2Fuploads%2FODudHqthpJTbo5FEnO7l%2Ffile.excalidraw.svg?alt=media\&token=95719208-4142-42a1-8c38-e621c706bd27)
+{% hint style="info" %}
+Extra: also warn for obstacles **behind** the robot. Which part of `ranges` is
+that? (Tip: see [Laser scan](../../theory/laser-scan.md).)
+{% endhint %}
+
+## Exercise 2 - Scan sectors
+
+Front, left, behind and right at the same time: that is
+[Task 1](../../homework/task-1-scan-sectors.md) of the homework.
 
 ---
 
@@ -1165,7 +1271,7 @@ from the simulation book (Gazebo + ROS 2 Jazzy).
 ## Overview
 
 1. [Startup at home](startup-at-home.md) - start the simulation and VS Code
-2. [Task 1 - Scan sectors](task-1-scan-sectors.md) - front, left, behind, right
+2. [Task 1 - Scan sectors](task-1-scan-sectors.md) - closest distance front, left, behind, right
 3. [Task 2 - Battery warning](task-2-battery-warning.md) - with fake sensors (`/sim/battery_state`)
 4. [Task 3 - Drive exactly 1 m with odometry](task-3-drive-1-m-with-odometry.md) - `/odom` instead of time
 5. [Task 4 - Theory](task-4-theory.md) - the Check yourself questions
@@ -1233,16 +1339,44 @@ Check: `ros2 topic list` in the container shows `/scan`, `/odom`, `/cmd_vel`,
 <sub>homework/task-1-scan-sectors.md</sub>
 
 
-Do the [Exercise](../ros2-nodes/read-in-the-scan-topic/exercise.md) of *Read in the
-scan topic* in the simulation (`turtlebot3_world.launch.py`): print the mean
-distance **in front**, **left**, **behind** and **right** of the robot, and the
-**closest obstacle** with its angle.
+In the lab you used the **front** of the scan (the obstacle alarm). Now do the
+same for **four** directions: print the closest distance **in front**, **left**,
+**behind** and **right** of the robot. Work in the simulation
+(`turtlebot3_world.launch.py`) and drive around with teleop.
 
-{% hint style="info" %}
-Calculate the indices from `angle_increment` (see [Laser scan](../theory/laser-scan.md)),
-not with fixed numbers: then the same script works in the simulation (360 points)
-and on the real robot (about 220-230 points).
-{% endhint %}
+![](https://1503299445-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FjFguour9DiTaRsxIJsRZ%2Fuploads%2FODudHqthpJTbo5FEnO7l%2Ffile.excalidraw.svg?alt=media\&token=95719208-4142-42a1-8c38-e621c706bd27)
+
+Expected output, for example:
+
+```
+front 0.84 m | left 0.35 m | behind 1.92 m | right inf m
+```
+
+<details>
+
+<summary>Hints</summary>
+
+* Index 0 is in front, the angle grows counterclockwise: a quarter of the
+  array further is **left**, half way is **behind**, three quarters is **right**
+  (see [Laser scan](../theory/laser-scan.md)).
+* Don't use fixed numbers: calculate them, then the same script works in the
+  simulation (360 points) and on the real robot (about 220-230 points):
+
+  ```python
+  n = len(msg.ranges)
+  quarter = n // 4
+  k = int(math.radians(15) / msg.angle_increment)   # +-15 degrees around each direction
+  left = msg.ranges[quarter - k : quarter + k]
+  ```
+
+* **Front** is special: it is at the start **and** at the end of the array
+  (`ranges[:k] + ranges[-k:]`).
+* Filter invalid values (`inf`, `nan`, values below 0.12 m) before `min()`,
+  and handle an empty list.
+
+</details>
+
+Extra: also print the **angle** (in degrees) of the closest obstacle of the whole scan.
 
 ---
 
