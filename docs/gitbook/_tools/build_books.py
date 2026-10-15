@@ -39,7 +39,7 @@ BOOKS = {
 # Top-level pages not listed keep their place after the listed ones.
 ORDER = {
     "turtlebot3": [
-        "turtlebot3-in-the-real-world.md", "installation.md", "turtlebot3-startup.md",
+        "installation.md", "turtlebot3-in-the-real-world.md", "turtlebot3-startup.md",
         "visualise-the-robot.md", "controlling-the-robot.md", "see-turtlebot3-topics.md",
         "play-a-sound.md", "ros2-nodes.md", "simulation-of-sensors.md",
         # SLAM / navigation (hidden for now: 'hidden: true' front matter)

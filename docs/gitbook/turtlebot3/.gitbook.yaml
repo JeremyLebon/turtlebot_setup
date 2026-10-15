@@ -2,5 +2,5 @@
 root: ./
 
 structure:
-  readme: turtlebot3-in-the-real-world.md
+  readme: installation.md
   summary: SUMMARY.md

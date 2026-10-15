@@ -50,7 +50,9 @@ that is `/root/ros2_ws`. Files there survive a restart of the container. See
 [Location files on WSL](location-files-on-wsl.md).
 
 {% hint style="success" %}
-Done? In the lab you continue with [Turtlebot3 - startup](turtlebot3-startup/).
-Setting your robot number and starting the container happens there, in
+Done? Read [Turtlebot3 in the real world](turtlebot3-in-the-real-world.md)
+(the lab setup and the objectives). In the lab you continue with
+[Turtlebot3 - startup](turtlebot3-startup/): setting your robot number and
+starting the container happens in
 [Setup laptop (student)](turtlebot3-startup/setup-laptop-student.md).
 {% endhint %}
